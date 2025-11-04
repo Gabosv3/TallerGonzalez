@@ -39,10 +39,10 @@ class AdministrativoPanelProvider extends PanelProvider
             ->colors([
                 'primary' => $settings && $settings->theme_color ? $settings->theme_color : '#FFA500',  // Si es null, se pone el color predeterminado
             ])
-            ->brandLogo(asset($settings && $settings->site_logo ? 'storage/' . $settings->site_logo : 'assets/img/Eles.png'))  // Si el logo es null, se usa el logo predeterminado
+            ->brandLogo(asset($settings && $settings->site_logo ? 'storage/' . $settings->site_logo : 'assets/img/tallergonzalez.png'))  // Si el logo es null, se usa el logo predeterminado
             ->brandLogoHeight('3.5rem')
             ->brandName($settings && $settings->site_name ? $settings->site_name : 'No se encontró')  // Si el nombre del sitio es null, se pone 'No se encontró'
-            ->darkModeBrandLogo(asset($settings && $settings->site_logo ? 'storage/' . $settings->site_logo : 'assets/img/Eles.png'))  // Si el logo es null, se usa el logo predeterminado
+            ->darkModeBrandLogo(asset($settings && $settings->site_logo ? 'storage/' . $settings->site_logo : 'assets/img/tallergonzalez.png'))  // Si el logo es null, se usa el logo predeterminado
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([

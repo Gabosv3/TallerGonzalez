@@ -19,6 +19,7 @@ return new class extends Migration
 
             // Especificaciones técnicas
             $table->foreignId('marca_id')->constrained('marcas')->restrictOnDelete()->comment('Marca específica del aceite');
+            $table->foreignId('aceite_id')->nullable()->constrained()->onDelete('cascade');
             $table->string('modelo')->nullable()->comment('Modelo específico o referencia');
             $table->string('viscosidad')->comment('Ej: 5W-30, 10W-40');
             $table->foreignId('tipo_aceite_id')->constrained('tipos_aceites')->restrictOnDelete();
@@ -50,7 +51,7 @@ return new class extends Migration
             $table->timestamps();
 
             // Índices
-            $table->unique(['marca_aceite_id', 'viscosidad', 'capacidad_ml'], 'aceite_unique_specs');
+            $table->unique(['marca_id', 'viscosidad', 'capacidad_ml'], 'aceite_unique_specs');
             $table->index(['viscosidad', 'tipo_aceite_id']);
             $table->index('stock_disponible');
             $table->index('producto_id');
