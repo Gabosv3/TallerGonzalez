@@ -75,7 +75,38 @@ class Aceite extends Model
     // Helper para nombre completo
     public function getNombreCompletoAttribute(): string
     {
-        return "{$this->marca->nombre} {$this->viscosidad} {$this->capacidad_formateada}";
+        $marcaNombre = $this->marca->nombre ?? 'Sin Marca';
+        return "{$marcaNombre} {$this->viscosidad} {$this->capacidad_formateada}";
+    }
+
+    // Helper para nombre técnico completo
+    public function getNombreTecnicoCompletoAttribute(): string
+    {
+        $marcaNombre = $this->marca->nombre ?? 'Sin Marca';
+        $tipoAceite = $this->tipoAceite->nombre ?? '';
+        $productoNombre = $this->producto->nombre ?? '';
+        
+        return "{$productoNombre} - {$marcaNombre} {$this->viscosidad} {$tipoAceite} {$this->capacidad_formateada}";
+    }
+
+    // Sincronizar stock con producto principal
+    public function sincronizarStock(): void
+    {
+        if ($this->producto) {
+            $this->producto->update([
+                'stock_actual' => $this->stock_disponible
+            ]);
+        }
+    }
+
+    // Evento para auto-sincronizar stock
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::saved(function ($aceite) {
+            $aceite->sincronizarStock();
+        });
     }
 
     // Scopes para búsquedas
@@ -108,5 +139,17 @@ class Aceite extends Model
     public function getBajoStockAttribute(): bool
     {
         return $this->stock_disponible <= $this->stock_minimo;
+    }
+
+    // Estado de stock
+    public function getEstadoStockAttribute(): string
+    {
+        if ($this->stock_disponible <= 0) {
+            return 'agotado';
+        } elseif ($this->stock_disponible <= $this->stock_minimo) {
+            return 'bajo';
+        } else {
+            return 'disponible';
+        }
     }
 }

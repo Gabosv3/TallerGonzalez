@@ -18,13 +18,13 @@ return new class extends Migration
             $table->foreignId('producto_id')->constrained('productos')->cascadeOnDelete();
 
             // Especificaciones técnicas
-            $table->foreignId('marca_id')->constrained('marcas')->restrictOnDelete();
+            $table->foreignId('marca_id')->constrained('marcas')->restrictOnDelete()->comment('Marca específica del aceite');
             $table->string('modelo')->nullable()->comment('Modelo específico o referencia');
-            $table->string('viscosidad')->comment('Ej: 5W-30, 10W-40'); // Mejor nombre que "espesor"
+            $table->string('viscosidad')->comment('Ej: 5W-30, 10W-40');
             $table->foreignId('tipo_aceite_id')->constrained('tipos_aceites')->restrictOnDelete();
 
             // Envase y presentación
-            $table->decimal('capacidad_ml', 8, 2)->comment('Capacidad en mililitros'); // Más preciso que "tamaño"
+            $table->decimal('capacidad_ml', 8, 2)->comment('Capacidad en mililitros');
             $table->string('unidad_medida')->default('ml')->comment('ml, L, galón, etc.');
             $table->string('presentacion')->nullable()->comment('Botella, bidón, tambor');
 
@@ -39,7 +39,7 @@ return new class extends Migration
             $table->json('aplicaciones')->nullable()->comment('Tipos de motor compatibles');
             $table->text('compatibilidad')->nullable()->comment('Marcas y modelos de vehículos');
 
-            // Control de stock
+            // Control de stock específico (sincronizado con productos)
             $table->integer('stock_disponible')->default(0);
             $table->integer('stock_minimo')->default(5);
             $table->integer('stock_maximo')->nullable();
@@ -50,9 +50,10 @@ return new class extends Migration
             $table->timestamps();
 
             // Índices
-            $table->unique(['marca_id', 'viscosidad', 'capacidad_ml'], 'aceite_unique_specs');
+            $table->unique(['marca_aceite_id', 'viscosidad', 'capacidad_ml'], 'aceite_unique_specs');
             $table->index(['viscosidad', 'tipo_aceite_id']);
             $table->index('stock_disponible');
+            $table->index('producto_id');
         });
     }
 

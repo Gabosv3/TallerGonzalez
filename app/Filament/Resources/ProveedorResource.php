@@ -20,7 +20,6 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Filters\SelectFilter;
-use Illuminate\Support\Str;
 
 class ProveedorResource extends Resource
 {
@@ -125,10 +124,9 @@ class ProveedorResource extends Resource
                                     ->content(function ($record) {
                                         if (!$record) return 'Nuevo proveedor';
                                         
-                                        $productosCount = $record->productos()->count();
                                         $pedidosCount = $record->pedidos()->count();
                                         
-                                        return "{$productosCount} productos · {$pedidosCount} pedidos";
+                                        return "{$pedidosCount} pedidos registrados";
                                     })
                                     ->hidden(fn ($record) => !$record?->exists),
                             ])
@@ -224,21 +222,13 @@ class ProveedorResource extends Resource
                     ->falseColor('danger')
                     ->sortable(),
 
-                TextColumn::make('productos_count')
-                    ->label('Productos')
-                    ->counts('productos')
-                    ->sortable()
-                    ->alignCenter()
-                    ->color('gray')
-                    ->toggleable(isToggledHiddenByDefault: false),
-
                 TextColumn::make('pedidos_count')
                     ->label('Pedidos')
                     ->counts('pedidos')
                     ->sortable()
                     ->alignCenter()
                     ->color('blue')
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(isToggledHiddenByDefault: false),
 
                 TextColumn::make('created_at')
                     ->label('Registrado')
@@ -272,10 +262,6 @@ class ProveedorResource extends Resource
                         ->distinct()
                         ->pluck('pais', 'pais')
                         ->toArray()),
-
-                Tables\Filters\Filter::make('con_productos')
-                    ->label('Con productos')
-                    ->query(fn (Builder $query): Builder => $query->has('productos')),
 
                 Tables\Filters\Filter::make('recientes')
                     ->label('Registrados este mes')
@@ -345,7 +331,6 @@ class ProveedorResource extends Resource
             'index' => Pages\ListProveedors::route('/'),
             'create' => Pages\CreateProveedor::route('/create'),
             'edit' => Pages\EditProveedor::route('/{record}/edit'),
-           
         ];
     }
 
@@ -362,6 +347,6 @@ class ProveedorResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()
-            ->withCount(['productos', 'pedidos']);
+            ->withCount(['pedidos']); // Solo contar pedidos, no productos
     }
 }

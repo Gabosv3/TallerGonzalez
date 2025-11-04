@@ -20,10 +20,10 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Placeholder;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\IconColumn;
-use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\HtmlString;
 
 class AceiteResource extends Resource
 {
@@ -132,7 +132,7 @@ class AceiteResource extends Resource
                                         }
                                         return $capacidad ? $capacidad . ' ml' : 'No especificado';
                                     })
-                                    ->hidden(fn ($get) => empty($get('capacidad_ml'))),
+                                    ->hidden(fn($get) => empty($get('capacidad_ml'))),
                             ])
                             ->columnSpan(1),
                     ]),
@@ -246,7 +246,7 @@ class AceiteResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->weight('medium')
-                    ->description(fn ($record) => $record->modelo),
+                    ->description(fn($record) => $record->modelo),
 
                 TextColumn::make('viscosidad')
                     ->label('Viscosidad')
@@ -254,14 +254,14 @@ class AceiteResource extends Resource
                     ->sortable()
                     ->badge()
                     ->color('primary')
-                    ->tooltip(fn ($record) => $record->viscosidad_sae),
+                    ->tooltip(fn($record) => $record->viscosidad_sae),
 
                 TextColumn::make('tipoAceite.nombre')
                     ->label('Tipo')
                     ->searchable()
                     ->sortable()
                     ->badge()
-                    ->color(fn ($record) => match($record->tipoAceite->clave ?? '') {
+                    ->color(fn($record) => match ($record->tipoAceite->clave ?? '') {
                         'sintetico' => 'success',
                         'semi-sintetico' => 'warning',
                         'mineral' => 'gray',
@@ -270,7 +270,7 @@ class AceiteResource extends Resource
 
                 TextColumn::make('capacidad_ml')
                     ->label('Capacidad')
-                    ->formatStateUsing(fn ($state) => $state >= 1000 ? ($state / 1000) . ' L' : $state . ' ml')
+                    ->formatStateUsing(fn($state) => $state >= 1000 ? ($state / 1000) . ' L' : $state . ' ml')
                     ->sortable()
                     ->alignCenter()
                     ->color('gray'),
@@ -279,14 +279,13 @@ class AceiteResource extends Resource
                     ->label('Stock')
                     ->sortable()
                     ->alignCenter()
-                    ->color(fn ($record) => 
+                    ->color(
+                        fn($record) =>
                         $record->stock_disponible == 0 ? 'danger' : 
                         ($record->stock_disponible <= $record->stock_minimo ? 'warning' : 'success')
                     )
-                    ->weight(fn ($record) => 
-                        $record->stock_disponible == 0 ? 'bold' : 'medium'
-                    )
-                    ->description(fn ($record) => 
+                    ->description(
+                        fn($record) =>
                         $record->stock_minimo > 0 ? "Mín: {$record->stock_minimo}" : ''
                     ),
 
@@ -327,7 +326,7 @@ class AceiteResource extends Resource
 
                 SelectFilter::make('viscosidad')
                     ->label('Viscosidad')
-                    ->options(fn () => Aceite::query()
+                    ->options(fn() => Aceite::query()
                         ->whereNotNull('viscosidad')
                         ->distinct()
                         ->pluck('viscosidad', 'viscosidad')
@@ -343,14 +342,16 @@ class AceiteResource extends Resource
 
                 Tables\Filters\Filter::make('bajo_stock')
                     ->label('Stock Bajo')
-                    ->query(fn (Builder $query): Builder => 
+                    ->query(
+                        fn(Builder $query): Builder =>
                         $query->whereColumn('stock_disponible', '<=', 'stock_minimo')
                     )
                     ->toggle(),
 
                 Tables\Filters\Filter::make('sin_stock')
                     ->label('Sin Stock')
-                    ->query(fn (Builder $query): Builder => 
+                    ->query(
+                        fn(Builder $query): Builder =>
                         $query->where('stock_disponible', '<=', 0)
                     )
                     ->toggle(),
@@ -360,11 +361,11 @@ class AceiteResource extends Resource
                     Tables\Actions\ViewAction::make()
                         ->color('blue')
                         ->icon('heroicon-o-eye'),
-                    
+
                     Tables\Actions\EditAction::make()
                         ->color('green')
                         ->icon('heroicon-o-pencil'),
-                    
+
                     Tables\Actions\Action::make('ajustar_stock')
                         ->color('orange')
                         ->icon('heroicon-o-adjustments-horizontal')
@@ -377,27 +378,27 @@ class AceiteResource extends Resource
                         ->action(function (Aceite $record, array $data) {
                             $record->update(['stock_disponible' => $data['cantidad']]);
                         }),
-                    
+
                     Tables\Actions\DeleteAction::make()
                         ->color('danger')
                         ->icon('heroicon-o-trash'),
                 ])
-                ->icon('heroicon-o-cog-6-tooth')
-                ->size('sm'),
+                    ->icon('heroicon-o-cog-6-tooth')
+                    ->size('sm'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
-                    
+
                     Tables\Actions\BulkAction::make('activar')
                         ->icon('heroicon-o-check-badge')
                         ->color('success')
-                        ->action(fn ($records) => $records->each->update(['activo' => true])),
-                    
+                        ->action(fn($records) => $records->each->update(['activo' => true])),
+
                     Tables\Actions\BulkAction::make('desactivar')
                         ->icon('heroicon-o-x-circle')
                         ->color('danger')
-                        ->action(fn ($records) => $records->each->update(['activo' => false])),
+                        ->action(fn($records) => $records->each->update(['activo' => false])),
                 ]),
             ])
             ->emptyStateActions([
@@ -421,7 +422,6 @@ class AceiteResource extends Resource
             'index' => Pages\ListAceites::route('/'),
             'create' => Pages\CreateAceite::route('/create'),
             'edit' => Pages\EditAceite::route('/{record}/edit'),
-            
         ];
     }
 

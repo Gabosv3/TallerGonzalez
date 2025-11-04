@@ -12,6 +12,7 @@ class PedidoDetalle extends Model
     protected $fillable = [
         'pedido_id',
         'producto_id',
+        'aceite_id',
         'producto_nombre',
         'producto_codigo',
         'unidad_medida',
@@ -43,6 +44,12 @@ class PedidoDetalle extends Model
         return $this->belongsTo(Producto::class);
     }
 
+     // Nueva relación con Aceite
+    public function aceite(): BelongsTo
+    {
+        return $this->belongsTo(Aceite::class);
+    }
+
     // Calcular subtotal automáticamente
     public static function boot()
     {
@@ -58,4 +65,30 @@ class PedidoDetalle extends Model
             }
         });
     }
+
+    // AGREGADO: Accesores útiles para las variantes
+    public function getTieneVarianteAttribute(): bool
+    {
+        return !is_null($this->aceite_id);
+    }
+
+    public function getDescripcionVarianteAttribute(): ?string
+    {
+        if ($this->aceite_id && $this->aceite) {
+            return $this->aceite->marca->nombre . ' ' . $this->aceite->viscosidad;
+        }
+        return null;
+    }
+
+    public function getDescripcionCompletaAttribute(): string
+    {
+        $descripcion = $this->producto_nombre ?? $this->producto->nombre;
+        
+        if ($this->tiene_variante) {
+            $descripcion .= ' - ' . $this->descripcion_variante;
+        }
+        
+        return $descripcion;
+    }
+
 }
