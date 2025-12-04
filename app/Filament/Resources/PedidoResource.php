@@ -860,13 +860,5 @@ class PedidoResource extends Resource
         return static::getModel()::where('estado', 'pendiente')->count() > 0 ? 'warning' : 'gray';
     }
 
-    public static function getGloballySearchableAttributes(): array
-    {
-        return ['numero_pedido', 'proveedor.nombre', 'estado'];
-    }
-
-    public static function getGlobalSearchResultTitle($record): string
-    {
-        return "Pedido #{$record->numero_pedido}";
-    }
+    
 }
