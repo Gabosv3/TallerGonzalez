@@ -22,7 +22,6 @@ use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Joaopaulolndev\FilamentEditProfile\FilamentEditProfilePlugin;
 use Joaopaulolndev\FilamentGeneralSettings\FilamentGeneralSettingsPlugin;
 use Joaopaulolndev\FilamentGeneralSettings\Models\GeneralSetting;
-use Tapp\FilamentAuthenticationLog\FilamentAuthenticationLogPlugin;
 
 class AdministrativoPanelProvider extends PanelProvider
 {
@@ -52,7 +51,6 @@ class AdministrativoPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
-                \App\Filament\Widgets\BuscadorGlobal::class,
                 Widgets\AccountWidget::class,
                 \App\Filament\Widgets\TotalClientes::class,
                 \App\Filament\Widgets\TotalProductos::class,

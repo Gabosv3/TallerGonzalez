@@ -12,7 +12,6 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
-use Tapp\FilamentAuthenticationLog\RelationManagers\AuthenticationLogsRelationManager;
 
 class UserResource extends Resource
 {
@@ -326,7 +325,6 @@ class UserResource extends Resource
     {
         return [
             // RelationManagers\PermissionsRelationManager::class,
-            AuthenticationLogsRelationManager::class,
         ];
     }
 
