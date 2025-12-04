@@ -137,17 +137,7 @@ class TipoAceiteResource extends Resource
             ->columns([
                 ColorColumn::make('color')
                     ->label('Color')
-                    ->width(50)
-                    ->toggleable(isToggledHiddenByDefault: false),
-
-                TextColumn::make('nombre')
-                    ->label('Tipo de Aceite')
-                    ->searchable()
-                    ->sortable()
-                    ->weight('medium')
-                    ->description(fn ($record) => $record->clave)
-                    ->tooltip(fn ($record) => $record->descripcion ?: 'Sin descripción')
-                    ->limit(30),
+                    ->width(50),
 
                 TextColumn::make('clave')
                     ->label('Clave')
@@ -188,6 +178,7 @@ class TipoAceiteResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
+                Tables\Filters\TrashedFilter::make(),
                 TernaryFilter::make('activo')
                     ->label('Estado')
                     ->placeholder('Todos los tipos')
@@ -228,6 +219,15 @@ class TipoAceiteResource extends Resource
                     Tables\Actions\DeleteAction::make()
                         ->color('danger')
                         ->icon('heroicon-o-trash'),
+                    Tables\Actions\RestoreAction::make()
+                        ->icon('heroicon-o-arrow-uturn-left')
+                        ->color('success')
+                        ->visible(fn ($record) => method_exists($record, 'trashed') ? $record->trashed() : false),
+                    Tables\Actions\ForceDeleteAction::make()
+                        ->icon('heroicon-o-x-circle')
+                        ->color('danger')
+                        ->requiresConfirmation()
+                        ->visible(fn ($record) => method_exists($record, 'trashed') ? $record->trashed() : false),
                 ])
                 ->icon('heroicon-o-cog-6-tooth')
                 ->size('sm'),
@@ -245,6 +245,16 @@ class TipoAceiteResource extends Resource
                         ->icon('heroicon-o-x-circle')
                         ->color('danger')
                         ->action(fn ($records) => $records->each->update(['activo' => false])),
+                    Tables\Actions\RestoreBulkAction::make()
+                        ->label('Restaurar seleccionados')
+                        ->icon('heroicon-o-arrow-uturn-left')
+                        ->action(fn ($records) => $records->each->restore()),
+                    Tables\Actions\ForceDeleteBulkAction::make()
+                        ->label('Eliminar Permanentemente')
+                        ->icon('heroicon-o-x-circle')
+                        ->color('danger')
+                        ->requiresConfirmation()
+                        ->action(fn ($records) => $records->each->forceDelete()),
                 ]),
             ])
             ->reorderable('orden')

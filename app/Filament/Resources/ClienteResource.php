@@ -423,6 +423,7 @@ class ClienteResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
+                Tables\Filters\TrashedFilter::make(),
                 TernaryFilter::make('activo')
                     ->label('Estado')
                     ->placeholder('Todos los clientes')
@@ -495,6 +496,15 @@ class ClienteResource extends Resource
                     Tables\Actions\DeleteAction::make()
                         ->color('danger')
                         ->icon('heroicon-o-trash'),
+                    Tables\Actions\RestoreAction::make()
+                        ->icon('heroicon-o-arrow-uturn-left')
+                        ->color('success')
+                        ->visible(fn ($record) => method_exists($record, 'trashed') ? $record->trashed() : false),
+                    Tables\Actions\ForceDeleteAction::make()
+                        ->icon('heroicon-o-x-circle')
+                        ->color('danger')
+                        ->requiresConfirmation()
+                        ->visible(fn ($record) => method_exists($record, 'trashed') ? $record->trashed() : false),
                 ])
                 ->icon('heroicon-o-cog-6-tooth')
                 ->size('sm'),
@@ -561,5 +571,15 @@ class ClienteResource extends Resource
     {
         return parent::getEloquentQuery()
             ->withCount([]);
+    }
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['nombre', 'email', 'telefono', 'dui', 'nit', 'codigo_cliente'];
+    }
+
+    public static function getGlobalSearchResultTitle($record): string
+    {
+        return $record->nombre;
     }
 }

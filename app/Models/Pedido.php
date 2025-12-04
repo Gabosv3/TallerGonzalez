@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Exceptions\PedidoNoEliminableException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -63,12 +64,7 @@ class Pedido extends Model
         return $this->hasMany(PedidoDetalle::class);
     }
 
-    /*public function historial(): HasMany
-    {
-        return $this->hasMany(PedidoHistorial::class);
-    }*/
-
-    // Scopes útiles
+    
     public function scopePendientes($query)
     {
         return $query->where('estado', 'pendiente');
@@ -86,34 +82,25 @@ class Pedido extends Model
 
     /**
      * Método para actualizar stock cuando el pedido se completa
-     * Ahora maneja variantes individuales en lugar de agrupación
+     * Optimizado para hacer menos queries
      */
     public function actualizarStock(): void
     {
-        foreach ($this->detalles as $detalle) {
+        // Cargar todos los detalles con sus relaciones de una vez
+        $detalles = $this->detalles()->with(['producto', 'aceite'])->get();
+        
+        foreach ($detalles as $detalle) {
             $producto = $detalle->producto;
             $cantidad = $detalle->cantidad;
             
-            if ($producto) {
-                // Actualizar stock del producto principal
-                $producto->increment('stock_actual', $cantidad);
-                
-                // Si es un aceite, actualizar también el stock de las variantes específicas
-                if ($producto->es_aceite) {
-                    // Obtener la variante específica del detalle del pedido
-                    $aceiteVariante = $detalle->aceite;
-                    
-                    if ($aceiteVariante) {
-                        // Actualizar stock de la variante específica
-                        $aceiteVariante->increment('stock_disponible', $cantidad);
-                    } else {
-                        // Si no hay variante específica, buscar la variante principal
-                        $variantePrincipal = $producto->variante_principal;
-                        if ($variantePrincipal) {
-                            $variantePrincipal->increment('stock_disponible', $cantidad);
-                        }
-                    }
-                }
+            if (!$producto) continue;
+            
+            // Actualizar stock del producto principal
+            $producto->increment('stock_actual', $cantidad);
+            
+            // Si es un aceite, actualizar también el stock de las variantes específicas
+            if ($producto->es_aceite && $detalle->aceite) {
+                $detalle->aceite->increment('stock_disponible', $cantidad);
             }
         }
     }
@@ -163,7 +150,7 @@ class Pedido extends Model
      */
     public function getEstadoConColorAttribute(): array
     {
-        return match($this->estado) {
+        return match ($this->estado) {
             'pendiente' => ['color' => 'warning', 'label' => 'Pendiente'],
             'confirmado' => ['color' => 'info', 'label' => 'Confirmado'],
             'parcial' => ['color' => 'primary', 'label' => 'Parcialmente Entregado'],
@@ -175,10 +162,17 @@ class Pedido extends Model
 
     /**
      * Calcular y actualizar los totales del pedido
+     * Optimizado para evitar queries extras
      */
     public function calcularTotales(): void
     {
-        $subtotal = $this->detalles->sum(function ($detalle) {
+        // Si los detalles ya están cargados en memoria, usarlos
+        // De lo contrario, cargar solo lo necesario
+        $detalles = $this->relationLoaded('detalles') 
+            ? $this->detalles 
+            : $this->detalles()->get();
+        
+        $subtotal = $detalles->sum(function ($detalle) {
             return $detalle->cantidad * $detalle->precio_unitario;
         });
 
@@ -211,49 +205,83 @@ class Pedido extends Model
     }
 
     /**
-     * Boot method para manejar eventos del modelo
+     * Validar que el pedido puede ser eliminado
+     */
+    public function puedeSerEliminado(): bool
+    {
+        return !in_array($this->estado, ['completado', 'cancelado']);
+    }
+
+    /**
+     * Validar que tenga detalles
+     */
+    public function tieneDetalles(): bool
+    {
+        return $this->detalles()->count() > 0;
+    }
+
+    /**
+     * Validar que el total sea válido
+     */
+    public function totalValido(): bool
+    {
+        return $this->total > 0;
+    }
+
+    /**
+     * Validar fechas consistentes
+     */
+    public function fechasValidas(): bool
+    {
+        if ($this->fecha_orden && $this->fecha_esperada && $this->fecha_esperada < $this->fecha_orden) {
+            return false;
+        }
+
+        if ($this->fecha_entrega && $this->fecha_orden && $this->fecha_entrega < $this->fecha_orden) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Boot - Manejo de eventos
      */
     protected static function boot()
     {
         parent::boot();
 
-        // Generar número de factura automáticamente si no se proporciona
         static::creating(function ($pedido) {
             if (empty($pedido->numero_factura)) {
-                $pedido->numero_factura = 'PED-' . date('Ymd') . '-' . str_pad(Pedido::withTrashed()->count() + 1, 4, '0', STR_PAD_LEFT);
+                $hoy = now()->format('Ymd');
+                $contadorHoy = Pedido::withTrashed()->whereDate('created_at', now()->toDateString())->count() + 1;
+                $pedido->numero_factura = 'PED-' . $hoy . '-' . str_pad($contadorHoy, 4, '0', STR_PAD_LEFT);
+            }
+        });
+
+        static::deleting(function ($pedido) {
+            if (!$pedido->puedeSerEliminado()) {
+                throw new PedidoNoEliminableException('No se puede eliminar un pedido completado o cancelado.');
+            }
+        });
+
+        static::updating(function ($pedido) {
+            if ($pedido->isDirty('estado')) {
+                $nuevoEstado = $pedido->estado;
+                if ($nuevoEstado === 'completado') {
+                    $pedido->completado_at = now();
+                } elseif ($nuevoEstado === 'confirmado') {
+                    $pedido->confirmado_at = now();
+                } elseif ($nuevoEstado === 'cancelado') {
+                    $pedido->cancelado_at = now();
+                }
             }
         });
 
         static::updated(function ($pedido) {
-            // Actualizar stock cuando el estado cambia a "completado"
             if ($pedido->wasChanged('estado') && $pedido->estado === 'completado') {
+                // Solo actualizar stock cuando se completa
                 $pedido->actualizarStock();
-                $pedido->completado_at = now();
-                $pedido->saveQuietly(); // Guardar sin disparar eventos nuevamente
-            }
-
-            // Actualizar confirmado_at cuando el estado cambia a "confirmado"
-            if ($pedido->wasChanged('estado') && $pedido->estado === 'confirmado') {
-                $pedido->confirmado_at = now();
-                $pedido->saveQuietly();
-            }
-
-            // Actualizar cancelado_at cuando el estado cambia a "cancelado"
-            if ($pedido->wasChanged('estado') && $pedido->estado === 'cancelado') {
-                $pedido->cancelado_at = now();
-                $pedido->saveQuietly();
-            }
-
-            // Recalcular totales cuando cambien los detalles
-            if ($pedido->wasChanged(['subtotal', 'impuesto_porcentaje'])) {
-                $pedido->calcularTotales();
-            }
-        });
-
-        // Recalcular totales cuando se crea, actualiza o elimina un detalle
-        static::saved(function ($pedido) {
-            if ($pedido->wasChanged() && !$pedido->wasChanged(['subtotal', 'monto_impuesto', 'total'])) {
-                $pedido->calcularTotales();
             }
         });
     }

@@ -22,6 +22,7 @@ use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Joaopaulolndev\FilamentEditProfile\FilamentEditProfilePlugin;
 use Joaopaulolndev\FilamentGeneralSettings\FilamentGeneralSettingsPlugin;
 use Joaopaulolndev\FilamentGeneralSettings\Models\GeneralSetting;
+use Tapp\FilamentAuthenticationLog\FilamentAuthenticationLogPlugin;
 
 class AdministrativoPanelProvider extends PanelProvider
 {
@@ -39,10 +40,11 @@ class AdministrativoPanelProvider extends PanelProvider
             ->colors([
                 'primary' => $settings && $settings->theme_color ? $settings->theme_color : '#FFA500',  // Si es null, se pone el color predeterminado
             ])
-            ->brandLogo(asset($settings && $settings->site_logo ? 'storage/' . $settings->site_logo : 'assets/img/tallergonzalez.png'))  // Si el logo es null, se usa el logo predeterminado
+            ->brandLogo(asset($settings && $settings->site_logo ? 'storage/' . $settings->site_logo : 'assets/img/tallergonzalez.png'))
             ->brandLogoHeight('3.5rem')
             ->brandName($settings && $settings->site_name ? $settings->site_name : 'No se encontró')  // Si el nombre del sitio es null, se pone 'No se encontró'
-            ->darkModeBrandLogo(asset($settings && $settings->site_logo ? 'storage/' . $settings->site_logo : 'assets/img/tallergonzalez.png'))  // Si el logo es null, se usa el logo predeterminado
+            ->darkModeBrandLogo(asset($settings && $settings->site_logo ? 'storage/' . $settings->site_logo : 'assets/img/tallergonzalez.png'))
+            ->globalSearch(true)
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
@@ -50,8 +52,15 @@ class AdministrativoPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
+                \App\Filament\Widgets\BuscadorGlobal::class,
                 Widgets\AccountWidget::class,
-               
+                \App\Filament\Widgets\TotalClientes::class,
+                \App\Filament\Widgets\TotalProductos::class,
+                \App\Filament\Widgets\TotalPedidos::class,
+                \App\Filament\Widgets\Top10ProductosMes::class,
+                \App\Filament\Widgets\Top10ClientesMes::class,
+                \App\Filament\Widgets\ProductosMasVendidosTabla::class,
+                \App\Filament\Widgets\ClientesMasCompranTabla::class,
             ])
             ->middleware([
                 EncryptCookies::class,
@@ -68,19 +77,21 @@ class AdministrativoPanelProvider extends PanelProvider
             ->databaseNotificationsPolling('30s')
             ->plugins([
                 FilamentShieldPlugin::make(),
-                     // Asegúrate de tener este plugin instalado
+                // Asegúrate de tener este plugin instalado
                 FilamentGeneralSettingsPlugin::make()
                     ->setIcon('heroicon-o-cog')
                     ->setNavigationGroup('Configuración del Sistema')
                     ->setTitle('Configuraciones')
                     ->setNavigationLabel('Configuraciones Generales'),
-                
+
                 FilamentEditProfilePlugin::make()
                     ->slug('mi-perfil')
                     ->setTitle('Mi Perfil')
                     ->setNavigationLabel('Mi Perfil')
                     ->setNavigationGroup('Configuración del Sistema')
-                    ->setIcon('heroicon-o-user')
+                    ->setIcon('heroicon-o-user'),
+
+
 
 
             ])

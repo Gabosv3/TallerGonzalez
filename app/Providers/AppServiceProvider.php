@@ -35,6 +35,9 @@ class AppServiceProvider extends ServiceProvider
             return str_replace('Models', 'Policies', $modelClass) . 'Policy';
         });
 
+        // Registrar el Observer para Producto
+        \App\Models\Producto::observe(\App\Observers\ProductoObserver::class);
+
         // Este código parece estar relacionado con un hook para tu vista personalizada de inicio de sesión
         FilamentView::registerRenderHook(
             'panels::auth.login.form.after',

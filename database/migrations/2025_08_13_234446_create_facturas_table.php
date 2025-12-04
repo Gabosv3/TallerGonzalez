@@ -12,13 +12,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('facturas', function (Blueprint $table) {
-        $table->id();
-        $table->string('numero_factura')->unique();
-        $table->date('fecha');
-        $table->string('cliente');
-        $table->decimal('total', 10, 2)->default(0);
-        $table->timestamps();
-    });
+            $table->id();
+            $table->string('numero_factura')->unique();
+            $table->foreignId('cliente_id')->nullable()->constrained('clientes')->nullOnDelete();
+            $table->string('cliente')->nullable();
+            $table->date('fecha')->nullable();
+            $table->decimal('total', 12, 2)->default(0);
+            $table->string('estado')->default('pendiente');
+            $table->timestamps();
+        });
     }
 
     /**

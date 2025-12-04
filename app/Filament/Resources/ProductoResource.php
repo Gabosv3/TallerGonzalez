@@ -393,13 +393,6 @@ class ProductoResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->toggleable(),
-
-                Tables\Columns\TextColumn::make('categoria.nombre')
-                    ->label('Categoría')
-                    ->searchable()
-                    ->sortable()
-                    ->toggleable(),
-
                 // Columna de precios
                 Tables\Columns\TextColumn::make('precio_venta')
                     ->label('Precio Venta')
@@ -499,6 +492,8 @@ class ProductoResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
+                // Mostrar registros borrados (soft deletes)
+                Tables\Filters\TrashedFilter::make(),
                 // Filtro por tipo de producto
                 Tables\Filters\SelectFilter::make('tipo_producto_id')
                     ->label('Tipo de Producto')
@@ -562,6 +557,28 @@ class ProductoResource extends Resource
                     }))
                     ->toggle(),
             ])
+            ->headerActions([
+                Tables\Actions\Action::make('reporte_reorden_pdf')
+                    ->label('Reporte Reorden (PDF)')
+                    ->icon('heroicon-o-clipboard-document-check')
+                    ->url(fn () => route('productos.reporte_reorden'))
+                    ->openUrlInNewTab()
+                    ->color('warning'),
+
+                Tables\Actions\Action::make('reporte_reorden_csv')
+                    ->label('Exportar Reorden (CSV)')
+                    ->icon('heroicon-o-document-arrow-down')
+                    ->url(fn () => route('productos.reporte_reorden') . '?format=csv')
+                    ->openUrlInNewTab()
+                    ->color('secondary'),
+
+                Tables\Actions\Action::make('reporte_general')
+                    ->label('Reporte General PDF')
+                    ->icon('heroicon-o-document-text')
+                    ->url(fn () => route('productos.reporte_general'))
+                    ->openUrlInNewTab()
+                    ->color('primary'),
+            ])
             ->actions([
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\ViewAction::make()
@@ -589,6 +606,21 @@ class ProductoResource extends Resource
                     Tables\Actions\DeleteAction::make()
                         ->icon('heroicon-o-trash')
                         ->color('danger'),
+                    Tables\Actions\RestoreAction::make()
+                        ->icon('heroicon-o-arrow-uturn-left')
+                        ->color('success')
+                        ->visible(fn ($record) => method_exists($record, 'trashed') ? $record->trashed() : false),
+                    Tables\Actions\ForceDeleteAction::make()
+                        ->icon('heroicon-o-x-circle')
+                        ->color('danger')
+                        ->requiresConfirmation()
+                        ->visible(fn ($record) => method_exists($record, 'trashed') ? $record->trashed() : false),
+                    Tables\Actions\Action::make('reporte_pdf')
+                        ->label('Reporte PDF')
+                        ->icon('heroicon-o-document-text')
+                        ->url(fn ($record) => route('productos.reporte', ['producto' => $record->id]))
+                        ->openUrlInNewTab()
+                        ->color('secondary'),
                 ])
                 ->button()
                 ->label('Acciones')
@@ -623,6 +655,16 @@ class ProductoResource extends Resource
                         ->action(function ($records) {
                             $records->each->update(['stock_actual' => 0]);
                         }),
+                    Tables\Actions\RestoreBulkAction::make()
+                        ->label('Restaurar seleccionados')
+                        ->icon('heroicon-o-arrow-uturn-left')
+                        ->action(fn ($records) => $records->each->restore()),
+                    Tables\Actions\ForceDeleteBulkAction::make()
+                        ->label('Eliminar Permanentemente')
+                        ->icon('heroicon-o-x-circle')
+                        ->color('danger')
+                        ->requiresConfirmation()
+                        ->action(fn ($records) => $records->each->forceDelete()),
                 ]),
             ])
             ->emptyStateActions([
@@ -673,6 +715,11 @@ class ProductoResource extends Resource
     public static function getGloballySearchableAttributes(): array
     {
         return ['codigo', 'nombre', 'descripcion', 'marca.nombre', 'categoria.nombre'];
+    }
+
+    public static function getGlobalSearchResultTitle($record): string
+    {
+        return $record->nombre;
     }
 
     public static function getEloquentQuery(): Builder

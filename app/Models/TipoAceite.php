@@ -5,10 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 
 class TipoAceite extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, LogsActivity;
 
     protected $table = 'tipos_aceites';
 
@@ -48,6 +50,13 @@ class TipoAceite extends Model
     public function getBadgeColorAttribute(): string
     {
         return $this->color ?? '#6B7280';
+    }
+
+    protected static $logAttributes = ['*'];
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()->logAll();
     }
 
     // Buscar por clave

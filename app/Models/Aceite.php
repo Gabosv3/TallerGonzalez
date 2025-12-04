@@ -4,11 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 
 class Aceite extends Model
 {
-    
+    use LogsActivity;
 
     protected $table = 'aceites';
 
@@ -21,11 +22,6 @@ class Aceite extends Model
         'capacidad_ml',
         'unidad_medida',
         'presentacion',
-        'norma_api',
-        'norma_acea',
-        'viscosidad_sae',
-        'punto_ignicion',
-        'punto_fluidez',
         'aplicaciones',
         'compatibilidad',
         'stock_disponible',
@@ -36,14 +32,22 @@ class Aceite extends Model
 
     protected $casts = [
         'capacidad_ml' => 'decimal:2',
-        'punto_ignicion' => 'decimal:1',
-        'punto_fluidez' => 'decimal:1',
         'aplicaciones' => 'array',
         'stock_disponible' => 'integer',
         'stock_minimo' => 'integer',
         'stock_maximo' => 'integer',
         'activo' => 'boolean',
     ];
+
+    protected static $logAttributes = ['*'];
+
+    /**
+     * Configure activity log options for this model (Spatie Activitylog v4+)
+     */
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()->logAll();
+    }
 
     // Relación con producto principal
     public function producto(): BelongsTo

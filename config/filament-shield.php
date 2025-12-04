@@ -56,7 +56,6 @@ return [
         'widgets' => true,
         'resources' => true,
         'custom_permissions' => false,
-        'filament-general-settings' => true,
     ],
 
     'generator' => [

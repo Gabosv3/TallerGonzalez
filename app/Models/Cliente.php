@@ -6,10 +6,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 
 class Cliente extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, LogsActivity;
 
     protected $table = 'clientes';
 
@@ -57,6 +59,25 @@ class Cliente extends Model
         'aprobado_credito_at' => 'datetime',
         'dias_credito' => 'integer',
     ];
+
+    /**
+     * Attributes to log for activity log.
+     * Adjust array if you want specific attributes only.
+     */
+    protected static $logAttributes = ['*'];
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()->logAll();
+    }
+
+    /**
+     * Relación: Un cliente puede tener muchas facturas
+     */
+    public function facturas(): HasMany
+    {
+        return $this->hasMany(Factura::class);
+    }
 
     /**
      * Relación: Un cliente puede tener muchas ventas

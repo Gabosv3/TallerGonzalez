@@ -12,6 +12,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
+use Tapp\FilamentAuthenticationLog\RelationManagers\AuthenticationLogsRelationManager;
 
 class UserResource extends Resource
 {
@@ -37,6 +38,10 @@ class UserResource extends Resource
                             ->required()
                             ->maxLength(255)
                             ->placeholder('Ej: Juan Carlos Pérez')
+                            ->regex('/^[a-zA-Z\s]+$/')
+                            ->validationMessages(
+                                ['regex' => 'El nombre debe contener solo letras y espacios.']
+                            )
                             ->helperText('Nombre completo del usuario'),
 
                         Forms\Components\TextInput::make('email')
@@ -45,6 +50,10 @@ class UserResource extends Resource
                             ->required()
                             ->unique(ignoreRecord: true)
                             ->maxLength(255)
+                            ->regex('/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/')
+                            ->validationMessages(
+                                ['regex' => 'El correo electrónica debe ser una dirección de correo electrónica válida.']
+                            )
                             ->placeholder('usuario@empresa.com')
                             ->helperText('Correo para inicio de sesión y notificaciones'),
 
@@ -52,6 +61,8 @@ class UserResource extends Resource
                             ->label('Correo Verificado')
                             ->displayFormat('d/m/Y H:i')
                             ->helperText('Fecha de verificación del correo'),
+
+
                     ])
                     ->columns(2),
 
@@ -62,13 +73,17 @@ class UserResource extends Resource
                         Forms\Components\TextInput::make('password')
                             ->label('Contraseña')
                             ->password()
-                            ->required(fn ($operation) => $operation === 'create')
+                            ->required(fn($operation) => $operation === 'create')
                             ->maxLength(255)
-                            ->dehydrated(fn ($state) => filled($state))
-                            ->dehydrateStateUsing(fn ($state) => Hash::make($state))
+                            ->dehydrated(fn($state) => filled($state))
+                            ->regex('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/')
+                            ->validationMessages(
+                                ['regex' => 'La contraseña debe contener al menos 8 caracteres, una letra mayúscula, una letra minúscula, un número y un carácter especial.']
+                            )
+                            ->dehydrateStateUsing(fn($state) => Hash::make($state))
                             ->revealable()
-                            ->helperText(fn ($operation) => $operation === 'create' 
-                                ? 'Mínimo 8 caracteres' 
+                            ->helperText(fn($operation) => $operation === 'create'
+                                ? 'Mínimo 8 caracteres'
                                 : 'Dejar vacío para mantener la contraseña actual'),
 
                         Forms\Components\Select::make('roles')
@@ -133,8 +148,8 @@ class UserResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->weight('medium')
-                    ->description(fn ($record) => $record->email)
-                    ->tooltip(fn ($record) => $record->roles->pluck('name')->join(', ') ?: 'Sin roles'),
+                    ->description(fn($record) => $record->email)
+                    ->tooltip(fn($record) => $record->roles->pluck('name')->join(', ') ?: 'Sin roles'),
 
                 Tables\Columns\TextColumn::make('email')
                     ->label('Correo')
@@ -152,7 +167,7 @@ class UserResource extends Resource
                         'success' => 'administrador',
                         'warning' => 'vendedor',
                         'info' => 'supervisor',
-                        'gray' => fn ($state) => in_array($state, ['usuario', 'user']),
+                        'gray' => fn($state) => in_array($state, ['usuario', 'user']),
                     ])
                     ->searchable()
                     ->sortable()
@@ -175,6 +190,11 @@ class UserResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
 
+                Tables\Columns\TextColumn::make('deleted_at')
+                    ->label('Eliminado')
+                    ->dateTime('d/m/Y')
+                    ->toggleable(isToggledHiddenByDefault: true),
+
                 Tables\Columns\TextColumn::make('updated_at')
                     ->label('Actualizado')
                     ->dateTime('d/m/Y H:i')
@@ -182,13 +202,14 @@ class UserResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
+                Tables\Filters\TrashedFilter::make(),
                 Tables\Filters\Filter::make('verified')
                     ->label('Correo Verificado')
-                    ->query(fn ($query) => $query->whereNotNull('email_verified_at')),
+                    ->query(fn($query) => $query->whereNotNull('email_verified_at')),
 
                 Tables\Filters\Filter::make('unverified')
                     ->label('Correo No Verificado')
-                    ->query(fn ($query) => $query->whereNull('email_verified_at')),
+                    ->query(fn($query) => $query->whereNull('email_verified_at')),
 
                 Tables\Filters\SelectFilter::make('roles')
                     ->label('Rol')
@@ -208,11 +229,11 @@ class UserResource extends Resource
                         return $query
                             ->when(
                                 $data['created_from'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
                             )
                             ->when(
                                 $data['created_until'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
                             );
                     }),
             ])
@@ -221,42 +242,51 @@ class UserResource extends Resource
                     Tables\Actions\ViewAction::make()
                         ->color('blue')
                         ->icon('heroicon-o-eye'),
-                    
+
                     Tables\Actions\EditAction::make()
                         ->color('green')
                         ->icon('heroicon-o-pencil'),
-                    
+
                     Tables\Actions\Action::make('verify_email')
                         ->label('Verificar Email')
                         ->icon('heroicon-o-check-badge')
                         ->color('success')
-                        ->action(fn ($record) => $record->update(['email_verified_at' => now()]))
+                        ->action(fn($record) => $record->update(['email_verified_at' => now()]))
                         ->requiresConfirmation()
-                        ->hidden(fn ($record) => $record->email_verified_at !== null),
-                    
+                        ->hidden(fn($record) => $record->email_verified_at !== null),
+
                     Tables\Actions\Action::make('impersonate')
                         ->label('Suplantar')
                         ->icon('heroicon-o-arrow-right-on-rectangle')
                         ->color('gray')
-                        ->url(fn ($record) => route('filament.admin.auth.impersonate', $record))
-                        ->hidden(fn () => !auth()->user()->can('impersonate', User::class)),
-                    
+                        ->url(fn($record) => route('filament.admin.auth.impersonate', $record))
+                        ->hidden(fn() => !auth()->user()->can('impersonate', User::class)),
+
                     Tables\Actions\DeleteAction::make()
                         ->color('danger')
                         ->icon('heroicon-o-trash'),
+                    Tables\Actions\RestoreAction::make()
+                        ->icon('heroicon-o-arrow-uturn-left')
+                        ->color('success')
+                        ->visible(fn ($record) => method_exists($record, 'trashed') ? $record->trashed() : false),
+                    Tables\Actions\ForceDeleteAction::make()
+                        ->icon('heroicon-o-x-circle')
+                        ->color('danger')
+                        ->requiresConfirmation()
+                        ->visible(fn ($record) => method_exists($record, 'trashed') ? $record->trashed() : false),
                 ])
-                ->icon('heroicon-o-cog-6-tooth')
-                ->size('sm'),
+                    ->icon('heroicon-o-cog-6-tooth')
+                    ->size('sm'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
-                    
+
                     Tables\Actions\BulkAction::make('verify_emails')
                         ->icon('heroicon-o-check-badge')
                         ->color('success')
-                        ->action(fn ($records) => $records->each->update(['email_verified_at' => now()])),
-                    
+                        ->action(fn($records) => $records->each->update(['email_verified_at' => now()])),
+
                     Tables\Actions\BulkAction::make('assign_role')
                         ->icon('heroicon-o-tag')
                         ->color('primary')
@@ -270,6 +300,16 @@ class UserResource extends Resource
                             $role = Role::find($data['role']);
                             $records->each->assignRole($role);
                         }),
+                    Tables\Actions\RestoreBulkAction::make()
+                        ->label('Restaurar seleccionados')
+                        ->icon('heroicon-o-arrow-uturn-left')
+                        ->action(fn($records) => $records->each->restore()),
+                    Tables\Actions\ForceDeleteBulkAction::make()
+                        ->label('Eliminar Permanentemente')
+                        ->icon('heroicon-o-x-circle')
+                        ->color('danger')
+                        ->requiresConfirmation()
+                        ->action(fn($records) => $records->each->forceDelete()),
                 ]),
             ])
             ->emptyStateActions([
@@ -286,6 +326,7 @@ class UserResource extends Resource
     {
         return [
             // RelationManagers\PermissionsRelationManager::class,
+            AuthenticationLogsRelationManager::class,
         ];
     }
 
@@ -295,7 +336,7 @@ class UserResource extends Resource
             'index' => Pages\ListUsers::route('/'),
             'create' => Pages\CreateUser::route('/create'),
             'edit' => Pages\EditUser::route('/{record}/edit'),
-            
+
         ];
     }
 
@@ -304,6 +345,4 @@ class UserResource extends Resource
         return parent::getEloquentQuery()
             ->with(['roles']);
     }
-
-    
 }

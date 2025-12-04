@@ -51,7 +51,6 @@ return new class extends Migration
             $table->timestamps();
 
             // Índices
-            $table->unique(['marca_id', 'viscosidad', 'capacidad_ml'], 'aceite_unique_specs');
             $table->index(['viscosidad', 'tipo_aceite_id']);
             $table->index('stock_disponible');
             $table->index('producto_id');

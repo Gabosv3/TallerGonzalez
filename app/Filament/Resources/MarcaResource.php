@@ -62,12 +62,8 @@ class MarcaResource extends Resource
                                 FileUpload::make('logo')
                                     ->label('Logo de la Marca')
                                     ->image()
-                                    ->directory('marcas-logos')
-                                    ->maxSize(2048)
-                                    ->imageResizeMode('contain')
-                                    ->imageCropAspectRatio('1:1')
-                                    ->imageResizeTargetWidth('200')
-                                    ->imageResizeTargetHeight('200')
+                                    ->disk('public')
+                                    ->visibility('public')
                                     ->helperText('Sube el logo de la marca (máx. 2MB)')
                                     ->downloadable()
                                     ->openable(),
@@ -143,7 +139,7 @@ class MarcaResource extends Resource
             ->columns([
                 ImageColumn::make('logo')
                     ->label('Logo')
-                    ->defaultImageUrl(fn ($record) => $record->logo_tipo)
+                    ->getStateUsing(fn ($record) => $record->logo_tipo)
                     ->circular()
                     ->size(40)
                     ->extraImgAttributes(['class' => 'object-contain'])
@@ -197,6 +193,7 @@ class MarcaResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
+                Tables\Filters\TrashedFilter::make(),
                 TernaryFilter::make('activo')
                     ->label('Estado')
                     ->placeholder('Todas las marcas')
@@ -247,6 +244,15 @@ class MarcaResource extends Resource
                     Tables\Actions\DeleteAction::make()
                         ->color('danger')
                         ->icon('heroicon-o-trash'),
+                    Tables\Actions\RestoreAction::make()
+                        ->icon('heroicon-o-arrow-uturn-left')
+                        ->color('success')
+                        ->visible(fn ($record) => method_exists($record, 'trashed') ? $record->trashed() : false),
+                    Tables\Actions\ForceDeleteAction::make()
+                        ->icon('heroicon-o-x-circle')
+                        ->color('danger')
+                        ->requiresConfirmation()
+                        ->visible(fn ($record) => method_exists($record, 'trashed') ? $record->trashed() : false),
                 ])
                 ->icon('heroicon-o-cog-6-tooth')
                 ->size('sm'),
@@ -264,6 +270,16 @@ class MarcaResource extends Resource
                         ->icon('heroicon-o-x-circle')
                         ->color('danger')
                         ->action(fn ($records) => $records->each->update(['activo' => false])),
+                    Tables\Actions\RestoreBulkAction::make()
+                        ->label('Restaurar seleccionados')
+                        ->icon('heroicon-o-arrow-uturn-left')
+                        ->action(fn ($records) => $records->each->restore()),
+                    Tables\Actions\ForceDeleteBulkAction::make()
+                        ->label('Eliminar Permanentemente')
+                        ->icon('heroicon-o-x-circle')
+                        ->color('danger')
+                        ->requiresConfirmation()
+                        ->action(fn ($records) => $records->each->forceDelete()),
                 ]),
             ])
             ->reorderable('orden')
@@ -308,5 +324,15 @@ class MarcaResource extends Resource
     {
         return parent::getEloquentQuery()
             ->withCount(['aceites']);
+    }
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['nombre', 'pais_origen'];
+    }
+
+    public static function getGlobalSearchResultTitle($record): string
+    {
+        return $record->nombre;
     }
 }

@@ -5,10 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Storage;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 
 class Marca extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, LogsActivity;
 
     protected $table = 'marcas';
 
@@ -26,10 +29,23 @@ class Marca extends Model
         'orden' => 'integer',
     ];
 
+    protected static $logAttributes = ['*'];
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()->logAll();
+    }
+
     // Relación con aceites
     public function aceites(): HasMany
     {
         return $this->hasMany(Aceite::class);
+    }
+
+    // Relación con productos
+    public function productos(): HasMany
+    {
+        return $this->hasMany(Producto::class);
     }
 
     // Scope para marcas activas
@@ -45,8 +61,5 @@ class Marca extends Model
     }
 
     // Helper para obtener logo o placeholder
-    public function getLogoTipoAttribute(): string
-    {
-        return $this->logo ?? '/images/placeholder-marca.png';
-    }
+  
 }

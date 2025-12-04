@@ -61,12 +61,12 @@ class PedidoResource extends Resource
                                         ->schema([
                                             TextInput::make('numero_factura')
                                                 ->label('Número de Orden')
-                                                ->required()
+                                                
                                                 ->unique(ignoreRecord: true)
                                                 ->maxLength(50)
-                                                ->placeholder('OC-' . date('Ymd') . '-001')
-                                                ->default('OC-' . date('Ymd') . '-' . rand(100, 999))
-                                                ->helperText('Número único de identificación de la orden')
+                                                ->placeholder('PED-' . date('Ymd') . '-0001')
+                                                ->disabled()
+                                                ->helperText('Se genera automáticamente al guardar')
                                                 ->hintIcon('heroicon-o-document'),
 
                                             Select::make('proveedor_id')
@@ -546,6 +546,7 @@ class PedidoResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
+                Tables\Filters\TrashedFilter::make(),
                 // Filtro por estado
                 SelectFilter::make('estado')
                     ->label('Estado del Pedido')
@@ -704,21 +705,22 @@ class PedidoResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ActionGroup::make([
-                    Tables\Actions\ViewAction::make()
-                        ->color('blue'),
-                    Tables\Actions\EditAction::make()
-                        ->color('green'),
+                    Tables\Actions\ViewAction::make()->color('blue'),
+                    Tables\Actions\EditAction::make()->color('green'),
+
                     Tables\Actions\Action::make('reporte')
                         ->label('Reporte PDF')
                         ->icon('heroicon-o-document-chart-bar')
                         ->color('purple')
                         ->url(fn($record) => Pages\ReportePedido::getUrl(['record' => $record]))
                         ->openUrlInNewTab(),
+
                     Tables\Actions\Action::make('reporte_detallado')
                         ->label('Reporte Detallado')
                         ->icon('heroicon-o-chart-bar')
                         ->color('orange')
                         ->url(fn($record) => Pages\ReportePedido::getUrl(['record' => $record])),
+
                     Tables\Actions\Action::make('confirmar')
                         ->icon('heroicon-o-check-circle')
                         ->color('success')
@@ -728,15 +730,12 @@ class PedidoResource extends Resource
                         ->modalHeading('Confirmar Pedido')
                         ->modalDescription('¿Estás seguro de que deseas confirmar este pedido?')
                         ->modalSubmitActionLabel('Sí, confirmar'),
+
                     Tables\Actions\Action::make('marcar_completado')
                         ->icon('heroicon-o-truck')
                         ->color('warning')
                         ->action(function ($record) {
                             $record->update(['estado' => 'completado']);
-
-                            // Actualizar el stock de productos y variantes
-                            self::actualizarStockProductos($record);
-
                             Notification::make()
                                 ->title('Pedido completado')
                                 ->body('El pedido ha sido marcado como completado y el stock actualizado.')
@@ -748,6 +747,7 @@ class PedidoResource extends Resource
                         ->modalHeading('Marcar pedido como completado')
                         ->modalDescription('¿Estás seguro de que deseas marcar este pedido como completado? Esto actualizará el stock de los productos y sus variantes.')
                         ->modalSubmitActionLabel('Sí, completar pedido'),
+
                     Tables\Actions\Action::make('marcar_cancelado')
                         ->icon('heroicon-o-x-circle')
                         ->color('danger')
@@ -757,13 +757,23 @@ class PedidoResource extends Resource
                         ->modalHeading('Cancelar Pedido')
                         ->modalDescription('¿Estás seguro de que deseas cancelar este pedido?')
                         ->modalSubmitActionLabel('Sí, cancelar'),
-                    Tables\Actions\DeleteAction::make()
-                        ->color('danger'),
-                ]),
+
+                    Tables\Actions\DeleteAction::make()->color('danger')->icon('heroicon-o-trash'),
+                    Tables\Actions\RestoreAction::make()
+                        ->icon('heroicon-o-arrow-uturn-left')
+                        ->color('success')
+                        ->visible(fn ($record) => method_exists($record, 'trashed') ? $record->trashed() : false),
+                    Tables\Actions\ForceDeleteAction::make()
+                        ->icon('heroicon-o-x-circle')
+                        ->color('danger')
+                        ->requiresConfirmation()
+                        ->visible(fn ($record) => method_exists($record, 'trashed') ? $record->trashed() : false),
+                ])->icon('heroicon-o-cog-6-tooth')->size('sm'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
+
                     Tables\Actions\BulkAction::make('generar_reporte_masivo')
                         ->label('Generar Reportes PDF')
                         ->icon('heroicon-o-document-arrow-down')
@@ -771,9 +781,10 @@ class PedidoResource extends Resource
                         ->action(function ($records) {
                             $pedidosIds = $records->pluck('id')->toArray();
                             return redirect()->route('pedidos.reporte.multiple', [
-                                'pedidos' => $pedidosIds
+                                'pedidos' => $pedidosIds,
                             ]);
                         }),
+
                     Tables\Actions\BulkAction::make('marcar_completados')
                         ->label('Marcar como Completados')
                         ->icon('heroicon-o-check-badge')
@@ -781,7 +792,6 @@ class PedidoResource extends Resource
                         ->action(function ($records) {
                             $records->each(function ($record) {
                                 $record->update(['estado' => 'completado']);
-                                self::actualizarStockProductos($record);
                             });
                             Notification::make()
                                 ->title('Pedidos completados')
@@ -790,6 +800,7 @@ class PedidoResource extends Resource
                                 ->send();
                         })
                         ->requiresConfirmation(),
+
                     Tables\Actions\BulkAction::make('marcar_confirmados')
                         ->label('Marcar como Confirmados')
                         ->icon('heroicon-o-check-circle')
@@ -812,38 +823,6 @@ class PedidoResource extends Resource
             ])
             ->emptyStateDescription('Comienza creando tu primera orden de compra')
             ->emptyStateIcon('heroicon-o-document-text');
-    }
-
-    /**
-     * Actualiza el stock de los productos cuando un pedido se completa
-     */
-    private static function actualizarStockProductos(Pedido $pedido): void
-    {
-        foreach ($pedido->detalles as $detalle) {
-            $producto = $detalle->producto;
-            $cantidad = $detalle->cantidad;
-
-            if ($producto) {
-                // Actualizar stock del producto principal
-                $producto->increment('stock_actual', $cantidad);
-
-                // Si tiene una variante específica, actualizar también el stock de la variante
-                if ($detalle->aceite_id && $detalle->aceite) {
-                    $detalle->aceite->increment('stock_disponible', $cantidad);
-                }
-                // Si es un aceite pero no tiene variante específica, actualizar la primera variante
-                elseif ($producto->es_aceite && $producto->aceites->isNotEmpty()) {
-                    $variantePrincipal = $producto->aceites->first();
-                    $variantePrincipal->increment('stock_disponible', $cantidad);
-                }
-            }
-        }
-
-        Notification::make()
-            ->title('Stock actualizado')
-            ->body('El stock de productos y variantes ha sido actualizado correctamente.')
-            ->success()
-            ->send();
     }
 
     public static function getPages(): array
@@ -879,5 +858,15 @@ class PedidoResource extends Resource
     public static function getNavigationBadgeColor(): string|array|null
     {
         return static::getModel()::where('estado', 'pendiente')->count() > 0 ? 'warning' : 'gray';
+    }
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['numero_pedido', 'proveedor.nombre', 'estado'];
+    }
+
+    public static function getGlobalSearchResultTitle($record): string
+    {
+        return "Pedido #{$record->numero_pedido}";
     }
 }
