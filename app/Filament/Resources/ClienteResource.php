@@ -105,19 +105,18 @@ class ClienteResource extends Resource
                                     ->label('DUI')
                                     ->required()
                                     ->unique(Cliente::class, 'dui', ignoreRecord: true)
-                                    ->mask('99999999-9')
-                                    ->maxLength(10)
-                                    ->regex('/^[0-9]{8}-[0-9]$/')
-                                    ->placeholder('12345678-9')
-                                    ->helperText('Documento Único de Identidad'),
+                                    ->maxLength(9)
+                                    ->numeric()
+                                    ->placeholder('059863879')
+                                    ->helperText('Documento Único de Identidad (9 dígitos sin guiones)'),
 
                                 TextInput::make('nit')
                                     ->label('NIT')
                                     ->unique(Cliente::class, 'nit', ignoreRecord: true)
-                                    ->mask('9999-999999-999-9')
-                                    ->maxLength(17)
-                                    ->placeholder('0614-151090-123-4')
-                                    ->helperText('Número de Identificación Tributaria'),
+                                    ->maxLength(14)
+                                    ->numeric()
+                                    ->placeholder('06141510901234')
+                                    ->helperText('Número de Identificación Tributaria (sin guiones)'),
 
                                 TextInput::make('nrc')
                                     ->label('NRC')
