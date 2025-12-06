@@ -8,16 +8,16 @@
           "nombre": "AHUACHAPAN NORTE",
           "distritos": [
             {
-              "nombre": "Atiquizaya"
+              "nombre": "ATIQUIZAYA"
             },
             {
-              "nombre": "El Refugio"
+              "nombre": "EL REFUGIO"
             },
             {
-              "nombre": "San Lorenzo"
+              "nombre": "SAN LORENZO"
             },
             {
-              "nombre": "Turín"
+              "nombre": "TURIN"
             }
           ]
         },
@@ -25,16 +25,16 @@
           "nombre": "AHUACHAPAN CENTRO",
           "distritos": [
             {
-              "nombre": "Ahuachapán"
+              "nombre": "AHUACHAPAN"
             },
             {
-              "nombre": "Apaneca"
+              "nombre": "APANECA"
             },
             {
-              "nombre": "Concepción de Ataco"
+              "nombre": "CONCEPCION DE ATACO"
             },
             {
-              "nombre": "Tacuba"
+              "nombre": "TACUBA"
             }
           ]
         },
@@ -42,16 +42,16 @@
           "nombre": "AHUACHAPAN SUR",
           "distritos": [
             {
-              "nombre": "Guaymango"
+              "nombre": "GUAYMANGO"
             },
             {
-              "nombre": "Jujutla"
+              "nombre": "JUJUTLA"
             },
             {
-              "nombre": "San Francisco Menendez"
+              "nombre": "SAN FRANCISCO MENENDEZ"
             },
             {
-              "nombre": "San Pedro Puxtla"
+              "nombre": "SAN PEDRO PUXTLA"
             }
           ]
         }
@@ -65,19 +65,19 @@
           "nombre": "CABAÑAS ESTE",
           "distritos": [
             {
-              "nombre": "Sensuntepeque"
+              "nombre": "SENSUNTEPEQUE"
             },
             {
-              "nombre": "Victoria"
+              "nombre": "VICTORIA"
             },
             {
-              "nombre": "Dolores"
+              "nombre": "DOLORES"
             },
             {
-              "nombre": "Guacotecti"
+              "nombre": "GUACOTECTI"
             },
             {
-              "nombre": "San Isidro"
+              "nombre": "SAN ISIDRO"
             }
           ]
         },
@@ -85,16 +85,16 @@
           "nombre": "CABAÑAS OESTE",
           "distritos": [
             {
-              "nombre": "Ilobasco"
+              "nombre": "ILOBASCO"
             },
             {
-              "nombre": "Tejutepeque"
+              "nombre": "TEJUTEPEQUE"
             },
             {
-              "nombre": "Jutiapa"
+              "nombre": "JUTIAPA"
             },
             {
-              "nombre": "Cinquera"
+              "nombre": "CINQUERA"
             }
           ]
         }
@@ -108,13 +108,13 @@
           "nombre": "CHALATENANGO NORTE",
           "distritos": [
             {
-              "nombre": "La Palma"
+              "nombre": "LA PALMA"
             },
             {
-              "nombre": "Citalá"
+              "nombre": "CITALA"
             },
             {
-              "nombre": "San Ignacio"
+              "nombre": "SAN IGNACIO"
             }
           ]
         },
@@ -122,34 +122,34 @@
           "nombre": "CHALATENANGO CENTRO",
           "distritos": [
             {
-              "nombre": "Nueva Concepción"
+              "nombre": "NUEVA CONCEPCION"
             },
             {
-              "nombre": "Tejutla"
+              "nombre": "TEJUTLA"
             },
             {
-              "nombre": "La Reina"
+              "nombre": "LA REINA"
             },
             {
-              "nombre": "Agua Caliente"
+              "nombre": "AGUA CALIENTE"
             },
             {
-              "nombre": "Dulce Nombre de María"
+              "nombre": "DULCE NOMBRE DE MARIA"
             },
             {
-              "nombre": "El Paraíso"
+              "nombre": "EL PARAISO"
             },
             {
-              "nombre": "San Francisco Morazán"
+              "nombre": "SAN FRANCISCO MORAZAN"
             },
             {
-              "nombre": "San Rafael"
+              "nombre": "SAN RAFAEL"
             },
             {
-              "nombre": "Santa Rita"
+              "nombre": "SANTA RITA"
             },
             {
-              "nombre": "San Fernando"
+              "nombre": "SAN FERNANDO"
             }
           ]
         },
@@ -157,64 +157,64 @@
           "nombre": "CHALATENANGO SUR",
           "distritos": [
             {
-              "nombre": "Chalatenango"
+              "nombre": "CHALATENANGO"
             },
             {
-              "nombre": "Arcatao"
+              "nombre": "ARCATAO"
             },
             {
-              "nombre": "Azacualpa"
+              "nombre": "AZACUALPA"
             },
             {
-              "nombre": "Comalapa"
+              "nombre": "COMALAPA"
             },
             {
-              "nombre": "Concepción Quezaltepeque"
+              "nombre": "CONCEPCION QUEZALTEPEQUE"
             },
             {
-              "nombre": "El Carrizal"
+              "nombre": "EL CARRIZAL"
             },
             {
-              "nombre": "La Laguna"
+              "nombre": "LA LAGUNA"
             },
             {
-              "nombre": "Las Vueltas"
+              "nombre": "LAS VUELTAS"
             },
             {
-              "nombre": "Nombre de Jesús"
+              "nombre": "NOMBRE DE JESUS"
             },
             {
-              "nombre": "Nueva Trinidad"
+              "nombre": "NUEVA TRINIDAD"
             },
             {
-              "nombre": "Ojos de Agua"
+              "nombre": "OJOS DE AGUA"
             },
             {
-              "nombre": "Potonico"
+              "nombre": "POTONICO"
             },
             {
-              "nombre": "San Antonio de La Cruz"
+              "nombre": "SAN ANTONIO DE LA CRUZ"
             },
             {
-              "nombre": "San Antonio Los Ranchos"
+              "nombre": "SAN ANTONIO LOS RANCHOS"
             },
             {
-              "nombre": "San Francisco Lempa"
+              "nombre": "SAN FRANCISCO LEMPA"
             },
             {
-              "nombre": "San Isidro Labrador"
+              "nombre": "SAN ISIDRO LABRADOR"
             },
             {
-              "nombre": "San José Cancasque"
+              "nombre": "SAN JOSE CANCASQUE"
             },
             {
-              "nombre": "San Miguel de Mercedes"
+              "nombre": "SAN MIGUEL DE MERCEDES"
             },
             {
-              "nombre": "San José Las Flores"
+              "nombre": "SAN JOSE LAS FLORES"
             },
             {
-              "nombre": "San Luis del Carmen"
+              "nombre": "SAN LUIS DEL CARMEN"
             }
           ]
         }
@@ -228,19 +228,19 @@
           "nombre": "CUSCATLAN NORTE",
           "distritos": [
             {
-              "nombre": "Suchitoto"
+              "nombre": "SUCHITOTO"
             },
             {
-              "nombre": "San José Guayabal"
+              "nombre": "SAN JOSE GUAYABAL"
             },
             {
-              "nombre": "Oratorio de Concepción"
+              "nombre": "ORATORIO DE CONCEPCION"
             },
             {
-              "nombre": "San Bartolomé Perulapán"
+              "nombre": "SAN BARTOLOME PERULAPAN"
             },
             {
-              "nombre": "San Pedro Perulapán"
+              "nombre": "SAN PEDRO PERULAPAN"
             }
           ]
         },
@@ -248,37 +248,37 @@
           "nombre": "CUSCATLAN SUR",
           "distritos": [
             {
-              "nombre": "Cojutepeque"
+              "nombre": "COJUTEPEQUE"
             },
             {
-              "nombre": "San Rafael Cedros"
+              "nombre": "SAN RAFAEL CEDROS"
             },
             {
-              "nombre": "Candelaria"
+              "nombre": "CANDELARIA"
             },
             {
-              "nombre": "Monte San Juan"
+              "nombre": "MONTE SAN JUAN"
             },
             {
-              "nombre": "El Carmen"
+              "nombre": "EL CARMEN"
             },
             {
-              "nombre": "San Cristóbal"
+              "nombre": "SAN CRISTOBAL"
             },
             {
-              "nombre": "Santa Cruz Michapa"
+              "nombre": "SANTA CRUZ MICHAPA"
             },
             {
-              "nombre": "San Ramón"
+              "nombre": "SAN RAMON"
             },
             {
-              "nombre": "El Rosario"
+              "nombre": "EL ROSARIO"
             },
             {
-              "nombre": "Santa Cruz Analquito"
+              "nombre": "SANTA CRUZ ANALQUITO"
             },
             {
-              "nombre": "Tenancingo"
+              "nombre": "TENANCINGO"
             }
           ]
         }
@@ -292,13 +292,13 @@
           "nombre": "LA LIBERTAD NORTE",
           "distritos": [
             {
-              "nombre": "Quezaltepeque"
+              "nombre": "QUEZALTEPEQUE"
             },
             {
-              "nombre": "San Matías"
+              "nombre": "SAN MATIAS"
             },
             {
-              "nombre": "San Pablo Tacachico"
+              "nombre": "SAN PABLO TACACHICO"
             }
           ]
         },
@@ -306,10 +306,10 @@
           "nombre": "LA LIBERTAD CENTRO",
           "distritos": [
             {
-              "nombre": "San Juan Opico"
+              "nombre": "SAN JUAN OPICO"
             },
             {
-              "nombre": "Ciudad Arce"
+              "nombre": "CIUDAD ARCE"
             }
           ]
         },
@@ -317,19 +317,19 @@
           "nombre": "LA LIBERTAD OESTE",
           "distritos": [
             {
-              "nombre": "Colón"
+              "nombre": "COLON"
             },
             {
-              "nombre": "Jayaque"
+              "nombre": "JAYAQUE"
             },
             {
-              "nombre": "Sacacoyo"
+              "nombre": "SACACOYO"
             },
             {
-              "nombre": "Tepecoyo"
+              "nombre": "TEPECOYO"
             },
             {
-              "nombre": "Talnique"
+              "nombre": "TALNIQUE"
             }
           ]
         },
@@ -337,19 +337,19 @@
           "nombre": "LA LIBERTAD ESTE",
           "distritos": [
             {
-              "nombre": "Antiguo Cuscatlán"
+              "nombre": "ANTIGUO CUSCATLAN"
             },
             {
-              "nombre": "Huizúcar"
+              "nombre": "HUIZUCAR"
             },
             {
-              "nombre": "Nuevo Cuscatlán"
+              "nombre": "NUEVO CUSCATLAN"
             },
             {
-              "nombre": "San José Villanueva"
+              "nombre": "SAN JOSE VILLANUEVA"
             },
             {
-              "nombre": "Zaragoza"
+              "nombre": "ZARAGOZA"
             }
           ]
         },
@@ -357,19 +357,19 @@
           "nombre": "LA LIBERTAD COSTA",
           "distritos": [
             {
-              "nombre": "Chiltuipán"
+              "nombre": "CHILTUIPAN"
             },
             {
-              "nombre": "Jicalapa"
+              "nombre": "JICALAPA"
             },
             {
-              "nombre": "La Libertad"
+              "nombre": "LA LIBERTAD"
             },
             {
-              "nombre": "Tamanique"
+              "nombre": "TAMANIQUE"
             },
             {
-              "nombre": "Teotepeque"
+              "nombre": "TEOTEPEQUE"
             }
           ]
         },
@@ -377,10 +377,10 @@
           "nombre": "LA LIBERTAD SUR",
           "distritos": [
             {
-              "nombre": "Comasagua"
+              "nombre": "COMASAGUA"
             },
             {
-              "nombre": "Santa Tecla"
+              "nombre": "SANTA TECLA"
             }
           ]
         }
@@ -394,25 +394,25 @@
           "nombre": "LA PAZ OESTE",
           "distritos": [
             {
-              "nombre": "Cuyultitán"
+              "nombre": "CUYULTITAN"
             },
             {
-              "nombre": "Olocuilta"
+              "nombre": "OLOCUILTA"
             },
             {
-              "nombre": "San Juan Talpa"
+              "nombre": "SAN JUAN TALPA"
             },
             {
-              "nombre": "San Luis Talpa"
+              "nombre": "SAN LUIS TALPA"
             },
             {
-              "nombre": "San Pedro Masahuat"
+              "nombre": "SAN PEDRO MASAHUAT"
             },
             {
-              "nombre": "Tapalhuaca"
+              "nombre": "TAPALHUACA"
             },
             {
-              "nombre": "San Francisco Chinameca"
+              "nombre": "SAN FRANCISCO CHINAMECA"
             }
           ]
         },
@@ -420,40 +420,40 @@
           "nombre": "LA PAZ CENTRO",
           "distritos": [
             {
-              "nombre": "El Rosario"
+              "nombre": "EL ROSARIO"
             },
             {
-              "nombre": "Jerusalén"
+              "nombre": "JERUSALEN"
             },
             {
-              "nombre": "Mercedes La Ceiba"
+              "nombre": "MERCEDES LA CEIBA"
             },
             {
-              "nombre": "Paraíso de Osorio"
+              "nombre": "PARAISO DE OSORIO"
             },
             {
-              "nombre": "San Antonio Masahuat"
+              "nombre": "SAN ANTONIO MASAHUAT"
             },
             {
-              "nombre": "San Emigdio"
+              "nombre": "SAN EMIGDIO"
             },
             {
-              "nombre": "San Juan Tepezontes"
+              "nombre": "SAN JUAN TEPEZONTES"
             },
             {
-              "nombre": "San Luis La Herradura"
+              "nombre": "SAN LUIS LA HERRADURA"
             },
             {
-              "nombre": "San Miguel Tepezontes"
+              "nombre": "SAN MIGUEL TEPEZONTES"
             },
             {
-              "nombre": "San Pedro Nonualco"
+              "nombre": "SAN PEDRO NONUALCO"
             },
             {
-              "nombre": "Santa María Ostuma"
+              "nombre": "SANTA MARIA OSTUMA"
             },
             {
-              "nombre": "Santiago Nonualco"
+              "nombre": "SANTIAGO NONUALCO"
             }
           ]
         },
@@ -461,13 +461,13 @@
           "nombre": "LA PAZ ESTE",
           "distritos": [
             {
-              "nombre": "San Juan Nonualco"
+              "nombre": "SAN JUAN NONUALCO"
             },
             {
-              "nombre": "San Rafael Obrajuelo"
+              "nombre": "SAN RAFAEL OBRAJUELO"
             },
             {
-              "nombre": "Zacatecoluca"
+              "nombre": "ZACATECOLUCA"
             }
           ]
         }
@@ -481,34 +481,34 @@
           "nombre": "LA UNION NORTE",
           "distritos": [
             {
-              "nombre": "Anamorós"
+              "nombre": "ANAMOROS"
             },
             {
-              "nombre": "Bolivar"
+              "nombre": "BOLIVAR"
             },
             {
-              "nombre": "Concepción de Oriente"
+              "nombre": "CONCEPCION DE ORIENTE"
             },
             {
-              "nombre": "El Sauce"
+              "nombre": "EL SAUCE"
             },
             {
-              "nombre": "Lislique"
+              "nombre": "LISLIQUE"
             },
             {
-              "nombre": "Nueva Esparta"
+              "nombre": "NUEVA ESPARTA"
             },
             {
-              "nombre": "Pasaquina"
+              "nombre": "PASAQUINA"
             },
             {
-              "nombre": "Polorós"
+              "nombre": "POLOROS"
             },
             {
-              "nombre": "San José La Fuente"
+              "nombre": "SAN JOSE LA FUENTE"
             },
             {
-              "nombre": "Santa Rosa de Lima"
+              "nombre": "SANTA ROSA DE LIMA"
             }
           ]
         },
@@ -516,28 +516,28 @@
           "nombre": "LA UNION SUR",
           "distritos": [
             {
-              "nombre": "Conchagua"
+              "nombre": "CONCHAGUA"
             },
             {
-              "nombre": "El Carmen"
+              "nombre": "EL CARMEN"
             },
             {
-              "nombre": "Intipucá"
+              "nombre": "INTIPUCA"
             },
             {
-              "nombre": "La Unión"
+              "nombre": "LA UNION"
             },
             {
-              "nombre": "Meanguera del Golfo"
+              "nombre": "MEANGUERA DEL GOLFO"
             },
             {
-              "nombre": "San Alejo"
+              "nombre": "SAN ALEJO"
             },
             {
-              "nombre": "Yayantique"
+              "nombre": "YAYANTIQUE"
             },
             {
-              "nombre": "Yucuaiquín"
+              "nombre": "YUCUAIQUIN"
             }
           ]
         }
@@ -551,37 +551,37 @@
           "nombre": "MORAZAN NORTE",
           "distritos": [
             {
-              "nombre": "Arambala"
+              "nombre": "ARAMBALA"
             },
             {
-              "nombre": "Cacaopera"
+              "nombre": "CACAOPERA"
             },
             {
-              "nombre": "Corinto"
+              "nombre": "CORINTO"
             },
             {
-              "nombre": "El Rosario"
+              "nombre": "EL ROSARIO"
             },
             {
-              "nombre": "Joateca"
+              "nombre": "JOATECA"
             },
             {
-              "nombre": "Jocoaitique"
+              "nombre": "JOCOAITIQUE"
             },
             {
-              "nombre": "Meanguera"
+              "nombre": "MEANGUERA"
             },
             {
-              "nombre": "Perquín"
+              "nombre": "PERQUIN"
             },
             {
-              "nombre": "San Fernando"
+              "nombre": "SAN FERNANDO"
             },
             {
-              "nombre": "San Isidro"
+              "nombre": "SAN ISIDRO"
             },
             {
-              "nombre": "Torola"
+              "nombre": "TOROLA"
             }
           ]
         },
@@ -589,49 +589,49 @@
           "nombre": "MORAZAN SUR",
           "distritos": [
             {
-              "nombre": "Chilanga"
+              "nombre": "CHILANGA"
             },
             {
-              "nombre": "Delicias de Concepción"
+              "nombre": "DELICIAS DE CONCEPCION"
             },
             {
-              "nombre": "El Divisadero"
+              "nombre": "EL DIVISADERO"
             },
             {
-              "nombre": "Gualococti"
+              "nombre": "GUALOCOCTI"
             },
             {
-              "nombre": "Guatajiagua"
+              "nombre": "GUATAJIAGUA"
             },
             {
-              "nombre": "Jocoro"
+              "nombre": "JOCORO"
             },
             {
-              "nombre": "Lolotiquillo"
+              "nombre": "LOLOTIQUILLO"
             },
             {
-              "nombre": "Osicala"
+              "nombre": "OSICALA"
             },
             {
-              "nombre": "San Carlos"
+              "nombre": "SAN CARLOS"
             },
             {
-              "nombre": "San Francisco Gotera"
+              "nombre": "SAN FRANCISCO GOTERA"
             },
             {
-              "nombre": "San Simón"
+              "nombre": "SAN SIMON"
             },
             {
-              "nombre": "Sensembra"
+              "nombre": "SENSEMBRA"
             },
             {
-              "nombre": "Sociedad"
+              "nombre": "SOCIEDAD"
             },
             {
-              "nombre": "Yamabal"
+              "nombre": "YAMABAL"
             },
             {
-              "nombre": "Yoloaiquín"
+              "nombre": "YOLOAIQUIN"
             }
           ]
         }
@@ -645,28 +645,28 @@
           "nombre": "SAN MIGUEL NORTE",
           "distritos": [
             {
-              "nombre": "Ciudad Barrios"
+              "nombre": "CIUDAD BARRIOS"
             },
             {
-              "nombre": "Sesori"
+              "nombre": "SESORI"
             },
             {
-              "nombre": "Nuevo Edén de San Juan"
+              "nombre": "NUEVO EDEN DE SAN JUAN"
             },
             {
-              "nombre": "San Gerardo"
+              "nombre": "SAN GERARDO"
             },
             {
-              "nombre": "San Luis de La Reina"
+              "nombre": "SAN LUIS DE LA REINA"
             },
             {
-              "nombre": "Carolina"
+              "nombre": "CAROLINA"
             },
             {
-              "nombre": "San Antonio del Mosco"
+              "nombre": "SAN ANTONIO DEL MOSCO"
             },
             {
-              "nombre": "Chapeltique"
+              "nombre": "CHAPELTIQUE"
             }
           ]
         },
@@ -674,22 +674,22 @@
           "nombre": "SAN MIGUEL CENTRO",
           "distritos": [
             {
-              "nombre": "San Miguel"
+              "nombre": "SAN MIGUEL"
             },
             {
-              "nombre": "Comacarán"
+              "nombre": "COMACARAN"
             },
             {
-              "nombre": "Uluazapa"
+              "nombre": "ULUAZAPA"
             },
             {
-              "nombre": "Moncagua"
+              "nombre": "MONCAGUA"
             },
             {
-              "nombre": "Quelepa"
+              "nombre": "QUELEPA"
             },
             {
-              "nombre": "Chirilagua"
+              "nombre": "CHIRILAGUA"
             }
           ]
         },
@@ -697,22 +697,22 @@
           "nombre": "SAN MIGUEL OESTE",
           "distritos": [
             {
-              "nombre": "Chinameca"
+              "nombre": "CHINAMECA"
             },
             {
-              "nombre": "Nueva Guadalupe"
+              "nombre": "NUEVA GUADALUPE"
             },
             {
-              "nombre": "Lolotique"
+              "nombre": "LOLOTIQUE"
             },
             {
-              "nombre": "San Jorge"
+              "nombre": "SAN JORGE"
             },
             {
-              "nombre": "San Rafael Oriente"
+              "nombre": "SAN RAFAEL ORIENTE"
             },
             {
-              "nombre": "El Tránsito"
+              "nombre": "EL TRANSITO"
             }
           ]
         }
@@ -726,13 +726,13 @@
           "nombre": "SAN SALVADOR NORTE",
           "distritos": [
             {
-              "nombre": "Aguilares"
+              "nombre": "AGUILARES"
             },
             {
-              "nombre": "El Paisnal"
+              "nombre": "EL PAISNAL"
             },
             {
-              "nombre": "Guazapa"
+              "nombre": "GUAZAPA"
             }
           ]
         },
@@ -740,10 +740,10 @@
           "nombre": "SAN SALVADOR OESTE",
           "distritos": [
             {
-              "nombre": "Apopa"
+              "nombre": "APOPA"
             },
             {
-              "nombre": "Nejapa"
+              "nombre": "NEJAPA"
             }
           ]
         },
@@ -751,16 +751,16 @@
           "nombre": "SAN SALVADOR ESTE",
           "distritos": [
             {
-              "nombre": "Ilopango"
+              "nombre": "ILOPANGO"
             },
             {
-              "nombre": "San Martín"
+              "nombre": "SAN MARTIN"
             },
             {
-              "nombre": "Soyapango"
+              "nombre": "SOYAPANGO"
             },
             {
-              "nombre": "Tonacatepeque"
+              "nombre": "TONACATEPEQUE"
             }
           ]
         },
@@ -768,19 +768,19 @@
           "nombre": "SAN SALVADOR CENTRO",
           "distritos": [
             {
-              "nombre": "Ayutuxtepeque"
+              "nombre": "AYUTUXTEPEQUE"
             },
             {
-              "nombre": "Mejicanos"
+              "nombre": "MEJICANOS"
             },
             {
-              "nombre": "San Salvador"
+              "nombre": "SAN SALVADOR"
             },
             {
-              "nombre": "Cuscatancingo"
+              "nombre": "CUSCATANCINGO"
             },
             {
-              "nombre": "Ciudad Delgado"
+              "nombre": "CIUDAD DELGADO"
             }
           ]
         },
@@ -788,19 +788,19 @@
           "nombre": "SAN SALVADOR SUR",
           "distritos": [
             {
-              "nombre": "Panchimalco"
+              "nombre": "PANCHIMALCO"
             },
             {
-              "nombre": "Rosario de Mora"
+              "nombre": "ROSARIO DE MORA"
             },
             {
-              "nombre": "San Marcos"
+              "nombre": "SAN MARCOS"
             },
             {
-              "nombre": "Santo Tomás"
+              "nombre": "SANTO TOMAS"
             },
             {
-              "nombre": "Santiago Texacuangos"
+              "nombre": "SANTIAGO TEXACUANGOS"
             }
           ]
         }
@@ -814,25 +814,25 @@
           "nombre": "SAN VICENTE NORTE",
           "distritos": [
             {
-              "nombre": "Apastepeque"
+              "nombre": "APASTEPEQUE"
             },
             {
-              "nombre": "Santa Clara"
+              "nombre": "SANTA CLARA"
             },
             {
-              "nombre": "San Ildefonso"
+              "nombre": "SAN ILDEFONSO"
             },
             {
-              "nombre": "San Esteban Catarina"
+              "nombre": "SAN ESTEBAN CATARINA"
             },
             {
-              "nombre": "San Sebastián"
+              "nombre": "SAN SEBASTIAN"
             },
             {
-              "nombre": "San Lorenzo"
+              "nombre": "SAN LORENZO"
             },
             {
-              "nombre": "Santo Domingo"
+              "nombre": "SANTO DOMINGO"
             }
           ]
         },
@@ -840,22 +840,22 @@
           "nombre": "SAN VICENTE SUR",
           "distritos": [
             {
-              "nombre": "San Vicente"
+              "nombre": "SAN VICENTE"
             },
             {
-              "nombre": "Guadalupe"
+              "nombre": "GUADALUPE"
             },
             {
-              "nombre": "Verapaz"
+              "nombre": "VERAPAZ"
             },
             {
-              "nombre": "Tepetitán"
+              "nombre": "TEPETITAN"
             },
             {
-              "nombre": "Tecoluca"
+              "nombre": "TECOLUCA"
             },
             {
-              "nombre": "San Cayetano Istepeque"
+              "nombre": "SAN CAYETANO ISTEPEQUE"
             }
           ]
         }
@@ -869,16 +869,16 @@
           "nombre": "SANTA ANA NORTE",
           "distritos": [
             {
-              "nombre": "Masahuat"
+              "nombre": "MASAHUAT"
             },
             {
-              "nombre": "Metapán"
+              "nombre": "METAPAN"
             },
             {
-              "nombre": "Santa Rosa Guachipilín"
+              "nombre": "SANTA ROSA GUACHIPILIN"
             },
             {
-              "nombre": "Texistepeque"
+              "nombre": "TEXISTEPEQUE"
             }
           ]
         },
@@ -886,7 +886,7 @@
           "nombre": "SANTA ANA CENTRO",
           "distritos": [
             {
-              "nombre": "Santa Ana"
+              "nombre": "SANTA ANA"
             }
           ]
         },
@@ -894,10 +894,10 @@
           "nombre": "SANTA ANA ESTE",
           "distritos": [
             {
-              "nombre": "Coatepeque"
+              "nombre": "COATEPEQUE"
             },
             {
-              "nombre": "El Congo"
+              "nombre": "EL CONGO"
             }
           ]
         },
@@ -905,22 +905,22 @@
           "nombre": "SANTA ANA OESTE",
           "distritos": [
             {
-              "nombre": "Candelaria de la Frontera"
+              "nombre": "CANDELARIA DE LA FRONTERA"
             },
             {
-              "nombre": "Chalchuapa"
+              "nombre": "CHALCHUAPA"
             },
             {
-              "nombre": "El Porvenir"
+              "nombre": "EL PORVENIR"
             },
             {
-              "nombre": "San Antonio Pajonal"
+              "nombre": "SAN ANTONIO PAJONAL"
             },
             {
-              "nombre": "San Sebastián Salitrillo"
+              "nombre": "SAN SEBASTIAN SALITRILLO"
             },
             {
-              "nombre": "Santiago de La Frontera"
+              "nombre": "SANTIAGO DE LA FRONTERA"
             }
           ]
         }
@@ -934,16 +934,16 @@
           "nombre": "SONSONATE NORTE",
           "distritos": [
             {
-              "nombre": "Juayúa"
+              "nombre": "JUAYUA"
             },
             {
-              "nombre": "Nahuizalco"
+              "nombre": "NAHUIZALCO"
             },
             {
-              "nombre": "Salcoatitán"
+              "nombre": "SALCOATITAN"
             },
             {
-              "nombre": "Santa Catarina Masahuat"
+              "nombre": "SANTA CATARINA MASAHUAT"
             }
           ]
         },
@@ -951,19 +951,19 @@
           "nombre": "SONSONATE CENTRO",
           "distritos": [
             {
-              "nombre": "Sonsonate"
+              "nombre": "SONSONATE"
             },
             {
-              "nombre": "Sonzacate"
+              "nombre": "SONZACATE"
             },
             {
-              "nombre": "Nahulingo"
+              "nombre": "NAHULINGO"
             },
             {
-              "nombre": "San Antonio del Monte"
+              "nombre": "SAN ANTONIO DEL MONTE"
             },
             {
-              "nombre": "Santo Domingo de Guzmán"
+              "nombre": "SANTO DOMINGO DE GUZMAN"
             }
           ]
         },
@@ -971,22 +971,22 @@
           "nombre": "SONSONATE ESTE",
           "distritos": [
             {
-              "nombre": "Izalco"
+              "nombre": "IZALCO"
             },
             {
-              "nombre": "Armenia"
+              "nombre": "ARMENIA"
             },
             {
-              "nombre": "Caluco"
+              "nombre": "CALUCO"
             },
             {
-              "nombre": "San Julián"
+              "nombre": "SAN JULIAN"
             },
             {
-              "nombre": "Cuisnahuat"
+              "nombre": "CUISNAHUAT"
             },
             {
-              "nombre": "Santa Isabel Ishuatán"
+              "nombre": "SANTA ISABEL ISHUATAN"
             }
           ]
         },
@@ -994,7 +994,7 @@
           "nombre": "SONSONATE OESTE",
           "distritos": [
             {
-              "nombre": "Acajutla"
+              "nombre": "ACAJUTLA"
             }
           ]
         }
@@ -1008,31 +1008,31 @@
           "nombre": "USULUTAN NORTE",
           "distritos": [
             {
-              "nombre": "Santiago de María"
+              "nombre": "SANTIAGO DE MARIA"
             },
             {
-              "nombre": "Alegría"
+              "nombre": "ALEGRIA"
             },
             {
-              "nombre": "Berlín"
+              "nombre": "BERLIN"
             },
             {
-              "nombre": "Mercedes Umaña"
+              "nombre": "MERCEDES UMANA"
             },
             {
-              "nombre": "Jucuapa"
+              "nombre": "JUCUAPA"
             },
             {
-              "nombre": "El Triunfo"
+              "nombre": "EL TRIUNFO"
             },
             {
-              "nombre": "Estanzuelas"
+              "nombre": "ESTANZUELAS"
             },
             {
-              "nombre": "San Buenaventura"
+              "nombre": "SAN BUENAVENTURA"
             },
             {
-              "nombre": "Nueva Granada"
+              "nombre": "NUEVA GRANADA"
             }
           ]
         },
@@ -1040,34 +1040,34 @@
           "nombre": "USULUTAN ESTE",
           "distritos": [
             {
-              "nombre": "Usulután"
+              "nombre": "USULUTAN"
             },
             {
-              "nombre": "Jucuarán"
+              "nombre": "JUCUARAN"
             },
             {
-              "nombre": "San Dionisio"
+              "nombre": "SAN DIONISIO"
             },
             {
-              "nombre": "Concepción Batres"
+              "nombre": "CONCEPCION BATRES"
             },
             {
-              "nombre": "Santa María"
+              "nombre": "SANTA MARIA"
             },
             {
-              "nombre": "Ozatlán"
+              "nombre": "OZATLAN"
             },
             {
-              "nombre": "Tecapán"
+              "nombre": "TECAPAN"
             },
             {
-              "nombre": "Santa Elena"
+              "nombre": "SANTA ELENA"
             },
             {
-              "nombre": "California"
+              "nombre": "CALIFORNIA"
             },
             {
-              "nombre": "Ereguayquín"
+              "nombre": "EREGUAYQUIN"
             }
           ]
         },
@@ -1075,16 +1075,16 @@
           "nombre": "USULUTAN OESTE",
           "distritos": [
             {
-              "nombre": "Jiquilisco"
+              "nombre": "JIQUILISCO"
             },
             {
-              "nombre": "Puerto El Triunfo"
+              "nombre": "PUERTO EL TRIUNFO"
             },
             {
-              "nombre": "San Agustín"
+              "nombre": "SAN AGUSTIN"
             },
             {
-              "nombre": "San Francisco Javier"
+              "nombre": "SAN FRANCISCO JAVIER"
             }
           ]
         }
