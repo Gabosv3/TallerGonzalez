@@ -201,10 +201,11 @@ class ClienteResource extends Resource
                                 Select::make('municipio')
                                     ->label('Municipio')
                                     ->options(function (callable $get) use ($data) {
-                                        $departamentoId = $get('departamento');
-                                        if (!$departamentoId) return [];
+                                        $departamentoNombre = $get('departamento');
+                                        if (!$departamentoNombre) return [];
                                         
-                                        $departamento = collect($data['departamentos'])->firstWhere('idMDepa', $departamentoId);
+                                        $departamento = collect($data['departamentos'])->firstWhere('nombre', $departamentoNombre);
+                                        if (!$departamento) return [];
                                         return collect($departamento['municipios'])->pluck('nombre', 'nombre');
                                     })
                                     ->searchable()
@@ -215,12 +216,14 @@ class ClienteResource extends Resource
                                 Select::make('distrito')
                                     ->label('Distrito')
                                     ->options(function (callable $get) use ($data) {
-                                        $departamentoId = $get('departamento');
+                                        $departamentoNombre = $get('departamento');
                                         $municipioNombre = $get('municipio');
-                                        if (!$departamentoId || !$municipioNombre) return [];
+                                        if (!$departamentoNombre || !$municipioNombre) return [];
                                         
-                                        $departamento = collect($data['departamentos'])->firstWhere('idMDepa', $departamentoId);
+                                        $departamento = collect($data['departamentos'])->firstWhere('nombre', $departamentoNombre);
+                                        if (!$departamento) return [];
                                         $municipio = collect($departamento['municipios'])->firstWhere('nombre', $municipioNombre);
+                                        if (!$municipio) return [];
                                         return collect($municipio['distritos'])->pluck('nombre', 'nombre');
                                     })
                                     ->searchable()
