@@ -191,7 +191,7 @@ class ClienteResource extends Resource
                                 Select::make('departamento')
                                     ->label('Departamento')
                                     ->options(function () use ($data) {
-                                        return collect($data['departamentos'])->pluck('nombre', 'idMDepa');
+                                        return collect($data['departamentos'])->pluck('nombre', 'nombre');
                                     })
                                     ->searchable()
                                     ->reactive()
