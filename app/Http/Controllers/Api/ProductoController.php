@@ -16,7 +16,8 @@ class ProductoController extends Controller
     {
         try {
             $query = Producto::with(['marca', 'categoria', 'tipoProducto', 'aceites.marca', 'aceites.tipoAceite'])
-                            ->activos();
+                            ->activos()
+                            ->where('stock_actual', '>', 0); // Solo productos con stock
 
             // Búsqueda por código
             if ($request->has('codigo')) {
@@ -45,11 +46,6 @@ class ProductoController extends Controller
                 }
             }
 
-            // Filtro por stock
-            if ($request->has('con_stock')) {
-                $query->where('stock_actual', '>', 0);
-            }
-
             // Ordenamiento
             $sortField = $request->get('sort_field', 'nombre');
             $sortDirection = $request->get('sort_direction', 'asc');
@@ -75,13 +71,14 @@ class ProductoController extends Controller
         try {
             $producto = Producto::with(['marca', 'categoria', 'tipoProducto', 'aceites.marca', 'aceites.tipoAceite'])
                                ->where('codigo', $codigo)
+                               ->where('stock_actual', '>', 0)
                                ->activos()
                                ->first();
 
             if (!$producto) {
                 return response()->json([
-                    'error' => 'Producto no encontrado',
-                    'message' => 'No se encontró ningún producto con el código: ' . $codigo
+                    'error' => 'Producto no encontrado o sin stock',
+                    'message' => 'No se encontró ningún producto con el código: ' . $codigo . ' (o no tiene stock disponible)'
                 ], 404);
             }
 
