@@ -13,6 +13,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\HtmlString;
 use Spatie\Permission\Models\Role;
 
 class UserResource extends Resource
@@ -104,11 +105,11 @@ class UserResource extends Resource
                                 $hasSpecial = preg_match('/[@$!%*?&]/', $password);
                                 
                                 $requirements = [
-                                    ['✓ Mínimo 8 caracteres', $hasLength],
-                                    ['✓ Letra minúscula (a-z)', $hasLower],
-                                    ['✓ Letra mayúscula (A-Z)', $hasUpper],
-                                    ['✓ Número (0-9)', $hasNumber],
-                                    ['✓ Carácter especial (@$!%*?&)', $hasSpecial],
+                                    ['Mínimo 8 caracteres', $hasLength],
+                                    ['Letra minúscula (a-z)', $hasLower],
+                                    ['Letra mayúscula (A-Z)', $hasUpper],
+                                    ['Número (0-9)', $hasNumber],
+                                    ['Carácter especial (@$!%*?&)', $hasSpecial],
                                 ];
                                 
                                 $html = '<div style="margin-top: 10px; padding: 12px; background-color: #f5f5f5; border-radius: 6px; border-left: 4px solid #3b82f6;">';
@@ -121,7 +122,7 @@ class UserResource extends Resource
                                 
                                 $html .= '</div>';
                                 
-                                return $html;
+                                return new HtmlString($html);
                             })
                             ->visible(fn(Get $get) => filled($get('password'))),
 
