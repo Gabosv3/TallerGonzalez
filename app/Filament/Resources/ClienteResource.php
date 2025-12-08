@@ -146,7 +146,7 @@ class ClienteResource extends Resource
                                     ->helperText('Seleccione la categoría económica')
                                     ->columnSpan(2),
                             ])
-                            ->columnSpan(1),
+                            ->columnSpan(2),
                     ]),
 
                 Section::make('Información de Empresa')
