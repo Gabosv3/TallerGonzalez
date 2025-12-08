@@ -177,42 +177,11 @@ class PedidoResource extends Resource
                                                                     $precio = $producto->precio_compra;
                                                                     $set('precio_unitario', $precio);
 
-                                                                    // Limpiar selección de variante si el producto cambia
-                                                                    $set('aceite_id', null);
-
                                                                     self::actualizarSubtotal($set, $get);
                                                                 }
                                                             }
                                                         })
                                                         ->columnSpan(2),
-
-                                                    Select::make('aceite_id')
-                                                        ->label('Variante (Aceites)')
-                                                        ->options(function (Get $get) {
-                                                            $productoId = $get('producto_id');
-                                                            if (!$productoId) return [];
-
-                                                            $producto = Producto::with(['aceites.marca', 'aceites.tipoAceite'])->find($productoId);
-                                                            if (!$producto || !$producto->es_aceite) return [];
-
-                                                            return $producto->aceites->mapWithKeys(function ($aceite) {
-                                                                $label = $aceite->marca->nombre . ' ' . $aceite->viscosidad;
-                                                                if ($aceite->tipoAceite) {
-                                                                    $label .= ' - ' . $aceite->tipoAceite->nombre;
-                                                                }
-                                                                $label .= ' (' . $aceite->stock_disponible . ' unidades)';
-                                                                return [$aceite->id => $label];
-                                                            })->toArray();
-                                                        })
-                                                        ->searchable()
-                                                        ->preload()
-                                                        ->live()
-                                                        ->helperText('Selecciona la variante específica')
-                                                        ->visible(
-                                                            fn(Get $get) =>
-                                                            $get('producto_id') &&
-                                                                Producto::find($get('producto_id'))?->es_aceite
-                                                        ),
 
                                                     TextInput::make('cantidad')
                                                         ->label('Cantidad')
@@ -256,7 +225,7 @@ class PedidoResource extends Resource
                                                     $producto = Producto::find($productoId);
                                                     if (!$producto) return null;
 
-                                                    return self::generarInfoProducto($producto, $get('aceite_id'));
+                                                    return self::generarInfoProducto($producto);
                                                 })
                                                 ->columnSpanFull(),
                                         ])
@@ -271,12 +240,7 @@ class PedidoResource extends Resource
                                         ->itemLabel(
                                             fn(array $state): ?string =>
                                             $state['producto_id'] ?
-                                                Producto::find($state['producto_id'])?->nombre .
-                                                ($state['aceite_id'] ?
-                                                    ' - ' . Aceite::find($state['aceite_id'])?->marca?->nombre . ' ' .
-                                                    Aceite::find($state['aceite_id'])?->viscosidad :
-                                                    ''
-                                                )
+                                                Producto::find($state['producto_id'])?->nombre
                                                 : 'Nuevo Item'
                                         )
                                         ->helperText('Agrega todos los productos para esta orden de compra')
@@ -341,25 +305,8 @@ class PedidoResource extends Resource
                                             $items = $get('detalles') ?? [];
                                             $totalItems = count($items);
                                             $totalProductos = array_sum(array_column($items, 'cantidad') ?? []);
-                                            $aceitesCount = 0;
-                                            $variantesCount = 0;
-
-                                            foreach ($items as $item) {
-                                                if ($item['producto_id']) {
-                                                    $producto = Producto::find($item['producto_id']);
-                                                    if ($producto && $producto->es_aceite) {
-                                                        $aceitesCount++;
-                                                        if ($item['aceite_id']) {
-                                                            $variantesCount++;
-                                                        }
-                                                    }
-                                                }
-                                            }
 
                                             $resumen = "Resumen: {$totalItems} tipo(s) de producto";
-                                            if ($aceitesCount > 0) {
-                                                $resumen .= " ({$aceitesCount} aceites, {$variantesCount} variantes específicas)";
-                                            }
                                             $resumen .= ", {$totalProductos} unidad(es) en total";
 
                                             return $resumen;
@@ -380,79 +327,22 @@ class PedidoResource extends Resource
             ->columns(1);
     }
 
-    private static function generarInfoProducto($producto, $aceiteId = null): \Illuminate\Support\HtmlString
+    private static function generarInfoProducto($producto): \Illuminate\Support\HtmlString
     {
         $html = '<div class="p-3 bg-blue-50 border border-blue-200 rounded">';
 
-        if ($producto->es_aceite) {
-            $html .= '
-                <div class="flex items-center gap-2 mb-2">
-                    <span class="text-lg">🛢️</span>
-                    <p class="font-semibold text-blue-800">Aceite con Variantes</p>
-                </div>
-                <div class="grid grid-cols-2 gap-2 text-sm">
-                    <div><span class="font-medium">Producto:</span> ' . $producto->nombre . '</div>
-                   
-                </div>
-            ';
-
-            // Mostrar información de la variante seleccionada
-            if ($aceiteId) {
-                $variante = Aceite::with(['marca', 'tipoAceite'])->find($aceiteId);
-                if ($variante) {
-                    $html .= '
-                        <div class="mt-2 p-2 bg-green-50 border border-green-200 rounded">
-                            <p class="text-xs font-medium text-green-700 mb-1">✅ Variante seleccionada:</p>
-                            <div class="grid grid-cols-2 gap-1 text-xs">
-                                <div><span class="font-medium">Marca:</span> ' . ($variante->marca->nombre ?? 'N/A') . '</div>
-                                <div><span class="font-medium">Viscosidad:</span> ' . $variante->viscosidad . '</div>
-                                <div><span class="font-medium">Tipo:</span> ' . ($variante->tipoAceite->nombre ?? 'N/A') . '</div>
-                                <div><span class="font-medium">Stock:</span> ' . $variante->stock_disponible . ' unidades</div>
-                                <div><span class="font-medium">Capacidad:</span> ' . $variante->capacidad_formateada . '</div>
-                                <div><span class="font-medium">Presentación:</span> ' . $variante->presentacion . '</div>
-                            </div>
-                        </div>
-                    ';
-                }
-            } else {
-                $html .= '
-                    <div class="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded">
-                        <p class="text-xs font-medium text-yellow-700">⚠️ Selecciona una variante específica</p>
-                    </div>
-                ';
-            }
-
-            // Listar todas las variantes disponibles
-            if (!$producto->aceites->isEmpty()) {
-                $html .= '<div class="mt-2">';
-                $html .= '<p class="text-xs font-medium text-blue-700 mb-1">Todas las variantes:</p>';
-                $html .= '<div class="space-y-1 max-h-20 overflow-y-auto">';
-                foreach ($producto->aceites as $variante) {
-                    $selected = $aceiteId == $variante->id ? ' ✅' : '';
-                    $stockColor = $variante->stock_disponible == 0 ? 'text-red-600' : ($variante->stock_disponible <= 5 ? 'text-orange-600' : 'text-green-600');
-
-                    $html .= '<div class="flex justify-between text-xs">';
-                    $html .= '<span>' . ($variante->marca->nombre ?? 'N/A') . ' ' . $variante->viscosidad . $selected . '</span>';
-                    $html .= '<span class="' . $stockColor . ' font-medium">' . $variante->stock_disponible . ' unidades</span>';
-                    $html .= '</div>';
-                }
-                $html .= '</div>';
-                $html .= '</div>';
-            }
-        } else {
-            $html .= '
-                <div class="flex items-center gap-2 mb-2">
-                    <span class="text-lg">📦</span>
-                    <p class="font-semibold text-blue-800">Producto Normal</p>
-                </div>
-                <div class="text-sm">
-                    <div><span class="font-medium">Producto:</span> ' . $producto->nombre . '</div>
-                    <div><span class="font-medium">Stock actual:</span> ' . $producto->stock_actual . ' ' . $producto->unidad_medida . '</div>
-                    <div><span class="font-medium">Stock mínimo:</span> ' . $producto->stock_minimo . '</div>
-                    <div><span class="font-medium">Precio compra:</span> $' . number_format($producto->precio_compra, 2) . '</div>
-                </div>
-            ';
-        }
+        $html .= '
+            <div class="flex items-center gap-2 mb-2">
+                <span class="text-lg">�</span>
+                <p class="font-semibold text-blue-800">' . $producto->nombre . '</p>
+            </div>
+            <div class="grid grid-cols-2 gap-2 text-sm">
+                <div><span class="font-medium">Código:</span> ' . ($producto->codigo ?? 'N/A') . '</div>
+                <div><span class="font-medium">Stock actual:</span> ' . $producto->stock_actual . ' ' . $producto->unidad_medida . '</div>
+                <div><span class="font-medium">Stock mínimo:</span> ' . $producto->stock_minimo . '</div>
+                <div><span class="font-medium">Precio compra:</span> $' . number_format($producto->precio_compra, 2) . '</div>
+            </div>
+        ';
 
         $html .= '</div>';
         return new \Illuminate\Support\HtmlString($html);
@@ -684,17 +574,6 @@ class PedidoResource extends Resource
                                 fn(Builder $query, $max): Builder => $query->where('total', '<=', $max)
                             );
                     }),
-
-                // Nuevo filtro: Pedidos con variantes de aceite
-                Filter::make('con_variantes_aceite')
-                    ->label('Con Variantes de Aceite')
-                    ->query(
-                        fn(Builder $query): Builder =>
-                        $query->whereHas('detalles', function ($q) {
-                            $q->whereNotNull('aceite_id');
-                        })
-                    )
-                    ->toggle(),
 
                 // Filtro: Pedidos recientes (últimos 7 días)
                 Filter::make('ultimos_7_dias')
