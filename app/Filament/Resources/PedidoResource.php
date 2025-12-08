@@ -162,9 +162,14 @@ class PedidoResource extends Resource
                                                         ->label('Producto')
                                                         ->relationship('producto', 'nombre')
                                                         ->required()
-                                                        ->searchable()
+                                                        ->searchable(['codigo', 'nombre'])
                                                         ->preload()
                                                         ->live()
+                                                        ->getSearchResultsUsing(fn (string $search) => Producto::where('codigo', 'ilike', "%{$search}%")
+                                                            ->orWhere('nombre', 'ilike', "%{$search}%")
+                                                            ->limit(50)
+                                                            ->pluck('nombre', 'id'))
+                                                        ->getOptionLabelUsing(fn ($value) => Producto::find($value)?->nombre ?? $value)
                                                         ->afterStateUpdated(function ($state, Set $set, Get $get) {
                                                             if ($state) {
                                                                 $producto = Producto::find($state);
