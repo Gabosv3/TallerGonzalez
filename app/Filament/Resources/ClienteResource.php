@@ -101,22 +101,25 @@ class ClienteResource extends Resource
                             ->description('Documentos para facturación en El Salvador')
                             ->icon('heroicon-o-document-text')
                             ->schema([
-                                TextInput::make('dui')
-                                    ->label('DUI')
-                                    ->required()
-                                    ->unique(Cliente::class, 'dui', ignoreRecord: true)
-                                    ->maxLength(9)
-                                    ->numeric()
-                                    ->placeholder('059863879')
-                                    ->helperText('Documento Único de Identidad (9 dígitos sin guiones)'),
+                                Grid::make(2)
+                                    ->schema([
+                                        TextInput::make('dui')
+                                            ->label('DUI')
+                                            ->required()
+                                            ->unique(Cliente::class, 'dui', ignoreRecord: true)
+                                            ->maxLength(9)
+                                            ->numeric()
+                                            ->placeholder('059863879')
+                                            ->helperText('Documento Único de Identidad (9 dígitos sin guiones)'),
 
-                                TextInput::make('nit')
-                                    ->label('NIT')
-                                    ->unique(Cliente::class, 'nit', ignoreRecord: true)
-                                    ->maxLength(14)
-                                    ->numeric()
-                                    ->placeholder('06141510901234')
-                                    ->helperText('Número de Identificación Tributaria (sin guiones)'),
+                                        TextInput::make('nit')
+                                            ->label('NIT')
+                                            ->unique(Cliente::class, 'nit', ignoreRecord: true)
+                                            ->maxLength(14)
+                                            ->numeric()
+                                            ->placeholder('06141510901234')
+                                            ->helperText('Número de Identificación Tributaria (sin guiones)'),
+                                    ]),
 
                                 TextInput::make('nrc')
                                     ->label('NRC')
