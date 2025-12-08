@@ -101,7 +101,7 @@ class ClienteResource extends Resource
                             ->description('Documentos para facturación en El Salvador')
                             ->icon('heroicon-o-document-text')
                             ->schema([
-                                Grid::make(2)
+                                Grid::make(3)
                                     ->schema([
                                         TextInput::make('dui')
                                             ->label('DUI')
@@ -119,35 +119,37 @@ class ClienteResource extends Resource
                                             ->numeric()
                                             ->placeholder('06141510901234')
                                             ->helperText('Número de Identificación Tributaria (sin guiones)'),
+
+                                        TextInput::make('nrc')
+                                            ->label('NRC')
+                                            ->maxLength(20)
+                                            ->placeholder('123456-7')
+                                            ->helperText('Número de Registro de Contribuyente'),
                                     ]),
 
-                                TextInput::make('nrc')
-                                    ->label('NRC')
-                                    ->maxLength(20)
-                                    ->placeholder('123456-7')
-                                    ->helperText('Número de Registro de Contribuyente'),
+                                Grid::make(2)
+                                    ->schema([
+                                        Select::make('tipo_cliente')
+                                            ->label('Tipo de Cliente')
+                                            ->options([
+                                                'consumidor_final' => '👤 Consumidor Final',
+                                                'contribuyente' => '🏢 Contribuyente',
+                                                'empresa' => '🏭 Empresa',
+                                                'distribuidor' => '🚚 Distribuidor',
+                                                'mayorista' => '📦 Mayorista',
+                                            ])
+                                            ->default('consumidor_final')
+                                            ->required()
+                                            ->helperText('Seleccione el tipo para facturación'),
 
-                                Select::make('tipo_cliente')
-                                    ->label('Tipo de Cliente')
-                                    ->options([
-                                        'consumidor_final' => '👤 Consumidor Final',
-                                        'contribuyente' => '🏢 Contribuyente',
-                                        'empresa' => '🏭 Empresa',
-                                        'distribuidor' => '🚚 Distribuidor',
-                                        'mayorista' => '📦 Mayorista',
-                                    ])
-                                    ->default('consumidor_final')
-                                    ->required()
-                                    ->helperText('Seleccione el tipo para facturación'),
-
-                                Select::make('categoria_economica_codigo')
-                                    ->label('Categoría Económica')
-                                    ->options(\App\Models\CategoriaEconomica::pluck('descripcion', 'codigo'))
-                                    ->searchable()
-                                    ->preload()
-                                    ->placeholder('Buscar categoría económica...')
-                                    ->helperText('Seleccione la categoría económica')
-                                    ->columnSpan(2),
+                                        Select::make('categoria_economica_codigo')
+                                            ->label('Categoría Económica')
+                                            ->options(\App\Models\CategoriaEconomica::pluck('descripcion', 'codigo'))
+                                            ->searchable()
+                                            ->preload()
+                                            ->placeholder('Buscar categoría económica...')
+                                            ->helperText('Seleccione la categoría económica'),
+                                    ]),
                             ])
                             ->columnSpan(2),
                     ]),
