@@ -6,6 +6,8 @@ use App\Filament\Resources\UserResource\Pages;
 use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -73,7 +75,7 @@ class UserResource extends Resource
                             ->label('Contraseña')
                             ->password()
                             ->required(fn($operation) => $operation === 'create')
-                            ->maxLength(255)
+                            ->minLength(8)
                             ->dehydrated(fn($state) => filled($state))
                             ->regex('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/')
                             ->validationMessages(
@@ -83,7 +85,45 @@ class UserResource extends Resource
                             ->revealable()
                             ->helperText(fn($operation) => $operation === 'create'
                                 ? 'Mínimo 8 caracteres'
-                                : 'Dejar vacío para mantener la contraseña actual'),
+                                : 'Dejar vacío para mantener la contraseña actual')
+                            ->live(debounce: 500),
+
+                        Forms\Components\Placeholder::make('password_checker')
+                            ->label('Estado de Requisitos')
+                            ->content(function (Get $get) {
+                                $password = $get('password') ?? '';
+                                
+                                if (empty($password)) {
+                                    return '';
+                                }
+                                
+                                $hasLength = strlen($password) >= 8;
+                                $hasLower = preg_match('/[a-z]/', $password);
+                                $hasUpper = preg_match('/[A-Z]/', $password);
+                                $hasNumber = preg_match('/\d/', $password);
+                                $hasSpecial = preg_match('/[@$!%*?&]/', $password);
+                                
+                                $requirements = [
+                                    ['✓ Mínimo 8 caracteres', $hasLength],
+                                    ['✓ Letra minúscula (a-z)', $hasLower],
+                                    ['✓ Letra mayúscula (A-Z)', $hasUpper],
+                                    ['✓ Número (0-9)', $hasNumber],
+                                    ['✓ Carácter especial (@$!%*?&)', $hasSpecial],
+                                ];
+                                
+                                $html = '<div style="margin-top: 10px; padding: 12px; background-color: #f5f5f5; border-radius: 6px; border-left: 4px solid #3b82f6;">';
+                                
+                                foreach ($requirements as [$label, $met]) {
+                                    $color = $met ? '#10b981' : '#ef4444';
+                                    $symbol = $met ? '✓' : '✗';
+                                    $html .= '<div style="margin: 6px 0; color: ' . $color . '; font-weight: 500;">' . $symbol . ' ' . $label . '</div>';
+                                }
+                                
+                                $html .= '</div>';
+                                
+                                return $html;
+                            })
+                            ->visible(fn(Get $get) => filled($get('password'))),
 
                         Forms\Components\Select::make('roles')
                             ->label('Roles')
