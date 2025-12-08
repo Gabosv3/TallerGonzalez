@@ -55,6 +55,10 @@ class ClienteResource extends Resource
                                     ->required()
                                     ->maxLength(100)
                                     ->placeholder('Ej: María José')
+                                    ->validationMessages([
+                                        'required' => 'El nombre es obligatorio.',
+                                        'max' => 'El nombre no puede exceder 100 caracteres.',
+                                    ])
                                     ->helperText('Nombres del cliente'),
 
                                 TextInput::make('apellido')
@@ -62,6 +66,10 @@ class ClienteResource extends Resource
                                     ->required()
                                     ->maxLength(100)
                                     ->placeholder('Ej: Rodríguez García')
+                                    ->validationMessages([
+                                        'required' => 'El apellido es obligatorio.',
+                                        'max' => 'El apellido no puede exceder 100 caracteres.',
+                                    ])
                                     ->helperText('Apellidos del cliente'),
 
                                 TextInput::make('email')
@@ -71,6 +79,12 @@ class ClienteResource extends Resource
                                     ->unique(Cliente::class, 'email', ignoreRecord: true)
                                     ->maxLength(80)
                                     ->placeholder('ejemplo@correo.com')
+                                    ->validationMessages([
+                                        'required' => 'El correo electrónico es obligatorio.',
+                                        'email' => 'El correo debe ser una dirección válida.',
+                                        'unique' => 'Este correo ya está registrado en el sistema.',
+                                        'max' => 'El correo no puede exceder 80 caracteres.',
+                                    ])
                                     ->helperText('Correo para comunicaciones'),
 
                                 Grid::make(2)
@@ -84,6 +98,11 @@ class ClienteResource extends Resource
                                             ->maxLength(9)
                                             ->regex('/^\d{4}-\d{4}$/')
                                             ->placeholder('7777-8888')
+                                            ->validationMessages([
+                                                'required' => 'El teléfono principal es obligatorio.',
+                                                'unique' => 'Este teléfono ya está registrado.',
+                                                'regex' => 'El teléfono debe tener el formato XXXX-XXXX (4 dígitos - 4 dígitos).',
+                                            ])
                                             ->helperText('Teléfono de contacto'),
 
                                         TextInput::make('telefono_alternativo')
@@ -91,6 +110,10 @@ class ClienteResource extends Resource
                                             ->tel()
                                             ->mask('9999-9999')
                                             ->maxLength(9)
+                                            ->validationMessages([
+                                                'regex' => 'El teléfono alternativo debe tener el formato XXXX-XXXX.',
+                                                'max' => 'El teléfono no puede exceder 9 caracteres.',
+                                            ])
                                             ->placeholder('7777-9999')
                                             ->helperText('Teléfono adicional (opcional)'),
                                     ]),
@@ -113,8 +136,16 @@ class ClienteResource extends Resource
                             ->mask('999999999')
                             ->numeric()
                             ->placeholder('059863879')
-                            ->helperText('✓ Exactamente 9 dígitos (sin guiones)')
-                            ->hint('Formato: 059863879'),
+                            ->validationMessages([
+                                'required' => 'El DUI es obligatorio.',
+                                'unique' => 'Este DUI ya está registrado en el sistema.',
+                                'min' => 'El DUI debe tener exactamente 9 dígitos.',
+                                'max' => 'El DUI debe tener exactamente 9 dígitos.',
+                                'regex' => 'El DUI debe contener solo 9 dígitos numéricos.',
+                                'numeric' => 'El DUI solo puede contener números.',
+                            ])
+                            ->helperText('✓ Exactamente 9 dígitos numéricos (sin guiones)')
+                            ->hint('Formato requerido: 059863879'),
 
                         TextInput::make('nit')
                             ->label('NIT')
@@ -126,12 +157,23 @@ class ClienteResource extends Resource
                             ->mask('99999999999999')
                             ->numeric()
                             ->placeholder('06141510901234')
-                            ->helperText('✓ Exactamente 14 dígitos (sin guiones)')
-                            ->hint('Formato: 06141510901234'),                                        TextInput::make('nrc')
+                            ->validationMessages([
+                                'required' => 'El NIT es obligatorio.',
+                                'unique' => 'Este NIT ya está registrado en el sistema.',
+                                'min' => 'El NIT debe tener exactamente 14 dígitos.',
+                                'max' => 'El NIT debe tener exactamente 14 dígitos.',
+                                'regex' => 'El NIT debe contener solo 14 dígitos numéricos.',
+                                'numeric' => 'El NIT solo puede contener números.',
+                            ])
+                            ->helperText('✓ Exactamente 14 dígitos numéricos (sin guiones)')
+                            ->hint('Formato requerido: 06141510901234'),                                        TextInput::make('nrc')
                                             ->label('NRC')
                                             ->maxLength(20)
                                             ->placeholder('123456-7')
-                                            ->helperText('Número de Registro de Contribuyente'),
+                                            ->validationMessages([
+                                                'max' => 'El NRC no puede exceder 20 caracteres.',
+                                            ])
+                                            ->helperText('Número de Registro de Contribuyente (opcional)'),
                                     ]),
 
                                 Grid::make(2)
@@ -172,24 +214,36 @@ class ClienteResource extends Resource
                                     ->label('Razón Social')
                                     ->maxLength(255)
                                     ->placeholder('Ej: Distribuidora de Lubricantes S.A. de C.V.')
+                                    ->validationMessages([
+                                        'max' => 'La razón social no puede exceder 255 caracteres.',
+                                    ])
                                     ->helperText('Nombre legal de la empresa'),
 
                                 TextInput::make('nombre_comercial')
                                     ->label('Nombre Comercial')
                                     ->maxLength(255)
                                     ->placeholder('Ej: LubriDist S.A.')
+                                    ->validationMessages([
+                                        'max' => 'El nombre comercial no puede exceder 255 caracteres.',
+                                    ])
                                     ->helperText('Nombre comercial de la empresa'),
 
                                 TextInput::make('giro')
                                     ->label('Giro del Negocio')
                                     ->maxLength(100)
                                     ->placeholder('Ej: Comercio al por mayor de lubricantes')
+                                    ->validationMessages([
+                                        'max' => 'El giro no puede exceder 100 caracteres.',
+                                    ])
                                     ->helperText('Actividad principal de la empresa'),
 
                                 TextInput::make('contacto_empresa')
                                     ->label('Persona de Contacto')
                                     ->maxLength(100)
                                     ->placeholder('Ej: Carlos Martínez - Gerente')
+                                    ->validationMessages([
+                                        'max' => 'El contacto no puede exceder 100 caracteres.',
+                                    ])
                                     ->helperText('Contacto principal en la empresa'),
                             ]),
                     ])
@@ -207,6 +261,10 @@ class ClienteResource extends Resource
                                     ->rows(3)
                                     ->maxLength(255)
                                     ->placeholder('Ej: Calle Principal #123, Colonia San Benito...')
+                                    ->validationMessages([
+                                        'required' => 'La dirección es obligatoria.',
+                                        'max' => 'La dirección no puede exceder 255 caracteres.',
+                                    ])
                                     ->helperText('Dirección completa para facturación'),
 
                                 Select::make('departamento')
@@ -314,6 +372,9 @@ class ClienteResource extends Resource
                                     ->default(0)
                                     ->prefix('$')
                                     ->step(0.01)
+                                    ->validationMessages([
+                                        'numeric' => 'El límite de crédito debe ser un número válido.',
+                                    ])
                                     ->helperText('Límite máximo de crédito autorizado'),
 
                                 TextInput::make('dias_credito')
@@ -321,6 +382,9 @@ class ClienteResource extends Resource
                                     ->numeric()
                                     ->default(0)
                                     ->suffix('días')
+                                    ->validationMessages([
+                                        'numeric' => 'Los días de crédito deben ser un número válido.',
+                                    ])
                                     ->helperText('Plazo de pago en días'),
 
                                 TextInput::make('descuento_autorizado')
@@ -330,6 +394,11 @@ class ClienteResource extends Resource
                                     ->suffix('%')
                                     ->minValue(0)
                                     ->maxValue(100)
+                                    ->validationMessages([
+                                        'numeric' => 'El descuento debe ser un número válido.',
+                                        'min' => 'El descuento no puede ser menor a 0%.',
+                                        'max' => 'El descuento no puede ser mayor a 100%.',
+                                    ])
                                     ->helperText('Porcentaje de descuento autorizado'),
                             ]),
 
@@ -354,6 +423,9 @@ class ClienteResource extends Resource
                             ->label('Observaciones')
                             ->rows(2)
                             ->placeholder('Notas adicionales sobre el cliente...')
+                            ->validationMessages([
+                                'max' => 'Las observaciones no pueden exceder 1000 caracteres.',
+                            ])
                             ->helperText('Información relevante para el equipo comercial'),
                     ]),
             ]);
