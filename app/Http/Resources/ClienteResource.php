@@ -26,6 +26,11 @@ class ClienteResource extends JsonResource
             'razon_social' => $this->razon_social,
             'nombre_comercial' => $this->nombre_comercial,
             'giro' => $this->giro,
+            'nrc' => $this->nrc,
+            'categoria_economica' => [
+                'codigo' => $this->categoriaEconomica?->codigo,
+                'descripcion' => $this->categoriaEconomica?->descripcion,
+            ],
             'direccion' => $this->direccion,
             'departamento' => $this->departamento,
             'municipio' => $this->municipio,

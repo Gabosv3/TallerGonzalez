@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
@@ -29,6 +30,7 @@ class Cliente extends Model
         'razon_social',
         'nombre_comercial',
         'giro',
+        'categoria_economica_codigo',
         'direccion',
         'departamento',
         'municipio',
@@ -70,6 +72,13 @@ class Cliente extends Model
     {
         return LogOptions::defaults()->logAll();
     }
+    /**
+     * Relación: Un cliente pertenece a una categoría económica
+     */
+    public function categoriaEconomica(): BelongsTo
+    {
+        return $this->belongsTo(CategoriaEconomica::class, 'categoria_economica_codigo', 'codigo');
+    }
 
     /**
      * Relación: Un cliente puede tener muchas facturas
@@ -77,6 +86,7 @@ class Cliente extends Model
     public function facturas(): HasMany
     {
         return $this->hasMany(Factura::class);
+   
     }
 
     /**

@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\ProductoController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\ClienteController;
+use App\Http\Controllers\Api\CategoriaEconomicaController;
 use App\Http\Controllers\Api\FacturaController;
 
 // Rutas públicas
@@ -33,6 +34,13 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/', [ClienteController::class, 'index']);
         Route::get('/buscar/{documento}', [ClienteController::class, 'buscarPorDocumento']);
         Route::get('/{id}', [ClienteController::class, 'show']);
+    });
+
+    // Categorías Económicas
+    Route::prefix('categorias-economicas')->group(function () {
+        Route::get('/', [CategoriaEconomicaController::class, 'index']);
+        Route::get('/buscar/{termino}', [CategoriaEconomicaController::class, 'buscar']);
+        Route::get('/{codigo}', [CategoriaEconomicaController::class, 'show']);
     });
 
     // Facturas

@@ -2,12 +2,12 @@
 
 ## 📋 Resumen General
 
-**Total de Endpoints:** 18
+**Total de Endpoints:** 22
 - **Públicos:** 3 (sin autenticación)
   - POST /login
   - GET /openapi.yaml
   - GET /openapi-debug
-- **Protegidos:** 15 (requieren Bearer token)
+- **Protegidos:** 19 (requieren Bearer token)
 
 ---
 
@@ -130,9 +130,80 @@
 
 ---
 
+## 📁 Categorías Económicas
+
+### 10. **GET /api/categorias-economicas** 🔒 AUTENTICADO
+- **Descripción:** Listar todas las categorías económicas (CAT-019) con búsqueda y paginación
+- **Headers:** `Authorization: Bearer {token}`
+- **Query Parameters:**
+  - `search` - Búsqueda por código o descripción
+  - `sort_field` - Campo para ordenar (default: `codigo`)
+  - `sort_direction` - Orden: `asc` o `desc` (default: `asc`)
+  - `per_page` - Categorías por página (default: 50)
+- **Response (200):**
+  ```json
+  {
+    "data": [
+      {
+        "codigo": "01111",
+        "descripcion": "Cultivo de cereales excepto arroz y para forrajes",
+        "created_at": "2024-12-07T10:30:00Z",
+        "updated_at": "2024-12-07T10:30:00Z"
+      }
+    ],
+    "pagination": {
+      "total": 3092,
+      "per_page": 50,
+      "current_page": 1,
+      "last_page": 62,
+      "from": 1,
+      "to": 50
+    }
+  }
+  ```
+
+### 11. **GET /api/categorias-economicas/buscar/{termino}** 🔒 AUTENTICADO
+- **Descripción:** Búsqueda rápida de categorías económicas por término
+- **Headers:** `Authorization: Bearer {token}`
+- **Parameters:**
+  - `termino` (path) - Término de búsqueda (código o descripción)
+- **Response (200):**
+  ```json
+  {
+    "data": [
+      {
+        "codigo": "01111",
+        "descripcion": "Cultivo de cereales excepto arroz y para forrajes"
+      }
+    ],
+    "total": 15
+  }
+  ```
+- **Nota:** Retorna máximo 20 resultados (ideal para autocompletado)
+
+### 12. **GET /api/categorias-economicas/{codigo}** 🔒 AUTENTICADO
+- **Descripción:** Obtener detalles de una categoría económica específica
+- **Headers:** `Authorization: Bearer {token}`
+- **Parameters:**
+  - `codigo` (path) - Código de la categoría (ej: 01111)
+- **Response (200):**
+  ```json
+  {
+    "data": {
+      "codigo": "01111",
+      "descripcion": "Cultivo de cereales excepto arroz y para forrajes",
+      "created_at": "2024-12-07T10:30:00Z",
+      "updated_at": "2024-12-07T10:30:00Z"
+    }
+  }
+  ```
+- **Response (404):** Categoría no encontrada
+
+---
+
 ## 📦 Productos
 
-### 10. **GET /api/productos** 🔒 AUTENTICADO
+### 13. **GET /api/productos** 🔒 AUTENTICADO
 - **Descripción:** Listar productos con filtros y paginación
 - **Headers:** `Authorization: Bearer {token}`
 - **Query Parameters:**
@@ -161,7 +232,7 @@
   }
   ```
 
-### 11. **GET /api/productos/buscar/{codigo}** 🔒 AUTENTICADO
+### 14. **GET /api/productos/buscar/{codigo}** 🔒 AUTENTICADO
 - **Descripción:** Buscar producto por código exacto
 - **Headers:** `Authorization: Bearer {token}`
 - **Parameters:**
@@ -169,7 +240,7 @@
 - **Response (200):** Producto con todos los detalles
 - **Response (404):** Producto no encontrado
 
-### 12. **GET /api/productos/{id}** 🔒 AUTENTICADO
+### 15. **GET /api/productos/{id}** 🔒 AUTENTICADO
 - **Descripción:** Obtener detalles completos de un producto
 - **Headers:** `Authorization: Bearer {token}`
 - **Parameters:**
@@ -177,14 +248,14 @@
 - **Response (200):** Datos completos del producto
 - **Response (404):** Producto no encontrado
 
-### 13. **GET /api/productos/tipo/{tipo}** 🔒 AUTENTICADO
+### 16. **GET /api/productos/tipo/{tipo}** 🔒 AUTENTICADO
 - **Descripción:** Obtener productos filtrados por tipo
 - **Headers:** `Authorization: Bearer {token}`
 - **Parameters:**
   - `tipo` (path) - `aceite` o `normal`
 - **Response (200):** Array de productos del tipo especificado
 
-### 14. **GET /api/productos/stock/bajo** 🔒 AUTENTICADO
+### 17. **GET /api/productos/stock/bajo** 🔒 AUTENTICADO
 - **Descripción:** Listar productos con stock inferior al mínimo
 - **Headers:** `Authorization: Bearer {token}`
 - **Response (200):** Array de productos con stock bajo
@@ -194,7 +265,7 @@
 
 ## 💰 Facturas
 
-### 15. **POST /api/facturas** 🔒 AUTENTICADO
+### 18. **POST /api/facturas** 🔒 AUTENTICADO
 - **Descripción:** Crear nueva factura (con bloqueo de concurrencia en stock)
 - **Headers:** `Authorization: Bearer {token}`
 - **Request:**
@@ -227,7 +298,7 @@
   - Decrementa stock automáticamente si `control_stock` está activo
   - Transacción atómica (rollback en caso de error)
 
-### 16. **GET /api/facturas** 🔒 AUTENTICADO
+### 19. **GET /api/facturas** 🔒 AUTENTICADO
 - **Descripción:** Listar facturas paginadas con filtros
 - **Headers:** `Authorization: Bearer {token}`
 - **Query Parameters:**
@@ -244,7 +315,7 @@
   }
   ```
 
-### 17. **GET /api/facturas/{id}** 🔒 AUTENTICADO
+### 20. **GET /api/facturas/{id}** 🔒 AUTENTICADO
 - **Descripción:** Obtener detalles completos de una factura
 - **Headers:** `Authorization: Bearer {token}`
 - **Parameters:**
@@ -252,7 +323,7 @@
 - **Response (200):** Factura con detalles de productos y creador
 - **Response (404):** Factura no encontrada
 
-### 18. **PUT /api/facturas/{id}** 🔒 AUTENTICADO
+### 21. **PUT /api/facturas/{id}** 🔒 AUTENTICADO
 - **Descripción:** Actualizar estado de factura o marcarla como pagada
 - **Headers:** `Authorization: Bearer {token}`
 - **Parameters:**
@@ -274,7 +345,7 @@
 
 ## 📄 Documentación
 
-### 19. **GET /api/openapi.yaml** ✅ PÚBLICO
+### 22. **GET /api/openapi.yaml** ✅ PÚBLICO
 - **Descripción:** Obtener especificación OpenAPI en formato YAML
 - **Response (200):** Archivo YAML con documentación completa
 - **Uso:** Se sirve en `/api/docs` para Swagger UI

@@ -136,6 +136,15 @@ class ClienteResource extends Resource
                                     ->default('consumidor_final')
                                     ->required()
                                     ->helperText('Seleccione el tipo para facturación'),
+
+                                Select::make('categoria_economica_codigo')
+                                    ->label('Categoría Económica')
+                                    ->options(\App\Models\CategoriaEconomica::pluck('descripcion', 'codigo'))
+                                    ->searchable()
+                                    ->preload()
+                                    ->placeholder('Buscar categoría económica...')
+                                    ->helperText('Seleccione la categoría económica')
+                                    ->columnSpan(2),
                             ])
                             ->columnSpan(1),
                     ]),
@@ -392,6 +401,14 @@ class ClienteResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->description(fn ($record) => $record->municipio),
+
+                TextColumn::make('categoriaEconomica.descripcion')
+                    ->label('Categoría Económica')
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false)
+                    ->limit(40)
+                    ->tooltip(fn ($record) => $record->categoriaEconomica?->descripcion),
 
                 TextColumn::make('limite_credito')
                     ->label('Límite Crédito')

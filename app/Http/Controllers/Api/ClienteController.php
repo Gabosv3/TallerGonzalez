@@ -31,6 +31,15 @@ class ClienteController extends Controller
                 });
             }
 
+            // Búsqueda por categoría económica (por código o descripción)
+            if ($request->has('search_categoria')) {
+                $searchCategoria = $request->search_categoria;
+                $query->whereHas('categoriaEconomica', function ($q) use ($searchCategoria) {
+                    $q->where('codigo', 'like', "%{$searchCategoria}%")
+                      ->orWhere('descripcion', 'like', "%{$searchCategoria}%");
+                });
+            }
+
             // Filtro por tipo de cliente
             if ($request->has('tipo_cliente')) {
                 $query->where('tipo_cliente', $request->tipo_cliente);
@@ -44,6 +53,11 @@ class ClienteController extends Controller
             // Filtro por crédito activo
             if ($request->has('credito_activo')) {
                 $query->where('credito_activo', $request->credito_activo);
+            }
+
+            // Filtro por categoría económica
+            if ($request->has('categoria_economica_codigo')) {
+                $query->where('categoria_economica_codigo', $request->categoria_economica_codigo);
             }
 
             // Ordenamiento
