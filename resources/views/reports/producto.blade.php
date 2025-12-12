@@ -26,8 +26,9 @@
             <tr><th>Tipo</th><td>{{ $producto->tipoProducto?->nombre }}</td></tr>
             <tr><th>Marca</th><td>{{ $producto->marca?->nombre }}</td></tr>
             
-            <tr><th>Precio Venta</th><td>{{ $producto->precio_venta }}</td></tr>
-            <tr><th>Precio Compra</th><td>{{ $producto->precio_compra }}</td></tr>
+            <tr><th>Precio Venta</th><td>${{ number_format($producto->precio_venta, 2) }}</td></tr>
+            <tr><th>Precio + IVA (13%)</th><td>${{ number_format($producto->precio_venta * 1.13, 2) }}</td></tr>
+            <tr><th>Precio Compra</th><td>${{ number_format($producto->precio_compra, 2) }}</td></tr>
             <tr><th>Stock Actual</th><td>{{ $producto->stock_actual }} {{ $producto->unidad_medida }}</td></tr>
             <tr><th>Activo</th><td>{{ $producto->activo ? 'Sí' : 'No' }}</td></tr>
         </table>

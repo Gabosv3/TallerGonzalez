@@ -174,8 +174,8 @@ class PedidoResource extends Resource
                                                             if ($state) {
                                                                 $producto = Producto::find($state);
                                                                 if ($producto) {
-                                                                    $precio = $producto->precio_compra;
-                                                                    $set('precio_unitario', $precio);
+                                                                    // Usar precio de compra SIN IVA
+                                                                    $set('precio_unitario', $producto->precio_compra);
 
                                                                     self::actualizarSubtotal($set, $get);
                                                                 }
@@ -193,13 +193,41 @@ class PedidoResource extends Resource
                                                         ->afterStateUpdated(fn(Set $set, Get $get) => self::actualizarSubtotal($set, $get)),
 
                                                     TextInput::make('precio_unitario')
-                                                        ->label('Precio Unitario')
+                                                        ->label('Precio Sin IVA')
                                                         ->numeric()
                                                         ->required()
                                                         ->prefix('$')
                                                         ->step(0.01)
-                                                        ->live(onBlur: true)
-                                                        ->afterStateUpdated(fn(Set $set, Get $get) => self::actualizarSubtotal($set, $get)),
+                                                        ->live(debounce: 500)
+                                                        ->afterStateUpdated(function ($state, Set $set, Get $get) {
+                                                            if ($state !== null && $state !== '') {
+                                                                // Cuando cambio precio sin IVA, calcula el con IVA
+                                                                $precioSinIva = (float) $state;
+                                                                $precioConIva = round($precioSinIva * 1.13, 2);
+                                                                $set('precio_con_iva_temp', $precioConIva);
+                                                                // Calcula subtotal con el precio sin IVA
+                                                                self::actualizarSubtotal($set, $get);
+                                                            }
+                                                        }),
+
+                                                    TextInput::make('precio_con_iva_temp')
+                                                        ->label('Precio + IVA (13%)')
+                                                        ->numeric()
+                                                        ->prefix('$')
+                                                        ->step(0.01)
+                                                        ->live(debounce: 500)
+                                                        ->dehydrated(false)
+                                                        ->default(fn(Get $get) => round((float)($get('precio_unitario') ?? 0) * 1.13, 2))
+                                                        ->afterStateUpdated(function ($state, Set $set, Get $get) {
+                                                            if ($state !== null && $state !== '') {
+                                                                // Cuando cambio precio con IVA, calcula el sin IVA
+                                                                $precioConIva = (float) $state;
+                                                                $precioSinIva = round($precioConIva / 1.13, 2);
+                                                                $set('precio_unitario', $precioSinIva);
+                                                                // Calcula subtotal con el precio sin IVA
+                                                                self::actualizarSubtotal($set, $get);
+                                                            }
+                                                        }),
 
                                                     TextInput::make('subtotal')
                                                         ->label('Subtotal')

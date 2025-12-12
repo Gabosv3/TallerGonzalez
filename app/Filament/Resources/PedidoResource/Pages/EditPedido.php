@@ -16,6 +16,13 @@ class EditPedido extends EditRecord
         $record = $this->record;
         $data = $this->form->getState();
 
+        // Remover campos temporales que no se deben guardar
+        if (isset($data['detalles'])) {
+            foreach ($data['detalles'] as &$detalle) {
+                unset($detalle['precio_con_iva_temp']);
+            }
+        }
+
         // Validación 1: No permitir editar completado o cancelado
         if (in_array($record->estado, ['completado', 'cancelado'])) {
             Notification::make()

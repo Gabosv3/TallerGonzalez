@@ -54,7 +54,7 @@ class ProductoReportController extends Controller
         $callback = function () use ($products) {
             $handle = fopen('php://output', 'w');
             // Header
-            fputcsv($handle, ['ID', 'Código', 'Nombre', 'Tipo', 'Marca', 'Precio Venta', 'Precio Compra', 'Stock Actual', 'Activo']);
+            fputcsv($handle, ['ID', 'Código', 'Nombre', 'Tipo', 'Marca', 'Precio Venta', 'Precio + IVA', 'Precio Compra', 'Stock Actual', 'Activo']);
 
             foreach ($products as $p) {
                 fputcsv($handle, [
@@ -64,6 +64,7 @@ class ProductoReportController extends Controller
                     $p->tipoProducto?->nombre,
                     $p->marca?->nombre,
                     $p->precio_venta,
+                    round($p->precio_venta * 1.13, 2),
                     $p->precio_compra,
                     $p->stock_actual,
                     $p->activo ? 'Sí' : 'No',
@@ -95,7 +96,7 @@ class ProductoReportController extends Controller
 
                 $callback = function () use ($products) {
                     $handle = fopen('php://output', 'w');
-                    fputcsv($handle, ['ID', 'Código', 'Nombre', 'Marca', 'Stock Actual', 'Stock Mínimo', 'Faltante']);
+                    fputcsv($handle, ['ID', 'Código', 'Nombre', 'Marca', 'Stock Actual', 'Stock Mínimo', 'Faltante', 'Precio Venta', 'Precio + IVA']);
 
                     foreach ($products as $p) {
                         fputcsv($handle, [
@@ -106,6 +107,8 @@ class ProductoReportController extends Controller
                             $p->stock_actual,
                             $p->stock_minimo,
                             max(0, $p->stock_minimo - $p->stock_actual),
+                            $p->precio_venta,
+                            round($p->precio_venta * 1.13, 2),
                         ]);
                     }
 

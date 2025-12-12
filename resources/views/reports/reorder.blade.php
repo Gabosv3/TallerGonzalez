@@ -25,6 +25,8 @@
                 <th class="right">Stock Actual</th>
                 <th class="right">Stock Mínimo</th>
                 <th class="right">Faltante</th>
+                <th class="right">Precio Venta</th>
+                <th class="right">Precio + IVA</th>
             </tr>
         </thead>
         <tbody>
@@ -37,10 +39,12 @@
                     <td class="right">{{ $p->stock_actual }}</td>
                     <td class="right">{{ $p->stock_minimo }}</td>
                     <td class="right">{{ max(0, $p->stock_minimo - $p->stock_actual) }}</td>
+                    <td class="right">${{ number_format($p->precio_venta, 2) }}</td>
+                    <td class="right">${{ number_format($p->precio_venta * 1.13, 2) }}</td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="7">No hay productos que requieran reorden.</td>
+                    <td colspan="9">No hay productos que requieran reorden.</td>
                 </tr>
             @endforelse
         </tbody>

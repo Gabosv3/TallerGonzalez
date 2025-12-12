@@ -85,13 +85,9 @@ components:
           type: integer
         marca_id:
           type: integer
-        categoria_id:
-          type: integer
         tipo_producto_id:
           type: integer
         marca:
-          type: object
-        categoria:
           type: object
         tipoProducto:
           type: object

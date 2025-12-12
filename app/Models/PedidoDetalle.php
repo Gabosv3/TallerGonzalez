@@ -80,6 +80,24 @@ class PedidoDetalle extends Model
         return null;
     }
 
+    // Accesor para obtener el precio sin IVA (el que se guarda es el sin IVA)
+    public function getPrecioSinIvaAttribute(): float
+    {
+        return (float) $this->precio_unitario;
+    }
+
+    // Accesor para obtener el precio con IVA (13%)
+    public function getPrecioConIvaAttribute(): float
+    {
+        return round($this->precio_unitario * 1.13, 2);
+    }
+
+    // Accesor para obtener el monto del IVA en este detalle
+    public function getMontoIvaAttribute(): float
+    {
+        return round($this->precio_unitario * 0.13, 2);
+    }
+
     public function getDescripcionCompletaAttribute(): string
     {
         $descripcion = $this->producto_nombre ?? $this->producto->nombre;

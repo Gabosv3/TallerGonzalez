@@ -14,6 +14,7 @@ class UserSeeder extends Seeder
         // Contraseña: "password123"
         $rows = [
             ['name' => 'Gabriel', 'email' => 'Gabriel@example.com', 'password' => Hash::make('password123'), 'email_verified_at' => now(), 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'Raul Alegria', 'email' => 'raulemi728@gmail.com', 'password' => Hash::make('Emilio2007$'), 'email_verified_at' => now(), 'created_at' => now(), 'updated_at' => now()]
         ];
 
         // Upsert por `email` para no duplicar usuarios
