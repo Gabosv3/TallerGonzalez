@@ -30,13 +30,33 @@ class FacturaController extends Controller
 
         try {
             $result = DB::transaction(function () use ($data) {
-                // Cliente: usa cliente_id si viene, si no crea cliente mínimo con nombre
+                // Cliente: usa cliente_id si viene
                 $clienteId = $data['cliente_id'] ?? null;
-                if (!$clienteId) {
-                    $cliente = Cliente::create([
-                        'nombre' => $data['cliente'],
-                    ]);
-                    $clienteId = $cliente->id;
+                
+                // Si no trae cliente_id, buscar por nombre existente o crear uno temporal
+                if (!$clienteId && !empty($data['cliente'])) {
+                    // Buscar cliente existente por nombre similar
+                    $clienteExistente = Cliente::where('nombre', 'like', '%' . $data['cliente'] . '%')
+                        ->orWhere('razon_social', 'like', '%' . $data['cliente'] . '%')
+                        ->first();
+                    
+                    if ($clienteExistente) {
+                        $clienteId = $clienteExistente->id;
+                    } else {
+                        // Crear cliente temporal con datos mínimos requeridos
+                        // El cliente debe completar sus datos después
+                        $cliente = Cliente::create([
+                            'nombre' => $data['cliente'],
+                            'apellido' => 'Temporal',  // Requerido por validación
+                            'email' => 'temporal-' . uniqid() . '@no-email.local',  // Email único temporal
+                            'telefono' => '0000-0000',  // Teléfono temporal
+                            'dui' => 'TEMPORAL-' . uniqid(),  // DUI temporal único
+                            'tipo_cliente' => 'consumidor_final',
+                            'activo' => true,
+                        ]);
+                        $clienteId = $cliente->id;
+                        Log::info("Cliente temporal creado ID: $clienteId para factura desde nombre: {$data['cliente']}");
+                    }
                 }
 
                 // Generar numero_factura si no viene

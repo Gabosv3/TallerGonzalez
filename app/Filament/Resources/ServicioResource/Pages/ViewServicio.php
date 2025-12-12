@@ -8,8 +8,6 @@ use Filament\Resources\Pages\ViewRecord;
 use Filament\Infolists\Infolist;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Components\BadgeEntry;
-use Filament\Infolists\Components\Tables\Columns\TextColumn;
 
 class ViewServicio extends ViewRecord
 {
@@ -40,20 +38,21 @@ class ViewServicio extends ViewRecord
                             ->copyable()
                             ->columnSpan(1),
                         
-                        BadgeEntry::make('estado')
+                        TextEntry::make('estado')
                             ->label('Estado')
                             ->icon('heroicon-o-check-badge')
-                            ->getStateUsing(function ($record) {
-                                return match($record->estado) {
+                            ->badge()
+                            ->formatStateUsing(function ($state) {
+                                return match($state) {
                                     'pendiente' => 'Pendiente',
                                     'en_proceso' => 'En Proceso',
                                     'completado' => 'Completado',
                                     'cancelado' => 'Cancelado',
-                                    default => $record->estado,
+                                    default => $state,
                                 };
                             })
-                            ->color(function ($record) {
-                                return match($record->estado) {
+                            ->color(function ($state) {
+                                return match($state) {
                                     'pendiente' => 'warning',
                                     'en_proceso' => 'info',
                                     'completado' => 'success',

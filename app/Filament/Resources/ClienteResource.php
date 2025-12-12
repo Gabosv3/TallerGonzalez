@@ -149,7 +149,7 @@ class ClienteResource extends Resource
 
                         TextInput::make('nit')
                             ->label('NIT')
-                            ->required()
+                            
                             ->unique(Cliente::class, 'nit', ignoreRecord: true)
                             ->minLength(14)
                             ->maxLength(14)
@@ -157,8 +157,8 @@ class ClienteResource extends Resource
                             ->mask('99999999999999')
                             ->numeric()
                             ->placeholder('06141510901234')
-                            ->validationMessages([
-                                'required' => 'El NIT es obligatorio.',
+                            ->validationMessages(
+                                [
                                 'unique' => 'Este NIT ya está registrado en el sistema.',
                                 'min' => 'El NIT debe tener exactamente 14 dígitos.',
                                 'max' => 'El NIT debe tener exactamente 14 dígitos.',

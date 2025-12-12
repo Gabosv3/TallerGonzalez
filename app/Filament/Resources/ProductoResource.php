@@ -76,14 +76,6 @@ class ProductoResource extends Resource
                                     ->nullable()
                                     ->columnSpan(1),
 
-                                Forms\Components\Select::make('categoria_id')
-                                    ->label('Categoría')
-                                    ->relationship('categoria', 'nombre')
-                                    ->searchable()
-                                    ->preload()
-                                    ->nullable()
-                                    ->columnSpan(1),
-
                                 Forms\Components\Select::make('unidad_medida')
                                     ->label('Unidad de Medida')
                                     ->options([
@@ -115,6 +107,7 @@ class ProductoResource extends Resource
                                     ->prefix('$')
                                     ->step(0.01)
                                     ->required()
+                                    ->live(debounce: 500)
                                     ->columnSpan(1),
 
                                 Forms\Components\TextInput::make('precio_venta')
@@ -123,6 +116,35 @@ class ProductoResource extends Resource
                                     ->prefix('$')
                                     ->step(0.01)
                                     ->required()
+                                    ->live(debounce: 500)
+                                    ->afterStateUpdated(function ($state, callable $set) {
+                                        if ($state !== null && $state !== '') {
+                                            // Cuando se modifica precio de venta, actualizar el con IVA
+                                            $precioConIva = round($state * 1.13, 2);
+                                            $set('precio_venta_con_iva', $precioConIva);
+                                        }
+                                    })
+                                    ->columnSpan(1),
+
+                                Forms\Components\TextInput::make('precio_venta_con_iva')
+                                    ->label('Precio + IVA (13%)')
+                                    ->numeric()
+                                    ->prefix('$')
+                                    ->step(0.01)
+                                    ->helperText('Se calcula automáticamente o modifica el precio sin IVA')
+                                    ->live(debounce: 500)
+                                    ->afterStateHydrated(function ($component, $state, $record) {
+                                        if ($record && $record->precio_venta) {
+                                            $component->state(round($record->precio_venta * 1.13, 2));
+                                        }
+                                    })
+                                    ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                        if ($state !== null && $state !== '') {
+                                            // Si se modifica el precio con IVA, recalcular el precio sin IVA
+                                            $precioSinIva = round($state / 1.13, 2);
+                                            $set('precio_venta', $precioSinIva);
+                                        }
+                                    })
                                     ->columnSpan(1),
 
                                 Forms\Components\TextInput::make('precio_minimo')
@@ -134,7 +156,7 @@ class ProductoResource extends Resource
                                     ->columnSpan(1),
                             ]),
                     ])
-                    ->columns(3)
+                    ->columns(4)
                     ->collapsible(),
 
                 // Sección de inventario
@@ -508,13 +530,6 @@ class ProductoResource extends Resource
                     ->preload()
                     ->searchable(),
 
-                // Filtro por categoría
-                Tables\Filters\SelectFilter::make('categoria_id')
-                    ->label('Categoría')
-                    ->relationship('categoria', 'nombre')
-                    ->preload()
-                    ->searchable(),
-
                 // Filtro por estado
                 Tables\Filters\TernaryFilter::make('activo')
                     ->label('Estado Activo')
@@ -678,10 +693,6 @@ class ProductoResource extends Resource
                     ->label('Tipo de Producto')
                     ->collapsible(),
 
-                Tables\Grouping\Group::make('categoria.nombre')
-                    ->label('Categoría')
-                    ->collapsible(),
-
                 Tables\Grouping\Group::make('activo')
                     ->label('Estado')
                     ->collapsible(),
@@ -714,7 +725,7 @@ class ProductoResource extends Resource
 
     public static function getGloballySearchableAttributes(): array
     {
-        return ['codigo', 'nombre', 'descripcion', 'marca.nombre', 'categoria.nombre'];
+        return ['codigo', 'nombre', 'descripcion', 'marca.nombre'];
     }
 
     public static function getGlobalSearchResultTitle($record): string
@@ -725,6 +736,6 @@ class ProductoResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()
-            ->with(['tipoProducto', 'marca', 'categoria', 'aceites.marca', 'aceites.tipoAceite']);
+            ->with(['tipoProducto', 'marca', 'aceites.marca', 'aceites.tipoAceite']);
     }
 }

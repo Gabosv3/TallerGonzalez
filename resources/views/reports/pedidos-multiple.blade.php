@@ -27,7 +27,8 @@
                         <th>Producto</th>
                         <th>Variante</th>
                         <th class="right">Cantidad</th>
-                        <th class="right">Precio Unitario</th>
+                        <th class="right">Precio Sin IVA</th>
+                        <th class="right">Precio + IVA</th>
                         <th class="right">Subtotal</th>
                     </tr>
                 </thead>
@@ -38,15 +39,16 @@
                             <td>{{ $d->producto?->nombre }}</td>
                             <td>{{ $d->aceite?->marca?->nombre }} {{ $d->aceite?->viscosidad }}</td>
                             <td class="right">{{ $d->cantidad }}</td>
-                            <td class="right">{{ number_format($d->precio_unitario, 2) }}</td>
-                            <td class="right">{{ number_format($d->subtotal, 2) }}</td>
+                            <td class="right">${{ number_format($d->precio_unitario, 2) }}</td>
+                            <td class="right">${{ number_format($d->precio_con_iva, 2) }}</td>
+                            <td class="right">${{ number_format($d->subtotal, 2) }}</td>
                         </tr>
                     @endforeach
                 </tbody>
                 <tfoot>
                     <tr>
-                        <td colspan="5" class="right"><strong>Total</strong></td>
-                        <td class="right"><strong>{{ number_format($pedido->total, 2) }}</strong></td>
+                        <td colspan="6" class="right"><strong>Total</strong></td>
+                        <td class="right"><strong>${{ number_format($pedido->total, 2) }}</strong></td>
                     </tr>
                 </tfoot>
             </table>

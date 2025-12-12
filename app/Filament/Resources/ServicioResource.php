@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ServicioResource\Pages;
 use App\Models\Servicio;
+use App\Models\Producto;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
@@ -32,20 +33,35 @@ class ServicioResource extends Resource
                 Forms\Components\Section::make('Información del Servicio')
                     ->description('Datos básicos del servicio de vehículo')
                     ->icon('heroicon-o-wrench-screwdriver')
+                    ->collapsible()
+                    ->collapsed(false)
                     ->schema([
                         Forms\Components\Grid::make(2)
                             ->schema([
                                 Forms\Components\TextInput::make('placa')
                                     ->label('Placa del Vehículo')
                                     ->required()
+                                    ->live(debounce: 800)
                                     ->maxLength(10)
                                     ->placeholder('ABC-123')
+                                    ->prefix('🚗')
                                     ->validationMessages([
                                         'required' => 'La placa es obligatoria.',
                                         'max' => 'La placa no puede exceder 10 caracteres.',
                                     ])
-                                    ->helperText('Placa única del vehículo'),
+                                    ->helperText('Placa única del vehículo')
+                                    ->columnSpan(1),
+                            ]),
+                    ]),
 
+                Forms\Components\Section::make('Estado y Notas')
+                    ->description('Detalles y observaciones del servicio')
+                    ->icon('heroicon-o-document-text')
+                    ->collapsible()
+                    ->collapsed(false)
+                    ->schema([
+                        Forms\Components\Grid::make(1)
+                            ->schema([
                                 Forms\Components\Select::make('estado')
                                     ->label('Estado del Servicio')
                                     ->options([
@@ -56,13 +72,16 @@ class ServicioResource extends Resource
                                     ])
                                     ->default('pendiente')
                                     ->required()
-                                    ->helperText('Selecciona el estado actual del servicio'),
+                                    ->live()
+                                    ->helperText('Selecciona el estado actual del servicio')
+                                    ->columnSpan(1),
                             ]),
 
                         Forms\Components\Textarea::make('notas')
                             ->label('Notas del Servicio')
                             ->placeholder('Observaciones o detalles importantes del servicio...')
-                            ->rows(3)
+                            ->live(debounce: 800)
+                            ->rows(4)
                             ->maxLength(500)
                             ->validationMessages([
                                 'max' => 'Las notas no pueden exceder 500 caracteres.',
@@ -71,55 +90,155 @@ class ServicioResource extends Resource
                     ]),
 
                 Forms\Components\Section::make('Productos Utilizados')
-                    ->description('Registra los productos usados en el servicio')
+                    ->description('📦 Registra los productos usados en el servicio')
                     ->icon('heroicon-o-shopping-bag')
+                    ->collapsible()
+                    ->collapsed(false)
                     ->schema([
                         Forms\Components\Repeater::make('productos')
+                            ->live()
                             ->schema([
-                                Forms\Components\Grid::make(2)
+                                Forms\Components\Grid::make(3)
                                     ->schema([
-                                        Forms\Components\TextInput::make('producto')
-                                            ->label('Nombre del Producto')
+                                        Forms\Components\Select::make('codigo_producto')
+                                            ->label('Código')
+                                            ->options(Producto::pluck('codigo', 'codigo')->toArray())
+                                            ->searchable()
+                                            ->preload()
+                                            ->live()
+                                            ->dehydrated(true)
                                             ->required()
+                                            ->afterStateUpdated(function ($state, Set $set) {
+                                                if ($state) {
+                                                    $producto = Producto::where('codigo', $state)->first();
+                                                    if ($producto) {
+                                                        $set('nombre_producto', $producto->nombre);
+                                                    }
+                                                }
+                                            })
+                                            ->getSearchResultsUsing(function (string $search): array {
+                                                return Producto::where('codigo', 'LIKE', "%{$search}%")
+                                                    ->orWhere('nombre', 'LIKE', "%{$search}%")
+                                                    ->limit(50)
+                                                    ->pluck('codigo', 'codigo')
+                                                    ->toArray();
+                                            })
+                                            ->columnSpan(1),
+
+                                        Forms\Components\TextInput::make('nombre_producto')
+                                            ->label('Producto')
                                             ->maxLength(100)
-                                            ->placeholder('Ej: Aceite 5W30, Filtro, etc.')
-                                            ->validationMessages([
-                                                'required' => 'El nombre del producto es obligatorio.',
-                                                'max' => 'El nombre no puede exceder 100 caracteres.',
-                                            ])
+                                            ->dehydrated(true)
                                             ->columnSpan(1),
 
                                         Forms\Components\TextInput::make('cantidad')
                                             ->label('Cantidad')
                                             ->numeric()
                                             ->required()
+                                            ->live(debounce: 500)
                                             ->default(1)
                                             ->minValue(0.01)
                                             ->step(0.01)
+                                            ->dehydrated(true)
+                                            ->suffix('x')
                                             ->validationMessages([
-                                                'required' => 'La cantidad es obligatoria.',
-                                                'numeric' => 'La cantidad debe ser un número válido.',
-                                                'min' => 'La cantidad debe ser mayor a 0.',
+                                                'required' => 'Requerido',
+                                                'numeric' => 'Número válido',
+                                                'min' => '> 0',
                                             ])
                                             ->columnSpan(1),
                                     ]),
                             ])
-                            ->defaultItems(1)
-                            ->minItems(1)
-                            ->reorderable()
+                            ->defaultItems(0)
+                            ->minItems(0)
+                            ->dehydrated(true)
+                            ->reorderable(true)
                             ->cloneable()
                             ->collapsible()
-                            ->collapseAllAction(fn($action) => $action->label('Contraer todos'))
-                            ->expandAllAction(fn($action) => $action->label('Expandir todos'))
+                            ->collapseAllAction(fn($action) => $action->label('Contraer'))
+                            ->expandAllAction(fn($action) => $action->label('Expandir'))
                             ->deleteAction(
                                 fn($action) => $action->requiresConfirmation(),
                             )
                             ->itemLabel(
                                 fn(array $state): ?string =>
-                                isset($state['producto']) ? $state['producto'] . ' (Qty: ' . ($state['cantidad'] ?? 0) . ')' : 'Nuevo Producto'
+                                isset($state['codigo_producto']) ? '📦 ' . ($state['codigo_producto'] ?? '') . ' (' . ($state['cantidad'] ?? 1) . 'x)' : 'Agregar Producto'
                             )
-                            ->helperText('Agrega todos los productos utilizados en este servicio')
-                            ->live(),
+                            ->helperText('Agrega los productos utilizados en este servicio'),
+                    ]),
+
+                Forms\Components\Section::make('Servicios Realizados')
+                    ->description('🔧 Registra los servicios adicionales realizados')
+                    ->icon('heroicon-o-wrench')
+                    ->collapsible()
+                    ->collapsed(false)
+                    ->schema([
+                        Forms\Components\Repeater::make('servicios')
+                            ->live()
+                            ->schema([
+                                Forms\Components\Grid::make(3)
+                                    ->schema([
+                                        Forms\Components\TextInput::make('servicio_nombre')
+                                            ->label('Servicio')
+                                            ->required()
+                                            ->live(debounce: 800)
+                                            ->maxLength(100)
+                                            ->dehydrated(true)
+                                            ->placeholder('Ej: Cambio de aceite')
+                                            ->validationMessages([
+                                                'required' => 'Requerido',
+                                                'max' => 'Máx 100 caracteres',
+                                            ])
+                                            ->columnSpan(1),
+
+                                        Forms\Components\TextInput::make('servicio_precio')
+                                            ->label('Precio Unitario')
+                                            ->numeric()
+                                            ->required()
+                                            ->live(debounce: 500)
+                                            ->minValue(0)
+                                            ->step(0.01)
+                                            ->dehydrated(true)
+                                            ->prefix('$')
+                                            ->validationMessages([
+                                                'required' => 'Requerido',
+                                                'numeric' => 'Número válido',
+                                            ])
+                                            ->columnSpan(1),
+
+                                        Forms\Components\TextInput::make('servicio_cantidad')
+                                            ->label('Cantidad')
+                                            ->numeric()
+                                            ->required()
+                                            ->live(debounce: 500)
+                                            ->default(1)
+                                            ->minValue(0.01)
+                                            ->step(0.01)
+                                            ->dehydrated(true)
+                                            ->suffix('x')
+                                            ->validationMessages([
+                                                'required' => 'Requerido',
+                                                'numeric' => 'Número válido',
+                                            ])
+                                            ->columnSpan(1),
+                                    ]),
+                            ])
+                            ->defaultItems(0)
+                            ->minItems(0)
+                            ->dehydrated(true)
+                            ->reorderable(true)
+                            ->cloneable()
+                            ->collapsible()
+                            ->collapseAllAction(fn($action) => $action->label('Contraer'))
+                            ->expandAllAction(fn($action) => $action->label('Expandir'))
+                            ->deleteAction(
+                                fn($action) => $action->requiresConfirmation(),
+                            )
+                            ->itemLabel(
+                                fn(array $state): ?string =>
+                                isset($state['servicio_nombre']) ? '🔧 ' . $state['servicio_nombre'] . ' - $' . ($state['servicio_precio'] ?? 0) : 'Agregar Servicio'
+                            )
+                            ->helperText('Agrega los servicios adicionales realizados'),
                     ]),
             ]);
     }
@@ -192,13 +311,15 @@ class ServicioResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ActionGroup::make([
-                    Tables\Actions\ViewAction::make()
-                        ->color('blue')
-                        ->icon('heroicon-o-eye'),
-                    
                     Tables\Actions\EditAction::make()
-                        ->color('green')
+                        ->color('blue')
                         ->icon('heroicon-o-pencil'),
+
+                    Tables\Actions\Action::make('generar_reporte')
+                        ->label('Ver Prefactura')
+                        ->icon('heroicon-o-document-text')
+                        ->color('success')
+                        ->url(fn(Servicio $record) => ServicioResource::getUrl('report', ['record' => $record])),
 
                     Tables\Actions\Action::make('cambiar_estado_proceso')
                         ->label('Marcar en Proceso')
@@ -277,6 +398,7 @@ class ServicioResource extends Resource
             'create' => Pages\CreateServicio::route('/create'),
             'view' => Pages\ViewServicio::route('/{record}'),
             'edit' => Pages\EditServicio::route('/{record}/edit'),
+            'report' => Pages\ViewServicioReport::route('/{record}/report'),
         ];
     }
 

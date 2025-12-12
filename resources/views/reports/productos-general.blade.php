@@ -26,7 +26,9 @@
                 <th style="width:8%">ID</th>
                 <th style="width:18%">Código</th>
                 <th>Nombre</th>
-                <th style="width:12%">Cantidad</th>
+                <th style="width:12%">Stock</th>
+                <th style="width:14%">Precio Venta</th>
+                <th style="width:14%">Precio + IVA</th>
                 <th style="width:16%">Marca / Tipo</th>
             </tr>
         </thead>
@@ -37,6 +39,8 @@
                     <td>{{ $p->codigo }}</td>
                     <td>{{ $p->nombre }}</td>
                     <td style="text-align:right">{{ number_format($p->stock_actual, 0, ',', '.') }} {{ $p->unidad_medida }}</td>
+                    <td style="text-align:right">${{ number_format($p->precio_venta, 2) }}</td>
+                    <td style="text-align:right">${{ number_format($p->precio_venta * 1.13, 2) }}</td>
                     <td>{{ $p->marca?->nombre ?? '-' }} / {{ $p->tipoProducto?->nombre ?? '-' }}</td>
                 </tr>
             @endforeach

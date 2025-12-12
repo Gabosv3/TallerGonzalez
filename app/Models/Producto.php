@@ -24,7 +24,6 @@ class Producto extends Model
         'nombre',
         'descripcion',
         'marca_id',
-        'categoria_id',
         'unidad_medida',
 
         // Tipo de producto
@@ -57,12 +56,6 @@ class Producto extends Model
         'activo' => 'boolean',
     ];
 
-    // Relación con categoría
-    public function categoria(): BelongsTo
-    {
-        return $this->belongsTo(Categoria::class);
-    }
-
     // Relación con marca
     public function marca(): BelongsTo
     {
@@ -91,6 +84,12 @@ class Producto extends Model
     public function getEsAceiteAttribute(): bool
     {
         return optional($this->tipoProducto)->nombre === 'aceite';
+    }
+
+    // Helper para calcular precio con IVA (13%)
+    public function getPrecioVentaConIvaAttribute(): float
+    {
+        return round($this->precio_venta * 1.13, 2);
     }
 
     // Helper para obtener nombre completo con tipo
@@ -236,11 +235,6 @@ class Producto extends Model
         return $query->where('marca_id', $marcaId);
     }
 
-    public function scopePorCategoria($query, $categoriaId)
-    {
-        return $query->where('categoria_id', $categoriaId);
-    }
-
     // Scope para productos con variantes
     public function scopeConVariantes($query)
     {
@@ -273,7 +267,7 @@ class Producto extends Model
                 }
             }
 
-            return $producto->load(['tipoProducto', 'aceites', 'marca', 'categoria']);
+            return $producto->load(['tipoProducto', 'aceites', 'marca']);
         });
     }
 
