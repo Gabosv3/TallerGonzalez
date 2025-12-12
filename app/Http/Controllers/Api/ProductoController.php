@@ -15,7 +15,7 @@ class ProductoController extends Controller
     public function index(Request $request)
     {
         try {
-            $query = Producto::with(['marca', 'categoria', 'tipoProducto', 'aceites.marca', 'aceites.tipoAceite'])
+            $query = Producto::with(['marca', 'tipoProducto', 'aceites.marca', 'aceites.tipoAceite'])
                             ->activos()
                             ->where('stock_actual', '>', 0); // Solo productos con stock
 
@@ -69,7 +69,7 @@ class ProductoController extends Controller
     public function buscarPorCodigo($codigo)
     {
         try {
-            $producto = Producto::with(['marca', 'categoria', 'tipoProducto', 'aceites.marca', 'aceites.tipoAceite'])
+            $producto = Producto::with(['marca', 'tipoProducto', 'aceites.marca', 'aceites.tipoAceite'])
                                ->where('codigo', $codigo)
                                ->where('stock_actual', '>', 0)
                                ->activos()
@@ -98,7 +98,7 @@ class ProductoController extends Controller
     public function show($id)
     {
         try {
-            $producto = Producto::with(['marca', 'categoria', 'tipoProducto', 'aceites.marca', 'aceites.tipoAceite'])
+            $producto = Producto::with(['marca', 'tipoProducto', 'aceites.marca', 'aceites.tipoAceite'])
                                ->activos()
                                ->find($id);
 
@@ -124,7 +124,7 @@ class ProductoController extends Controller
     public function stockBajo()
     {
         try {
-            $productos = Producto::with(['marca', 'categoria'])
+            $productos = Producto::with(['marca'])
                                 ->bajoStock()
                                 ->activos()
                                 ->orderBy('stock_actual', 'asc')
@@ -146,7 +146,7 @@ class ProductoController extends Controller
     public function porTipo($tipo)
     {
         try {
-            $query = Producto::with(['marca', 'categoria', 'tipoProducto'])
+            $query = Producto::with(['marca', 'tipoProducto'])
                             ->activos();
 
             if ($tipo === 'aceites') {
