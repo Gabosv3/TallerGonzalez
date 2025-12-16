@@ -75,4 +75,91 @@ class PedidoReportController extends Controller
             return Response::make('Error generando el reporte de pedidos', 500);
         }
     }
+
+    /**
+     * Reporte de compras agrupado por producto
+     * 
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
+     */
+    public function comprasPorProducto(Request $request)
+    {
+        try {
+            $fechaInicio = $request->query('fecha_inicio');
+            $fechaFin = $request->query('fecha_fin');
+
+            // Obtener detalles de pedidos con relaciones
+            $query = \App\Models\PedidoDetalle::with([
+                'pedido.proveedor',
+                'producto',
+                'aceite.marca',
+                'aceite.tipoAceite'
+            ]);
+
+            // Aplicar filtro de fechas si se proporcionan
+            if ($fechaInicio) {
+                $query->whereHas('pedido', fn($q) => $q->whereDate('fecha_orden', '>=', $fechaInicio));
+            }
+            if ($fechaFin) {
+                $query->whereHas('pedido', fn($q) => $q->whereDate('fecha_orden', '<=', $fechaFin));
+            }
+
+            $detalles = $query->get();
+
+            // Agrupar por producto principal (producto o aceite)
+            $comprasPorProducto = [];
+            
+            foreach ($detalles as $detalle) {
+                // Determinar el nombre del producto
+                $nombreProducto = $detalle->producto_nombre ?? ($detalle->producto?->nombre ?? 'Sin nombre');
+                $productoId = $detalle->producto_id ?? 'aceite-' . $detalle->aceite_id;
+                
+                // Si no existe, crear el grupo de producto
+                if (!isset($comprasPorProducto[$productoId])) {
+                    $comprasPorProducto[$productoId] = [
+                        'nombre' => $nombreProducto,
+                        'compras' => []
+                    ];
+                }
+
+                // Crear clave para agrupar por proveedor y factura
+                $proveedorId = $detalle->pedido->proveedor_id;
+                $numeroFactura = $detalle->pedido->numero_factura;
+                $clave = $proveedorId . '-' . $numeroFactura;
+
+                // Si no existe el grupo proveedor-factura, crearlo
+                if (!isset($comprasPorProducto[$productoId]['compras'][$clave])) {
+                    $comprasPorProducto[$productoId]['compras'][$clave] = [
+                        'proveedor' => $detalle->pedido->proveedor->nombre,
+                        'numero_factura' => $numeroFactura,
+                        'fecha_orden' => $detalle->pedido->fecha_orden,
+                        'precio_sin_iva' => $detalle->precio_sin_iva,
+                        'precio_con_iva' => $detalle->precio_con_iva,
+                        'cantidad_total' => 0,
+                    ];
+                }
+
+                // Sumar la cantidad
+                $comprasPorProducto[$productoId]['compras'][$clave]['cantidad_total'] += $detalle->cantidad;
+            }
+
+            // Preparar datos para la vista
+            $datos = [
+                'compras' => $comprasPorProducto,
+                'fecha_inicio' => $fechaInicio,
+                'fecha_fin' => $fechaFin,
+                'fecha_reporte' => now()->format('d/m/Y H:i')
+            ];
+
+            // Generar PDF
+            $pdf = Pdf::loadView('reports.compras-por-producto', $datos);
+            $fileName = 'compras-por-producto-' . now()->format('Ymd_His') . '.pdf';
+            
+            return $pdf->download($fileName);
+
+        } catch (\Exception $e) {
+            Log::error('Error generating compras por producto report: ' . $e->getMessage());
+            return Response::make('Error generando el reporte de compras: ' . $e->getMessage(), 500);
+        }
+    }
 }

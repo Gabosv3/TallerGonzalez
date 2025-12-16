@@ -697,6 +697,21 @@ class PedidoResource extends Resource
                             ]);
                         }),
 
+                    Tables\Actions\BulkAction::make('reporte_compras_por_producto')
+                        ->label('Reporte de Compras por Producto')
+                        ->icon('heroicon-o-chart-pie')
+                        ->color('warning')
+                        ->action(function ($records) {
+                            // Obtener las fechas del primer y último pedido seleccionado
+                            $fechaInicio = $records->min('fecha_orden');
+                            $fechaFin = $records->max('fecha_orden');
+                            
+                            return redirect()->route('pedidos.reporte.compras_por_producto', [
+                                'fecha_inicio' => $fechaInicio?->format('Y-m-d'),
+                                'fecha_fin' => $fechaFin?->format('Y-m-d'),
+                            ]);
+                        }),
+
                     Tables\Actions\BulkAction::make('marcar_completados')
                         ->label('Marcar como Completados')
                         ->icon('heroicon-o-check-badge')

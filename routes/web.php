@@ -15,6 +15,7 @@ Route::get('administrativo/productos/reporte-reorden', [\App\Http\Controllers\Pr
 // Pedidos reports
 Route::get('administrativo/pedidos/{pedido}/reporte-pdf', [\App\Http\Controllers\PedidoReportController::class, 'reporte'])->name('pedidos.reporte.pdf');
 Route::get('administrativo/pedidos/reporte-multiple', [\App\Http\Controllers\PedidoReportController::class, 'multiple'])->name('pedidos.reporte.multiple');
+Route::get('administrativo/pedidos/reporte-compras-por-producto', [\App\Http\Controllers\PedidoReportController::class, 'comprasPorProducto'])->name('pedidos.reporte.compras_por_producto');
 // Facturas reports
 Route::get('administrativo/facturas/{factura}/reporte-pdf', [\App\Http\Controllers\FacturaReportController::class, 'show'])->name('facturas.reporte.pdf');
 Route::get('administrativo/facturas/reporte-periodo', [\App\Http\Controllers\FacturaReportController::class, 'periodo'])->name('facturas.reporte.periodo');
