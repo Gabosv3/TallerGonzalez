@@ -43,7 +43,7 @@ class AdministrativoPanelProvider extends PanelProvider
             ->brandLogoHeight('3.5rem')
             ->brandName($settings && $settings->site_name ? $settings->site_name : 'No se encontró')  // Si el nombre del sitio es null, se pone 'No se encontró'
             ->darkModeBrandLogo(asset($settings && $settings->site_logo ? 'storage/' . $settings->site_logo : 'assets/img/tallergonzalez.png'))
-            ->globalSearch(true)
+            ->globalSearch(false)
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([

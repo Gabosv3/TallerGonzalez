@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\UserResource\Pages;
+use App\Mail\VerifyEmailMail;
 use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -13,8 +14,10 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\HtmlString;
 use Spatie\Permission\Models\Role;
+use Filament\Notifications\Notification;
 
 class UserResource extends Resource
 {
@@ -62,7 +65,9 @@ class UserResource extends Resource
                         Forms\Components\DateTimePicker::make('email_verified_at')
                             ->label('Correo Verificado')
                             ->displayFormat('d/m/Y H:i')
-                            ->helperText('Fecha de verificación del correo'),
+                            ->helperText('Fecha de verificación del correo')
+                            ->disabled()
+                            ->dehydrated(false),
 
 
                     ])
@@ -287,11 +292,18 @@ class UserResource extends Resource
                         ->color('green')
                         ->icon('heroicon-o-pencil'),
 
-                    Tables\Actions\Action::make('verify_email')
-                        ->label('Verificar Email')
-                        ->icon('heroicon-o-check-badge')
-                        ->color('success')
-                        ->action(fn($record) => $record->update(['email_verified_at' => now()]))
+                    Tables\Actions\Action::make('send_verification_email')
+                        ->label('Enviar Email de Verificacion')
+                        ->icon('heroicon-o-envelope')
+                        ->color('info')
+                        ->action(function ($record) {
+                            Mail::send(new VerifyEmailMail($record->email, $record->id));
+                            Notification::make()
+                                ->success()
+                                ->title('Correo enviado')
+                                ->body('Se ha enviado un correo de verificacion a ' . $record->email)
+                                ->send();
+                        })
                         ->requiresConfirmation()
                         ->hidden(fn($record) => $record->email_verified_at !== null),
 
@@ -304,7 +316,18 @@ class UserResource extends Resource
 
                     Tables\Actions\DeleteAction::make()
                         ->color('danger')
-                        ->icon('heroicon-o-trash'),
+                        ->icon('heroicon-o-trash')
+                        ->before(function (Tables\Actions\DeleteAction $action, $record) {
+                            // Verificar si el usuario tiene rol de super admin
+                            if ($record->hasRole('super_admin') || $record->hasRole('admin')) {
+                                $action->halt();
+                                Notification::make()
+                                    ->danger()
+                                    ->title('No se puede eliminar este usuario')
+                                    ->body('No puedes eliminar usuarios con rol Super Admin o Administrador. Asignalos a otro rol primero.')
+                                    ->send();
+                            }
+                        }),
                     Tables\Actions\RestoreAction::make()
                         ->icon('heroicon-o-arrow-uturn-left')
                         ->color('success')
@@ -322,10 +345,32 @@ class UserResource extends Resource
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
 
-                    Tables\Actions\BulkAction::make('verify_emails')
-                        ->icon('heroicon-o-check-badge')
-                        ->color('success')
-                        ->action(fn($records) => $records->each->update(['email_verified_at' => now()])),
+                    Tables\Actions\BulkAction::make('send_verification_emails')
+                        ->icon('heroicon-o-envelope')
+                        ->color('info')
+                        ->label('Enviar Emails de Verificacion')
+                        ->action(function ($records) {
+                            $sent = 0;
+                            foreach ($records as $record) {
+                                if ($record->email_verified_at === null) {
+                                    Mail::send(new VerifyEmailMail($record->email, $record->id));
+                                    $sent++;
+                                }
+                            }
+                            if ($sent > 0) {
+                                Notification::make()
+                                    ->success()
+                                    ->title('Correos enviados')
+                                    ->body('Se han enviado ' . $sent . ' correo(s) de verificacion.')
+                                    ->send();
+                            } else {
+                                Notification::make()
+                                    ->info()
+                                    ->title('Sin cambios')
+                                    ->body('Los usuarios seleccionados ya tienen el correo verificado.')
+                                    ->send();
+                            }
+                        }),
 
                     Tables\Actions\BulkAction::make('assign_role')
                         ->icon('heroicon-o-tag')

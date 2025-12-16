@@ -151,6 +151,10 @@
             <div class="producto-grupo">
                 <div class="producto-titulo">
                     📦 {{ $productoData['nombre'] }}
+                    @if($productoData['codigo'] !== 'N/A')
+                        <span style="font-size: 10px; font-weight: normal; margin-left: 15px;">Código: {{ $productoData['codigo'] }}</span>
+                    @endif
+                    <span style="font-size: 10px; font-weight: normal; margin-left: 15px;">Stock: {{ $productoData['stock_actual'] }}</span>
                 </div>
 
                 <table>

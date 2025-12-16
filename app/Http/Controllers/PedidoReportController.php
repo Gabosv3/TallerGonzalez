@@ -112,12 +112,16 @@ class PedidoReportController extends Controller
             foreach ($detalles as $detalle) {
                 // Determinar el nombre del producto
                 $nombreProducto = $detalle->producto_nombre ?? ($detalle->producto?->nombre ?? 'Sin nombre');
+                $codigoProducto = $detalle->producto?->codigo ?? 'N/A';
+                $inventarioActual = $detalle->producto?->stock_actual ?? 0;
                 $productoId = $detalle->producto_id ?? 'aceite-' . $detalle->aceite_id;
                 
                 // Si no existe, crear el grupo de producto
                 if (!isset($comprasPorProducto[$productoId])) {
                     $comprasPorProducto[$productoId] = [
                         'nombre' => $nombreProducto,
+                        'codigo' => $codigoProducto,
+                        'stock_actual' => $inventarioActual,
                         'compras' => []
                     ];
                 }

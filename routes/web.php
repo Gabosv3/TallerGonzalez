@@ -6,6 +6,11 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return redirect('/administrativo/login');
 });
+
+// Email Verification Routes
+Route::get('email/verify', [\App\Http\Controllers\EmailVerificationController::class, 'verify'])->name('verification.verify');
+Route::get('email/verify/{id}', [\App\Http\Controllers\EmailVerificationController::class, 'verifySimple'])->name('verification.verify.simple');
+Route::get('email/verify/{id}/{hash}', [\App\Http\Controllers\EmailVerificationController::class, 'verifyLegacy'])->name('verification.verify.legacy');
  
 // Product reports
 Route::get('administrativo/productos/{producto}/reporte', [\App\Http\Controllers\ProductoReportController::class, 'reporte'])->name('productos.reporte');

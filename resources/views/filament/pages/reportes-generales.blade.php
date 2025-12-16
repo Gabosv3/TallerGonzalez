@@ -422,14 +422,13 @@
                 }
             });
 
-            // Mostrar mensaje si no hay resultados
+            // Mostrar/ocultar mensaje si no hay resultados
             if (filasVisibles === 0) {
                 const tbody = document.getElementById('tbody-facturas');
                 if (!tbody.querySelector('.sin-resultados')) {
                     const fila = document.createElement('tr');
                     fila.className = 'sin-resultados';
                     fila.innerHTML = '<td colspan="7" class="px-6 py-4 text-center text-sm text-gray-700 dark:text-gray-300">No hay facturas que coincidan con los filtros seleccionados</td>';
-                    tbody.innerHTML = '';
                     tbody.appendChild(fila);
                 }
             } else {
@@ -471,14 +470,13 @@
                 }
             });
 
-            // Mostrar mensaje si no hay resultados
+            // Mostrar/ocultar mensaje si no hay resultados
             if (filasVisibles === 0) {
                 const tbody = document.getElementById('tbody-productos');
                 if (!tbody.querySelector('.sin-resultados')) {
                     const fila = document.createElement('tr');
                     fila.className = 'sin-resultados';
                     fila.innerHTML = '<td colspan="7" class="px-6 py-4 text-center text-sm text-gray-700 dark:text-gray-300">No hay productos que coincidan con los filtros seleccionados</td>';
-                    tbody.innerHTML = '';
                     tbody.appendChild(fila);
                 }
             } else {
@@ -513,14 +511,13 @@
                 }
             });
 
-            // Mostrar mensaje si no hay resultados
+            // Mostrar/ocultar mensaje si no hay resultados
             if (filasVisibles === 0) {
                 const tbody = document.getElementById('tbody-clientes');
                 if (!tbody.querySelector('.sin-resultados')) {
                     const fila = document.createElement('tr');
                     fila.className = 'sin-resultados';
                     fila.innerHTML = '<td colspan="7" class="px-6 py-4 text-center text-sm text-gray-700 dark:text-gray-300">No hay clientes que coincidan con los filtros seleccionados</td>';
-                    tbody.innerHTML = '';
                     tbody.appendChild(fila);
                 }
             } else {
