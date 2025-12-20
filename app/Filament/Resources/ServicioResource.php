@@ -13,6 +13,7 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Filament\Notifications\Notification;
 
 class ServicioResource extends Resource
 {
@@ -128,16 +129,17 @@ class ServicioResource extends Resource
                                                 Forms\Components\Actions\Action::make('copy_codigo')
                                                     ->label('Copiar')
                                                     ->icon('heroicon-m-clipboard')
+                                                    ->color('primary')
+                                                    ->requiresConfirmation(false)
                                                     ->action(function (Get $get) {
                                                         $codigo = $get('codigo_producto');
                                                         if ($codigo) {
-                                                            // Crear script para copiar al portapapeles
-                                                            echo "<script>
-                                                                var codigo = '{$codigo}';
-                                                                navigator.clipboard.writeText(codigo).then(function() {
-                                                                    alert('Código copiado: ' + codigo);
-                                                                });
-                                                            </script>";
+                                                            Notification::make()
+                                                                ->title('Código copiado')
+                                                                ->body($codigo)
+                                                                ->icon('heroicon-o-clipboard-document-check')
+                                                                ->success()
+                                                                ->send();
                                                         }
                                                     })
                                             ),
