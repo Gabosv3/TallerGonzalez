@@ -128,7 +128,13 @@ class ClienteResource extends Resource
                                     ->schema([
                         TextInput::make('dui')
                             ->label('DUI')
-                            ->required()
+                            ->required(fn (\Filament\Forms\Get $get) => blank($get('nit')))
+                            ->live()
+                            ->afterStateUpdated(function (\Filament\Forms\Get $get, \Filament\Forms\Set $set, ?string $state) {
+                                if ($get('nit_homologado')) {
+                                    $set('nit', $state);
+                                }
+                            })
                             ->unique(Cliente::class, 'dui', ignoreRecord: true)
                             ->minLength(9)
                             ->maxLength(9)
@@ -137,7 +143,7 @@ class ClienteResource extends Resource
                             ->numeric()
                             ->placeholder('059863879')
                             ->validationMessages([
-                                'required' => 'El DUI es obligatorio.',
+                                'required' => 'El DUI es obligatorio si no se ingresa NIT.',
                                 'unique' => 'Este DUI ya está registrado en el sistema.',
                                 'min' => 'El DUI debe tener exactamente 9 dígitos.',
                                 'max' => 'El DUI debe tener exactamente 9 dígitos.',
@@ -147,26 +153,39 @@ class ClienteResource extends Resource
                             ->helperText('✓ Exactamente 9 dígitos numéricos (sin guiones)')
                             ->hint('Formato requerido: 059863879'),
 
+                        Toggle::make('nit_homologado')
+                            ->label('NIT Homologado')
+                            ->inline(false)
+                            ->dehydrated(false)
+                            ->live()
+                            ->afterStateUpdated(function (\Filament\Forms\Get $get, \Filament\Forms\Set $set, bool $state) {
+                                if ($state) {
+                                    $set('nit', $get('dui'));
+                                } else {
+                                    $set('nit', null);
+                                }
+                            }),
+
                         TextInput::make('nit')
                             ->label('NIT')
-                            
+                            ->disabled(fn (\Filament\Forms\Get $get) => $get('nit_homologado'))
+                            ->dehydrated()
                             ->unique(Cliente::class, 'nit', ignoreRecord: true)
-                            ->minLength(14)
+                            ->minLength(fn (\Filament\Forms\Get $get) => $get('nit_homologado') ? 9 : 14)
                             ->maxLength(14)
-                            ->regex('/^\\d{14}$/', 'El NIT debe tener exactamente 14 dígitos numéricos')
-                            ->mask('99999999999999')
+                            ->regex(fn (\Filament\Forms\Get $get) => $get('nit_homologado') ? '/^\\d{9}$/' : '/^\\d{14}$/')
+                            ->mask(fn (\Filament\Forms\Get $get) => $get('nit_homologado') ? '999999999' : '99999999999999')
                             ->numeric()
-                            ->placeholder('06141510901234')
-                            ->validationMessages(
-                                [
+                            ->placeholder(fn (\Filament\Forms\Get $get) => $get('nit_homologado') ? '059863879' : '06141510901234')
+                            ->validationMessages([
                                 'unique' => 'Este NIT ya está registrado en el sistema.',
-                                'min' => 'El NIT debe tener exactamente 14 dígitos.',
-                                'max' => 'El NIT debe tener exactamente 14 dígitos.',
-                                'regex' => 'El NIT debe contener solo 14 dígitos numéricos.',
+                                'min' => 'El NIT debe tener la longitud correcta.',
+                                'max' => 'El NIT debe tener la longitud correcta.',
+                                'regex' => 'El NIT debe contener solo dígitos numéricos válidos.',
                                 'numeric' => 'El NIT solo puede contener números.',
                             ])
-                            ->helperText('✓ Exactamente 14 dígitos numéricos (sin guiones)')
-                            ->hint('Formato requerido: 06141510901234'),                                        TextInput::make('nrc')
+                            ->helperText(fn (\Filament\Forms\Get $get) => $get('nit_homologado') ? '✓ Copia del DUI (9 dígitos)' : '✓ Exactamente 14 dígitos numéricos (sin guiones)')
+                            ->hint(fn (\Filament\Forms\Get $get) => $get('nit_homologado') ? 'Homologado con DUI' : 'Formato requerido: 06141510901234'),                                        TextInput::make('nrc')
                                             ->label('NRC')
                                             ->maxLength(20)
                                             ->placeholder('123456-7')
