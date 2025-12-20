@@ -103,6 +103,8 @@ class ServicioResource extends Resource
                                         Forms\Components\Select::make('codigo_producto')
                                             ->label('Código')
                                             ->options(Producto::pluck('codigo', 'codigo')->toArray())
+                                            ->copyable()
+                                            ->copyMessage('Código copiado')
                                             ->searchable()
                                             ->preload()
                                             ->live()
@@ -266,7 +268,7 @@ class ServicioResource extends Resource
                 Tables\Columns\TextColumn::make('estado')
                     ->label('Estado')
                     ->badge()
-                    ->formatStateUsing(fn($state) => match($state) {
+                    ->formatStateUsing(fn($state) => match ($state) {
                         'pendiente' => '🟡 Pendiente',
                         'en_proceso' => '🔵 En Proceso',
                         'completado' => '🟢 Completado',
@@ -344,7 +346,7 @@ class ServicioResource extends Resource
                         ->action(fn(Servicio $record) => $record->update(['estado' => 'cancelado']))
                         ->hidden(fn(Servicio $record) => $record->estado === 'cancelado')
                         ->requiresConfirmation(),
-                    
+
                     Tables\Actions\DeleteAction::make()
                         ->color('danger')
                         ->icon('heroicon-o-trash'),

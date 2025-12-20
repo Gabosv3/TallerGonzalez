@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
             AceiteSeeder::class,
             UserSeeder::class,
             ReportePermissionsSeeder::class,
+            CategoriaEconomicaSeeder::class,
         ]);
     }
 }
