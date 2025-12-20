@@ -35,6 +35,7 @@ class AdministrativoPanelProvider extends PanelProvider
             ->id('administrativo')
             ->path('administrativo')
             ->login()
+            ->passwordReset()
 
             ->colors([
                 'primary' => $settings && $settings->theme_color ? $settings->theme_color : '#FFA500',  // Si es null, se pone el color predeterminado

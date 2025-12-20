@@ -307,6 +307,34 @@ class UserResource extends Resource
                         ->requiresConfirmation()
                         ->hidden(fn($record) => $record->email_verified_at !== null),
 
+                    Tables\Actions\Action::make('send_password_reset_email')
+                        ->label('Enviar Reset de Contraseña')
+                        ->icon('heroicon-o-key')
+                        ->color('warning')
+                        ->requiresConfirmation()
+                        ->modalHeading('Enviar correo de restablecimiento')
+                        ->modalDescription('¿Está seguro de que desea enviar un enlace de restablecimiento de contraseña a este usuario?')
+                        ->modalSubmitActionLabel('Sí, enviar')
+                        ->action(function (User $record) {
+                            $status = \Illuminate\Support\Facades\Password::broker()->sendResetLink(
+                                ['email' => $record->email]
+                            );
+
+                            if ($status === \Illuminate\Support\Facades\Password::RESET_LINK_SENT) {
+                                Notification::make()
+                                    ->title('Enlace enviado')
+                                    ->body('Se ha enviado el enlace de restablecimiento de contraseña al correo del usuario.')
+                                    ->success()
+                                    ->send();
+                            } else {
+                                Notification::make()
+                                    ->title('Error')
+                                    ->body('No se pudo enviar el enlace. Verifique la configuración de correo.')
+                                    ->danger()
+                                    ->send();
+                            }
+                        }),
+
                     Tables\Actions\Action::make('impersonate')
                         ->label('Suplantar')
                         ->icon('heroicon-o-arrow-right-on-rectangle')
