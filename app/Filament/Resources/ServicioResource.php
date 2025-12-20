@@ -98,7 +98,7 @@ class ServicioResource extends Resource
                         Forms\Components\Repeater::make('productos')
                             ->live()
                             ->schema([
-                                Forms\Components\Grid::make(4)
+                                Forms\Components\Grid::make(3)
                                     ->schema([
                                         Forms\Components\Select::make('codigo_producto')
                                             ->label('Código')
@@ -113,7 +113,6 @@ class ServicioResource extends Resource
                                                     $producto = Producto::where('codigo', $state)->first();
                                                     if ($producto) {
                                                         $set('nombre_producto', $producto->nombre);
-                                                        $set('codigo_copia', $state);
                                                     }
                                                 }
                                             })
@@ -124,26 +123,24 @@ class ServicioResource extends Resource
                                                     ->pluck('codigo', 'codigo')
                                                     ->toArray();
                                             })
-                                            ->columnSpan(1),
-
-                                        Forms\Components\TextInput::make('codigo_copia')
-                                            ->label('Copiar')
-                                            ->disabled()
-                                            ->dehydrated(false)
-                                            ->suffix('📋')
+                                            ->columnSpan(1)
                                             ->hintAction(
                                                 Forms\Components\Actions\Action::make('copy_codigo')
                                                     ->label('Copiar')
                                                     ->icon('heroicon-m-clipboard')
                                                     ->action(function (Get $get) {
-                                                        $codigo = $get('codigo_copia');
+                                                        $codigo = $get('codigo_producto');
                                                         if ($codigo) {
-                                                            // JavaScript para copiar al portapapeles
-                                                            $this->dispatch('copy-to-clipboard', $codigo);
+                                                            // Crear script para copiar al portapapeles
+                                                            echo "<script>
+                                                                var codigo = '{$codigo}';
+                                                                navigator.clipboard.writeText(codigo).then(function() {
+                                                                    alert('Código copiado: ' + codigo);
+                                                                });
+                                                            </script>";
                                                         }
                                                     })
-                                            )
-                                            ->columnSpan(1),
+                                            ),
 
                                         Forms\Components\TextInput::make('nombre_producto')
                                             ->label('Producto')
