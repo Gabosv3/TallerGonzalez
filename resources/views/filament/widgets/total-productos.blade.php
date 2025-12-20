@@ -1,6 +1,6 @@
 <div class="filament-widget">
     <div class="p-4 bg-white dark:bg-gray-800 rounded-lg shadow">
         <div class="text-sm text-gray-500">Productos</div>
-        <div class="mt-2 text-3xl font-bold">{{ $this->count }}</div>
+        <div class="mt-2 text-3xl font-bold">{{ $count }}</div>
     </div>
 </div>

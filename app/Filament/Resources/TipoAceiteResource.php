@@ -139,6 +139,12 @@ class TipoAceiteResource extends Resource
                     ->label('Color')
                     ->width(50),
 
+                TextColumn::make('nombre')
+                    ->label('Nombre del Tipo')
+                    ->searchable()
+                    ->sortable()
+                    ->weight('font-semibold'),
+
                 TextColumn::make('clave')
                     ->label('Clave')
                     ->searchable()

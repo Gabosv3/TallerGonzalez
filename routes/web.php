@@ -36,3 +36,9 @@ Route::get('administrativo/reports/clientes/excel', [\App\Http\Controllers\Repor
 // Serve API docs UI
 use App\Http\Controllers\ApiDocsController;
 Route::get('/api/docs', [ApiDocsController::class, 'ui']);
+
+Route::get('/test-mail', [\App\Http\Controllers\TestMailController::class, 'send']);
+
+Route::get('/password/reset/{token}', function ($token) {
+    return redirect(route('filament.administrativo.auth.password-reset.reset', ['token' => $token, 'email' => request()->email]));
+})->name('password.reset');
