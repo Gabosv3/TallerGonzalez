@@ -22,6 +22,7 @@ use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Joaopaulolndev\FilamentEditProfile\FilamentEditProfilePlugin;
 use Joaopaulolndev\FilamentGeneralSettings\FilamentGeneralSettingsPlugin;
 use Joaopaulolndev\FilamentGeneralSettings\Models\GeneralSetting;
+use MixCode\FilamentMulti2fa\FilamentMulti2faPlugin;
 
 class AdministrativoPanelProvider extends PanelProvider
 {
@@ -88,6 +89,8 @@ class AdministrativoPanelProvider extends PanelProvider
                     ->setNavigationLabel('Mi Perfil')
                     ->setNavigationGroup('Configuración del Sistema')
                     ->setIcon('heroicon-o-user'),
+
+                FilamentMulti2faPlugin::make(),
 
 
 
