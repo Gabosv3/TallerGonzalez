@@ -90,7 +90,7 @@ class AdministrativoPanelProvider extends PanelProvider
                     ->setNavigationGroup('Configuración del Sistema')
                     ->setIcon('heroicon-o-user'),
 
-                FilamentMulti2faPlugin::make(),
+                
 
 
 
