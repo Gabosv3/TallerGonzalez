@@ -108,6 +108,34 @@ class ProductoResource extends Resource
                                     ->step(0.01)
                                     ->required()
                                     ->live(debounce: 500)
+                                    ->afterStateUpdated(function ($state, callable $set) {
+                                        if ($state !== null && $state !== '') {
+                                            // Cuando se modifica precio de compra, actualizar el con IVA
+                                            $precioConIva = round($state * 1.13, 2);
+                                            $set('precio_compra_con_iva', $precioConIva);
+                                        }
+                                    })
+                                    ->columnSpan(1),
+
+                                Forms\Components\TextInput::make('precio_compra_con_iva')
+                                    ->label('Compra + IVA (13%)')
+                                    ->numeric()
+                                    ->prefix('$')
+                                    ->step(0.01)
+                                    ->helperText('Se calcula automáticamente o modifica el precio sin IVA')
+                                    ->live(debounce: 500)
+                                    ->afterStateHydrated(function ($component, $state, $record) {
+                                        if ($record && $record->precio_compra) {
+                                            $component->state(round($record->precio_compra * 1.13, 2));
+                                        }
+                                    })
+                                    ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                        if ($state !== null && $state !== '') {
+                                            // Si se modifica el precio con IVA, recalcular el precio sin IVA
+                                            $precioSinIva = round($state / 1.13, 2);
+                                            $set('precio_compra', $precioSinIva);
+                                        }
+                                    })
                                     ->columnSpan(1),
 
                                 Forms\Components\TextInput::make('precio_venta')
@@ -127,7 +155,7 @@ class ProductoResource extends Resource
                                     ->columnSpan(1),
 
                                 Forms\Components\TextInput::make('precio_venta_con_iva')
-                                    ->label('Precio + IVA (13%)')
+                                    ->label('Venta + IVA (13%)')
                                     ->numeric()
                                     ->prefix('$')
                                     ->step(0.01)
@@ -156,7 +184,7 @@ class ProductoResource extends Resource
                                     ->columnSpan(1),
                             ]),
                     ])
-                    ->columns(4)
+                    ->columns(2)
                     ->collapsible(),
 
                 // Sección de inventario
