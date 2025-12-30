@@ -38,7 +38,7 @@ class AdministrativoPanelProvider extends PanelProvider
             ->default()
             ->id('administrativo')
             ->path('administrativo')
-            ->login(\App\Filament\Pages\Auth\Login::class)
+            ->login()
             
 
             ->colors([
