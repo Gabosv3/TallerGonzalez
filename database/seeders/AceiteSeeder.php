@@ -123,12 +123,13 @@ class AceiteSeeder extends Seeder
             return $r;
         }, $rows);
 
-        // Upsert usando combinación producto_id+marca_id+modelo como clave compuesta
-        DB::table('aceites')->upsert(
-            $prepared,
-            ['producto_id','marca_id','modelo'],
-            ['viscosidad','tipo_aceite_id','capacidad_ml','unidad_medida','presentacion','aplicaciones','compatibilidad','stock_disponible','stock_minimo','stock_maximo','activo']
-        );
+        // Actualizar si existe o insertar si no (basado en producto_id)
+        foreach ($prepared as $data) {
+            DB::table('aceites')->updateOrInsert(
+                ['producto_id' => $data['producto_id']],
+                array_diff_key($data, ['producto_id' => ''])
+            );
+        }
 
         $this->command->info('✅ Aceites insertados/actualizados.');
     }
