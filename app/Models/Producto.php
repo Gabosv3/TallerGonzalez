@@ -83,7 +83,7 @@ class Producto extends Model
     // Helper para saber si es aceite
     public function getEsAceiteAttribute(): bool
     {
-        return optional($this->tipoProducto)->nombre === 'aceite';
+        return strtolower(optional($this->tipoProducto)->nombre) === 'aceite';
     }
 
     // Helper para calcular precio con IVA (13%)
@@ -157,6 +157,7 @@ class Producto extends Model
                     'viscosidad' => $aceite->viscosidad,
                     'tipo_aceite' => $aceite->tipoAceite->nombre ?? 'N/A',
                     'capacidad' => $aceite->capacidad_formateada,
+                    'capacidad_ml' => $aceite->capacidad_ml,
                     'presentacion' => $aceite->presentacion,
                     'stock_disponible' => $aceite->stock_disponible,
                     'precio_venta' => $this->precio_venta, // Usa el precio del producto principal

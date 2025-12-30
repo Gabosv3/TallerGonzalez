@@ -84,7 +84,7 @@ class ProductoResource extends Resource
                                     ->label('Unidad de Medida')
                                     ->options([
                                         'pza' => 'Pieza',
-                                        'kg' => 'Kilogramo', 
+                                        'kg' => 'Kilogramo',
                                         'l' => 'Litro',
                                         'ml' => 'Mililitro',
                                         'gal' => 'Galón',
@@ -102,22 +102,33 @@ class ProductoResource extends Resource
                                     ->columnSpanFull(),
                             ])
                             ->collapsible()
-                            ->collapsed(),
+                            ->collapsed(fn($record) => !($record && $record->es_aceite)),
 
                         // Sección para mostrar información de variantes de aceite
                         Forms\Components\Section::make('Variantes de Aceite')
+                            ->description('Detalles técnicos de las presentaciones de aceite vinculadas')
                             ->icon('heroicon-o-beaker')
                             ->schema([
                                 Forms\Components\Placeholder::make('info_variantes')
                                     ->label('')
                                     ->content(function ($record) {
-                                        if (!$record || !$record->es_aceite) {
+                                        if (!$record) {
                                             return new HtmlString('
                                                 <div class="text-center p-4 bg-gray-50 border border-gray-200 rounded">
-                                                    <p class="text-sm text-gray-600">
-                                                        ' . (!$record ? 'Guarda el producto primero' : 
-                                                            'Este producto no es un aceite') . '
-                                                    </p>
+                                                    <p class="text-sm text-gray-600">Guarda el producto primero para ver las variantes</p>
+                                                </div>
+                                            ');
+                                        }
+
+                                        // Forzamos la carga de la relación si no está
+                                        if (!$record->relationLoaded('tipoProducto')) {
+                                            $record->load('tipoProducto');
+                                        }
+
+                                        if (!$record->es_aceite) {
+                                            return new HtmlString('
+                                                <div class="text-center p-4 bg-gray-50 border border-gray-200 rounded">
+                                                    <p class="text-sm text-gray-600">Este producto no es un aceite</p>
                                                 </div>
                                             ');
                                         }
@@ -125,119 +136,50 @@ class ProductoResource extends Resource
                                         $variantes = $record->info_variantes;
 
                                         if ($variantes->isEmpty()) {
-                                            return new HtmlString('
-                                                <div class="text-center p-6 bg-yellow-50 border border-yellow-200 rounded-lg">
-                                                    <p class="text-sm text-yellow-700 font-medium">
-                                                        Este producto aceite no tiene variantes registradas
-                                                    </p>
-                                                    <p class="text-xs text-yellow-600 mt-2">
-                                                        Ve al módulo de Aceites para agregar variantes
-                                                    </p>
-                                                    <div class="mt-3">
-                                                        <a href="' . \App\Filament\Resources\AceiteResource::getUrl('create') . '" 
-                                                           class="inline-flex items-center px-3 py-2 text-xs font-medium text-yellow-700 bg-yellow-100 rounded hover:bg-yellow-200">
-                                                            <span class="mr-1">➕</span>
-                                                            Agregar Variante
-                                                        </a>
-                                                    </div>
-                                                </div>
-                                            ');
+                                            return null;
                                         }
 
-                                        // Calcular stock total de todas las variantes
-                                        $stockTotal = $variantes->sum('stock_disponible');
-                                        $stockTotalColor = $stockTotal == 0 ? 'text-red-600' : 
-                                                         ($stockTotal <= 10 ? 'text-orange-600' : 'text-green-600');
+                                        $html = '<div class="space-y-4">';
 
-                                        $html = "
-                                            <div class='mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg'>
-                                                <div class='flex justify-between items-center'>
-                                                    <div>
-                                                        <h4 class='font-semibold text-blue-900'>Resumen de Variantes</h4>
-                                                        <p class='text-sm text-blue-700'>Total de variantes: <span class='font-medium'>{$variantes->count()}</span></p>
-                                                    </div>
-                                                    <div class='text-right'>
-                                                        <p class='text-sm text-blue-700'>Stock Total:</p>
-                                                        <p class='text-2xl font-bold {$stockTotalColor}'>{$stockTotal}</p>
-                                                        <p class='text-xs text-blue-600'>unidades disponibles</p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        ";
-
-                                        $html .= '<div class="space-y-3">';
-                                        
                                         foreach ($variantes as $index => $variante) {
-                                            $borderColor = $variante['stock_disponible'] == 0 ? 'border-red-200' : 
-                                                         ($variante['stock_disponible'] <= 5 ? 'border-orange-200' : 'border-green-200');
-                                            $bgColor = $variante['stock_disponible'] == 0 ? 'bg-red-50' : 
-                                                     ($variante['stock_disponible'] <= 5 ? 'bg-orange-50' : 'bg-green-50');
-                                            $statusIcon = $variante['stock_disponible'] == 0 ? '🔴' : 
-                                                        ($variante['stock_disponible'] <= 5 ? '🟡' : '🟢');
-
-                                            // Precio individual de la variante (si está disponible, sino usar precio del producto)
-                                            $precioIndividual = $variante['precio_venta'] ?? $record->precio_venta;
-                                            $precioCompra = $variante['precio_compra'] ?? $record->precio_compra;
-
                                             $html .= "
-                                                <div class='p-4 border rounded-lg {$borderColor} {$bgColor}'>
-                                                    <div class='flex justify-between items-start'>
-                                                        <div class='flex-1'>
-                                                            <div class='flex items-center gap-2 mb-2'>
-                                                                <span class='text-lg'>{$statusIcon}</span>
-                                                                <p class='font-semibold text-gray-900'>{$variante['marca']} {$variante['viscosidad']}</p>
-                                                                " . (!$variante['activo'] ? 
-                                                                '<span class="px-2 py-1 text-xs bg-red-100 text-red-800 rounded-full font-medium">INACTIVO</span>' : '') . "
-                                                            </div>
-                                                            
-                                                            <div class='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 text-sm'>
-                                                                <div class='flex items-center gap-1'>
-                                                                    <span class='font-medium text-gray-700'>Tipo:</span>
-                                                                    <span class='text-gray-900'>{$variante['tipo_aceite']}</span>
-                                                                </div>
-                                                                <div class='flex items-center gap-1'>
-                                                                    <span class='font-medium text-gray-700'>Capacidad:</span>
-                                                                    <span class='text-gray-900'>{$variante['capacidad']}</span>
-                                                                </div>
-                                                                <div class='flex items-center gap-1'>
-                                                                    <span class='font-medium text-gray-700'>Presentación:</span>
-                                                                    <span class='text-gray-900'>{$variante['presentacion']}</span>
-                                                                </div>
-                                                                <div class='flex items-center gap-1'>
-                                                                    <span class='font-medium text-gray-700'>Stock:</span>
-                                                                    <span class='text-gray-900 font-semibold'>{$variante['stock_disponible']} unidades</span>
-                                                                </div>
-                                                            </div>
-                                                            
-                                                            " . ($variante['especificaciones']['norma_api'] || $variante['especificaciones']['norma_acea'] ? "
-                                                            <div class='mt-2 flex flex-wrap gap-2'>
-                                                                " . ($variante['especificaciones']['norma_api'] ? 
-                                                                '<span class="inline-flex items-center px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded">API: ' . $variante['especificaciones']['norma_api'] . '</span>' : '') . "
-                                                                " . ($variante['especificaciones']['norma_acea'] ? 
-                                                                '<span class="inline-flex items-center px-2 py-1 text-xs font-medium bg-purple-100 text-purple-800 rounded">ACEA: ' . $variante['especificaciones']['norma_acea'] . '</span>' : '') . "
-                                                                " . ($variante['especificaciones']['viscosidad_sae'] ? 
-                                                                '<span class="inline-flex items-center px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded">SAE: ' . $variante['especificaciones']['viscosidad_sae'] . '</span>' : '') . "
-                                                            </div>
-                                                            " : '') . "
+                                                <div class='p-4 bg-white border border-gray-200 rounded-xl shadow-sm'>
+                                                    <div class='flex items-center gap-2 mb-4 pb-2 border-b border-gray-100'>
+                                                        <div class='p-1.5 bg-blue-50 rounded-lg'>
+                                                            <svg class='w-5 h-5 text-blue-600' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                                                                <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.628.282a2 2 0 01-1.806 0l-.628-.282a6 6 0 00-3.86-.517l-2.387.477a2 2 0 00-1.022.547V19a2 2 0 002 2h11a2 2 0 002-2v-3.572zM15 11V5a2 2 0 10-4 0v6m-4 1v1m12-1v1m-12 4v1m12-1v1' />
+                                                            </svg>
                                                         </div>
-                                                        
-                                                        <div class='text-right ml-4 min-w-[120px]'>
-                                                            <div class='mb-3'>
-                                                                <p class='text-2xl font-bold text-gray-900'>{$variante['stock_disponible']}</p>
-                                                                <p class='text-xs text-gray-600'>stock actual</p>
-                                                            </div>
-                                                            <div class='space-y-1'>
-                                                                <div>
-                                                                    <p class='text-lg font-semibold text-green-600'>\$" . number_format($precioIndividual, 2) . "</p>
-                                                                    <p class='text-xs text-gray-500'>precio venta</p>
-                                                                </div>
-                                                                <div>
-                                                                    <p class='text-sm font-medium text-gray-600'>\$" . number_format($precioCompra, 2) . "</p>
-                                                                    <p class='text-xs text-gray-500'>precio compra</p>
-                                                                </div>
-                                                            </div>
+                                                        <p class='font-bold text-gray-900'>{$variante['marca']} - {$variante['tipo_aceite']}</p>
+                                                    </div>
+
+                                                    <div class='grid grid-cols-2 md:grid-cols-4 gap-6'>
+                                                        <div class='space-y-1'>
+                                                            <p class='text-[10px] font-bold text-gray-400 uppercase tracking-widest'>Viscosidad SAE</p>
+                                                            <p class='text-sm text-gray-900 font-semibold bg-gray-50 p-2 rounded-lg border border-gray-100'>{$variante['viscosidad']}</p>
+                                                        </div>
+                                                        <div class='space-y-1'>
+                                                            <p class='text-[10px] font-bold text-gray-400 uppercase tracking-widest'>Capacidad</p>
+                                                            <p class='text-sm text-gray-900 font-semibold bg-gray-50 p-2 rounded-lg border border-gray-100'>{$variante['capacidad_ml']} ml</p>
+                                                        </div>
+                                                        <div class='space-y-1'>
+                                                            <p class='text-[10px] font-bold text-gray-400 uppercase tracking-widest'>Presentación</p>
+                                                            <p class='text-sm text-gray-900 font-semibold bg-gray-50 p-2 rounded-lg border border-gray-100'>{$variante['presentacion']}</p>
+                                                        </div>
+                                                        <div class='space-y-1'>
+                                                            <p class='text-[10px] font-bold text-gray-400 uppercase tracking-widest'>Equivalencia</p>
+                                                            <p class='text-sm text-blue-700 font-bold bg-blue-50 p-2 rounded-lg border border-blue-100'>{$variante['capacidad']}</p>
                                                         </div>
                                                     </div>
+                                                    
+                                                    " . ($variante['especificaciones']['norma_api'] || $variante['especificaciones']['norma_acea'] ? "
+                                                    <div class='mt-4 pt-3 border-t border-gray-50 flex flex-wrap gap-2'>
+                                                        " . ($variante['especificaciones']['norma_api'] ?
+                                                '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-800 border border-slate-200">API: ' . $variante['especificaciones']['norma_api'] . '</span>' : '') . "
+                                                        " . ($variante['especificaciones']['norma_acea'] ?
+                                                '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-800 border border-slate-200">ACEA: ' . $variante['especificaciones']['norma_acea'] . '</span>' : '') . "
+                                                    </div>
+                                                    " : '') . "
                                                 </div>
                                             ";
                                         }
@@ -246,9 +188,9 @@ class ProductoResource extends Resource
                                         return new HtmlString($html);
                                     })
                             ])
-                            ->visible(fn ($record) => $record && $record->es_aceite)
+                            ->visible(fn($record) => $record && $record->es_aceite && $record->aceites()->exists())
                             ->collapsible()
-                            ->collapsed(),
+                            ->collapsed(false),
                     ])
                     ->columnSpan(['lg' => 2]),
 
@@ -436,8 +378,8 @@ class ProductoResource extends Resource
                         return 'success';
                     })
                     ->weight('bold')
-                    ->formatStateUsing(fn ($record) => "{$record->stock_actual} {$record->unidad_medida}")
-                    ->description(fn ($record) => "Mín: {$record->stock_minimo}"),
+                    ->formatStateUsing(fn($record) => "{$record->stock_actual} {$record->unidad_medida}")
+                    ->description(fn($record) => "Mín: {$record->stock_minimo}"),
 
                 // Columna de estado con toggle rápido
                 Tables\Columns\ToggleColumn::make('activo')
@@ -464,7 +406,7 @@ class ProductoResource extends Resource
             ->filters([
                 // Mostrar registros borrados (soft deletes)
                 Tables\Filters\TrashedFilter::make(),
-                
+
                 // Filtro por tipo de producto
                 Tables\Filters\SelectFilter::make('tipo_producto_id')
                     ->label('Tipo de Producto')
@@ -482,7 +424,7 @@ class ProductoResource extends Resource
                 // Filtro de Stock Bajo
                 Tables\Filters\Filter::make('stock_bajo')
                     ->label('Stock Bajo')
-                    ->query(fn (Builder $query) => $query->whereColumn('stock_actual', '<=', 'stock_minimo'))
+                    ->query(fn(Builder $query) => $query->whereColumn('stock_actual', '<=', 'stock_minimo'))
                     ->indicator('Stock Bajo'),
 
                 // Filtro por estado
@@ -495,9 +437,9 @@ class ProductoResource extends Resource
                 // Nuevo filtro: Productos con variantes
                 Tables\Filters\Filter::make('con_variantes')
                     ->label('Con Variantes')
-                    ->query(fn (Builder $query) => $query->whereHas('aceites', function ($q) {
+                    ->query(fn(Builder $query) => $query->whereHas('aceites', function ($q) {
                         $q->groupBy('producto_id')
-                          ->havingRaw('COUNT(*) > 1');
+                            ->havingRaw('COUNT(*) > 1');
                     }))
                     ->toggle(),
             ])
@@ -505,14 +447,14 @@ class ProductoResource extends Resource
                 Tables\Actions\Action::make('reporte_reorden_pdf')
                     ->label('Reporte Reorden (PDF)')
                     ->icon('heroicon-o-clipboard-document-check')
-                    ->url(fn () => route('productos.reporte_reorden'))
+                    ->url(fn() => route('productos.reporte_reorden'))
                     ->openUrlInNewTab()
                     ->color('warning'),
 
                 Tables\Actions\Action::make('reporte_general')
                     ->label('Reporte General PDF')
                     ->icon('heroicon-o-document-text')
-                    ->url(fn () => route('productos.reporte_general'))
+                    ->url(fn() => route('productos.reporte_general'))
                     ->openUrlInNewTab()
                     ->color('primary'),
             ])
@@ -530,38 +472,38 @@ class ProductoResource extends Resource
                         ->label('Gestionar Variantes')
                         ->icon('heroicon-o-beaker')
                         ->color('success')
-                        ->url(fn ($record) => \App\Filament\Resources\AceiteResource::getUrl('index', ['tableFilters[producto_id][value]' => $record->id]))
-                        ->visible(fn ($record) => $record->es_aceite),
+                        ->url(fn($record) => \App\Filament\Resources\AceiteResource::getUrl('index', ['tableFilters[producto_id][value]' => $record->id]))
+                        ->visible(fn($record) => $record->es_aceite),
 
                     Tables\Actions\DeleteAction::make()
                         ->icon('heroicon-o-trash')
                         ->color('danger'),
-                    
+
                     Tables\Actions\RestoreAction::make()
                         ->icon('heroicon-o-arrow-uturn-left')
                         ->color('success'),
                 ])
-                ->button()
-                ->label('Acciones')
-                ->color('gray')
-                ->size('sm'),
+                    ->button()
+                    ->label('Acciones')
+                    ->color('gray')
+                    ->size('sm'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                     Tables\Actions\RestoreBulkAction::make(),
-                    
+
                     Tables\Actions\BulkAction::make('activar')
                         ->label('Activar seleccionados')
                         ->icon('heroicon-o-check-circle')
                         ->color('success')
-                        ->action(fn ($records) => $records->each->update(['activo' => true])),
+                        ->action(fn($records) => $records->each->update(['activo' => true])),
 
                     Tables\Actions\BulkAction::make('desactivar')
                         ->label('Desactivar seleccionados')
                         ->icon('heroicon-o-x-circle')
                         ->color('danger')
-                        ->action(fn ($records) => $records->each->update(['activo' => false])),
+                        ->action(fn($records) => $records->each->update(['activo' => false])),
                 ]),
             ])
             ->emptyStateActions([
@@ -595,15 +537,15 @@ class ProductoResource extends Resource
         ];
     }
 
+
     public static function getNavigationBadge(): ?string
     {
-        $lowStockCount = static::getModel()::whereColumn('stock_actual', '<=', 'stock_minimo')->count();
-        return $lowStockCount > 0 ? (string) $lowStockCount : null;
+        return (string) static::getModel()::where('activo', true)->count();
     }
 
     public static function getNavigationBadgeColor(): ?string
     {
-        return 'danger';
+        return 'success';
     }
 
     public static function getGloballySearchableAttributes(): array

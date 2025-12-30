@@ -316,10 +316,9 @@ class AceiteResource extends Resource
         return static::getModel()::where('activo', true)->count();
     }
 
-    public static function getNavigationBadgeColor(): string|array|null
+    public static function getNavigationBadgeColor(): ?string
     {
-        $lowStockCount = static::getModel()::whereColumn('stock_disponible', '<=', 'stock_minimo')->count();
-        return $lowStockCount > 0 ? 'warning' : 'success';
+        return 'success';
     }
 
     public static function getEloquentQuery(): Builder

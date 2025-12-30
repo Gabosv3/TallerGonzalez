@@ -224,6 +224,11 @@ class RoleResource extends Resource implements HasShieldPermissions
             : null;
     }
 
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'success';
+    }
+
     public static function isScopedToTenant(): bool
     {
         return Utils::isScopedToTenant();
