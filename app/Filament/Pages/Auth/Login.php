@@ -12,6 +12,16 @@ class Login extends BaseLogin
         return false;
     }
 
+    public function getRegistrationUrl(): ?string
+    {
+        return null;
+    }
+
+    public function getRegisterAction(): \Filament\Actions\Action
+    {
+        return parent::getRegisterAction()->hidden();
+    }
+
     protected function getPasswordFormComponent(): Component
     {
         return parent::getPasswordFormComponent()

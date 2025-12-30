@@ -2,7 +2,6 @@
 
 namespace App\Providers\Filament;
 
-use App\Models\Setting;
 use Backstage\TwoFactorAuth\TwoFactorAuthPlugin;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -10,7 +9,6 @@ use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
-use Filament\Support\Colors\Color;
 use Filament\Widgets;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
@@ -23,7 +21,6 @@ use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Joaopaulolndev\FilamentEditProfile\FilamentEditProfilePlugin;
 use Joaopaulolndev\FilamentGeneralSettings\FilamentGeneralSettingsPlugin;
 use Joaopaulolndev\FilamentGeneralSettings\Models\GeneralSetting;
-use MixCode\FilamentMulti2fa\FilamentMulti2faPlugin;
 use ShuvroRoy\FilamentSpatieLaravelBackup\FilamentSpatieLaravelBackupPlugin;
 use ShuvroRoy\FilamentSpatieLaravelBackup\Pages\Backups;
 
@@ -38,8 +35,12 @@ class AdministrativoPanelProvider extends PanelProvider
             ->default()
             ->id('administrativo')
             ->path('administrativo')
-            ->login()
-            
+            ->login(\App\Filament\Pages\Auth\Login::class)
+            ->passwordReset(
+                \App\Filament\Pages\Auth\RequestPasswordReset::class,
+                \App\Filament\Pages\Auth\ResetPassword::class
+            )
+
 
             ->colors([
                 'primary' => $settings && $settings->theme_color ? $settings->theme_color : '#FFA500',  // Si es null, se pone el color predeterminado
@@ -94,15 +95,10 @@ class AdministrativoPanelProvider extends PanelProvider
                     ->setIcon('heroicon-o-user'),
                 TwoFactorAuthPlugin::make(),
                 FilamentSpatieLaravelBackupPlugin::make()
-    ->usingPage(Backups::class)
-    ->authorize(fn () => true),
-
-
-
-
-
-
+                    ->usingPage(Backups::class)
+                    ->authorize(fn() => true),
             ])
+            ->registration(null) // Deshabilitar registro explícitamente
             ->authMiddleware([
                 Authenticate::class,
             ]);
