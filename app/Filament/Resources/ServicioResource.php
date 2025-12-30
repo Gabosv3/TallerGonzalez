@@ -285,12 +285,12 @@ class ServicioResource extends Resource
                 Tables\Columns\TextColumn::make('estado')
                     ->label('Estado')
                     ->badge()
-                    ->formatStateUsing(fn($state) => match ($state) {
-                        'pendiente' => '🟡 Pendiente',
-                        'en_proceso' => '🔵 En Proceso',
-                        'completado' => '🟢 Completado',
-                        'cancelado' => '🔴 Cancelado',
-                        default => $state
+                    ->formatStateUsing(function ($state) {
+                        if ($state === 'pendiente') return '🟡 Pendiente';
+                        if ($state === 'en_proceso') return '🔵 En Proceso';
+                        if ($state === 'completado') return '🟢 Completado';
+                        if ($state === 'cancelado') return '🔴 Cancelado';
+                        return $state;
                     })
                     ->colors([
                         'warning' => 'pendiente',

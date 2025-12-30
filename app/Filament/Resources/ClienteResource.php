@@ -388,10 +388,13 @@ class ClienteResource extends Resource
                                 TextInput::make('limite_credito')
                                     ->label('Límite de Crédito ($)')
                                     ->numeric()
-                                    ->default(0)
+                                    ->live()
+                                    ->required(fn ($get) => filled($get('dias_credito')) || filled($get('descuento_autorizado')))
+                                    ->dehydrateStateUsing(fn ($state) => $state ?? 0)
                                     ->prefix('$')
                                     ->step(0.01)
                                     ->validationMessages([
+                                        'required' => 'El límite de crédito es obligatorio si se definen otras condiciones.',
                                         'numeric' => 'El límite de crédito debe ser un número válido.',
                                     ])
                                     ->helperText('Límite máximo de crédito autorizado'),
@@ -399,9 +402,12 @@ class ClienteResource extends Resource
                                 TextInput::make('dias_credito')
                                     ->label('Días de Crédito')
                                     ->numeric()
-                                    ->default(0)
+                                    ->live()
+                                    ->required(fn ($get) => filled($get('limite_credito')) || filled($get('descuento_autorizado')))
+                                    ->dehydrateStateUsing(fn ($state) => $state ?? 0)
                                     ->suffix('días')
                                     ->validationMessages([
+                                        'required' => 'Los días de crédito son obligatorios si se definen otras condiciones.',
                                         'numeric' => 'Los días de crédito deben ser un número válido.',
                                     ])
                                     ->helperText('Plazo de pago en días'),
@@ -409,11 +415,14 @@ class ClienteResource extends Resource
                                 TextInput::make('descuento_autorizado')
                                     ->label('Descuento Autorizado (%)')
                                     ->numeric()
-                                    ->default(0)
+                                    ->live()
+                                    ->required(fn ($get) => filled($get('limite_credito')) || filled($get('dias_credito')))
+                                    ->dehydrateStateUsing(fn ($state) => $state ?? 0)
                                     ->suffix('%')
                                     ->minValue(0)
                                     ->maxValue(100)
                                     ->validationMessages([
+                                        'required' => 'El descuento autorizado es obligatorio si se definen otras condiciones.',
                                         'numeric' => 'El descuento debe ser un número válido.',
                                         'min' => 'El descuento no puede ser menor a 0%.',
                                         'max' => 'El descuento no puede ser mayor a 100%.',
@@ -481,13 +490,13 @@ class ClienteResource extends Resource
 
                 BadgeColumn::make('tipo_cliente')
                     ->label('Tipo')
-                    ->formatStateUsing(fn ($state) => match($state) {
-                        'consumidor_final' => '👤 Final',
-                        'contribuyente' => '🏢 Contribuyente',
-                        'empresa' => '🏭 Empresa',
-                        'distribuidor' => '🚚 Distribuidor',
-                        'mayorista' => '📦 Mayorista',
-                        default => $state
+                    ->formatStateUsing(function ($state) {
+                        if ($state === 'consumidor_final') return '👤 Final';
+                        if ($state === 'contribuyente') return '🏢 Contribuyente';
+                        if ($state === 'empresa') return '🏭 Empresa';
+                        if ($state === 'distribuidor') return '🚚 Distribuidor';
+                        if ($state === 'mayorista') return '📦 Mayorista';
+                        return $state;
                     })
                     ->colors([
                         'gray' => 'consumidor_final',

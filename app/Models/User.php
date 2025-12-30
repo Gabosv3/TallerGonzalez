@@ -84,4 +84,20 @@ class User extends Authenticatable implements FilamentUser
     {
         return route('filament.administrativo.pages.dashboard');
     }
+
+    /**
+     * Enviar la notificación de restablecimiento de contraseña.
+     *
+     * @param  string  $token
+     * @return void
+     */
+    public function sendPasswordResetNotification($token): void
+    {
+        $url = route('filament.administrativo.auth.password-reset.reset', [
+            'token' => $token,
+            'email' => $this->getEmailForPasswordReset(),
+        ]);
+
+        \Illuminate\Support\Facades\Mail::to($this->email)->send(new \App\Mail\ResetPasswordMail($url));
+    }
 }

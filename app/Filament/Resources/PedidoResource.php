@@ -434,23 +434,23 @@ class PedidoResource extends Resource
                 TextColumn::make('estado')
                     ->label('Estado')
                     ->badge()
-                    ->formatStateUsing(fn($state) => match ($state) {
-                        'pendiente' => '🟡 Pendiente',
-                        'confirmado' => '🔵 Confirmado',
-                        'en_camino' => '🟠 En Camino',
-                        'parcial' => '🟣 Parcial',
-                        'completado' => '🟢 Completado',
-                        'cancelado' => '🔴 Cancelado',
-                        default => $state
+                    ->formatStateUsing(function ($state) {
+                        if ($state === 'pendiente') return '🟡 Pendiente';
+                        if ($state === 'confirmado') return '🔵 Confirmado';
+                        if ($state === 'en_camino') return '🟠 En Camino';
+                        if ($state === 'parcial') return '🟣 Parcial';
+                        if ($state === 'completado') return '🟢 Completado';
+                        if ($state === 'cancelado') return '🔴 Cancelado';
+                        return $state;
                     })
-                    ->color(fn($state) => match ($state) {
-                        'pendiente' => 'warning',
-                        'confirmado' => 'info',
-                        'en_camino' => 'primary',
-                        'parcial' => 'purple',
-                        'completado' => 'success',
-                        'cancelado' => 'danger',
-                        default => 'gray'
+                    ->color(function ($state) {
+                        if ($state === 'pendiente') return 'warning';
+                        if ($state === 'confirmado') return 'info';
+                        if ($state === 'en_camino') return 'primary';
+                        if ($state === 'parcial') return 'purple';
+                        if ($state === 'completado') return 'success';
+                        if ($state === 'cancelado') return 'danger';
+                        return 'gray';
                     }),
 
                 TextColumn::make('total')

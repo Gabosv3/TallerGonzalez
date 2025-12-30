@@ -138,38 +138,10 @@ class AceiteResource extends Resource
                     ]),
 
                 Section::make('Gestión de Inventario')
-                    ->description('Control de stock y disponibilidad')
+                    ->description('Control de disponibilidad y compatibilidad')
                     ->icon('heroicon-o-cube')
                     ->collapsible()
                     ->schema([
-                        Grid::make(3)
-                            ->schema([
-                                TextInput::make('stock_disponible')
-                                    ->label('Stock Disponible')
-                                    ->numeric()
-                                    ->required()
-                                    ->default(0)
-                                    ->minValue(0)
-                                    ->suffix('unidades')
-                                    ->helperText('Cantidad actual en inventario'),
-
-                                TextInput::make('stock_minimo')
-                                    ->label('Stock Mínimo')
-                                    ->numeric()
-                                    ->required()
-                                    ->default(5)
-                                    ->minValue(0)
-                                    ->suffix('unidades')
-                                    ->helperText('Alerta de stock bajo'),
-
-                                TextInput::make('stock_maximo')
-                                    ->label('Stock Máximo')
-                                    ->numeric()
-                                    ->minValue(0)
-                                    ->suffix('unidades')
-                                    ->helperText('Capacidad máxima recomendada'),
-                            ]),
-
                         Textarea::make('compatibilidad')
                             ->label('Compatibilidad')
                             ->rows(2)
@@ -211,11 +183,12 @@ class AceiteResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->badge()
-                    ->color(fn($record) => match ($record->tipoAceite->clave ?? '') {
-                        'sintetico' => 'success',
-                        'semi-sintetico' => 'warning',
-                        'mineral' => 'gray',
-                        default => 'primary'
+                    ->color(function ($record) {
+                        $clave = $record->tipoAceite->clave ?? '';
+                        if ($clave === 'sintetico') return 'success';
+                        if ($clave === 'semi-sintetico') return 'warning';
+                        if ($clave === 'mineral') return 'gray';
+                        return 'primary';
                     }),
 
                 TextColumn::make('capacidad_ml')
@@ -224,20 +197,6 @@ class AceiteResource extends Resource
                     ->sortable()
                     ->alignCenter()
                     ->color('gray'),
-
-                TextColumn::make('stock_disponible')
-                    ->label('Stock')
-                    ->sortable()
-                    ->alignCenter()
-                    ->color(
-                        fn($record) =>
-                        $record->stock_disponible == 0 ? 'danger' : 
-                        ($record->stock_disponible <= $record->stock_minimo ? 'warning' : 'success')
-                    )
-                    ->description(
-                        fn($record) =>
-                        $record->stock_minimo > 0 ? "Mín: {$record->stock_minimo}" : ''
-                    ),
 
                 IconColumn::make('activo')
                     ->label('Activo')
@@ -282,22 +241,6 @@ class AceiteResource extends Resource
                     ->placeholder('Todos los productos')
                     ->trueLabel('Solo activos')
                     ->falseLabel('Solo inactivos'),
-
-                Tables\Filters\Filter::make('bajo_stock')
-                    ->label('Stock Bajo')
-                    ->query(
-                        fn(Builder $query): Builder =>
-                        $query->whereColumn('stock_disponible', '<=', 'stock_minimo')
-                    )
-                    ->toggle(),
-
-                Tables\Filters\Filter::make('sin_stock')
-                    ->label('Sin Stock')
-                    ->query(
-                        fn(Builder $query): Builder =>
-                        $query->where('stock_disponible', '<=', 0)
-                    )
-                    ->toggle(),
             ])
             ->actions([
                 Tables\Actions\ActionGroup::make([

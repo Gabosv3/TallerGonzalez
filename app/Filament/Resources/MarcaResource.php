@@ -98,10 +98,10 @@ class MarcaResource extends Resource
                                     ->content(function ($record) {
                                         if (!$record) return 'Nueva marca';
                                         
-                                        $aceitesCount = $record->aceites()->count();
-                                        $aceitesActivos = $record->aceites()->where('activo', true)->count();
+                                        $productosCount = $record->productos()->count();
+                                        $productosActivos = $record->productos()->where('activo', true)->count();
                                         
-                                        return "{$aceitesCount} productos totales · {$aceitesActivos} activos";
+                                        return "{$productosCount} productos totales · {$productosActivos} activos";
                                     })
                                     ->hidden(fn ($record) => !$record?->exists),
 
@@ -162,13 +162,13 @@ class MarcaResource extends Resource
                     ->badge()
                     ->color('gray'),
 
-                TextColumn::make('aceites_count')
+                TextColumn::make('productos_count')
                     ->label('Productos')
-                    ->counts('aceites')
+                    ->counts('productos')
                     ->sortable()
                     ->alignCenter()
                     ->color('blue')
-                    ->description(fn ($record) => $record->aceites()->where('activo', true)->count() . ' activos'),
+                    ->description(fn ($record) => $record->productos()->where('activo', true)->count() . ' activos'),
 
                 TextColumn::make('orden')
                     ->label('Orden')
@@ -212,11 +212,11 @@ class MarcaResource extends Resource
 
                 Tables\Filters\Filter::make('con_productos')
                     ->label('Con productos')
-                    ->query(fn (Builder $query): Builder => $query->has('aceites')),
+                    ->query(fn (Builder $query): Builder => $query->has('productos')),
 
                 Tables\Filters\Filter::make('sin_productos')
                     ->label('Sin productos')
-                    ->query(fn (Builder $query): Builder => $query->doesntHave('aceites')),
+                    ->query(fn (Builder $query): Builder => $query->doesntHave('productos')),
 
                 Tables\Filters\Filter::make('recientes')
                     ->label('Agregadas este mes')

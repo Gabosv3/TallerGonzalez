@@ -67,13 +67,11 @@ class EditPedido extends EditRecord
 
     private function getEstadosValidos(string $estadoActual): array
     {
-        return match ($estadoActual) {
-            'pendiente' => ['confirmado', 'cancelado'],
-            'confirmado' => ['en_camino', 'parcial', 'completado', 'cancelado'],
-            'en_camino' => ['parcial', 'completado', 'cancelado'],
-            'parcial' => ['completado', 'cancelado'],
-            default => [],
-        };
+        if ($estadoActual === 'pendiente') return ['confirmado', 'cancelado'];
+        if ($estadoActual === 'confirmado') return ['en_camino', 'parcial', 'completado', 'cancelado'];
+        if ($estadoActual === 'en_camino') return ['parcial', 'completado', 'cancelado'];
+        if ($estadoActual === 'parcial') return ['completado', 'cancelado'];
+        return [];
     }
 
     protected function afterSave(): void

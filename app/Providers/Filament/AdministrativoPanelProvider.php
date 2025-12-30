@@ -36,7 +36,10 @@ class AdministrativoPanelProvider extends PanelProvider
             ->id('administrativo')
             ->path('administrativo')
             ->login(\App\Filament\Pages\Auth\Login::class)
-            ->passwordReset()
+            ->passwordReset(
+                \App\Filament\Pages\Auth\RequestPasswordReset::class,
+                \App\Filament\Pages\Auth\ResetPassword::class
+            )
 
             ->colors([
                 'primary' => $settings && $settings->theme_color ? $settings->theme_color : '#FFA500',  // Si es null, se pone el color predeterminado
@@ -53,11 +56,11 @@ class AdministrativoPanelProvider extends PanelProvider
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
                 Widgets\AccountWidget::class,
-                \App\Filament\Widgets\TotalClientes::class,
-                \App\Filament\Widgets\TotalProductos::class,
-                \App\Filament\Widgets\TotalPedidos::class,
+                \App\Filament\Widgets\StatsOverview::class,
+                \App\Filament\Widgets\PedidosPorMes::class,
                 \App\Filament\Widgets\Top10ProductosMes::class,
                 \App\Filament\Widgets\Top10ClientesMes::class,
+                \App\Filament\Widgets\ProductosPorMarca::class,
                 \App\Filament\Widgets\ProductosMasVendidosTabla::class,
                 \App\Filament\Widgets\ClientesMasCompranTabla::class,
             ])

@@ -9,7 +9,8 @@ use Illuminate\Support\Facades\DB;
 class Top10ClientesMes extends ChartWidget
 {
     protected static ?string $heading = '👥 Top 10 Clientes Que Más Compran Este Mes';
-    protected static ?int $sort = 3;
+    protected static ?int $sort = 4;
+    protected int | string | array $columnSpan = 1;
 
     protected function getData(): array
     {
