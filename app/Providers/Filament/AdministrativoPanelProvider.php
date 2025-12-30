@@ -39,10 +39,7 @@ class AdministrativoPanelProvider extends PanelProvider
             ->id('administrativo')
             ->path('administrativo')
             ->login(\App\Filament\Pages\Auth\Login::class)
-            ->passwordReset(
-                \App\Filament\Pages\Auth\RequestPasswordReset::class,
-                \App\Filament\Pages\Auth\ResetPassword::class
-            )
+            
 
             ->colors([
                 'primary' => $settings && $settings->theme_color ? $settings->theme_color : '#FFA500',  // Si es null, se pone el color predeterminado
