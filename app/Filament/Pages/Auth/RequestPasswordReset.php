@@ -8,5 +8,9 @@ use Illuminate\Support\Facades\Password;
 
 class RequestPasswordReset extends BaseRequestPasswordReset
 {
-    // Podemos sobreescribir métodos aquí si es necesario para depurar o personalizar
+    public function register(): void
+    {
+        \Illuminate\Support\Facades\Log::info('RequestPasswordReset::register() llamado');
+        parent::register();
+    }
 }
