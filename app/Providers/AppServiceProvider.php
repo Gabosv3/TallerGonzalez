@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\ResetPasswordMail;
+use App\Services\CustomPasswordBroker;
 
 use Joaopaulolndev\FilamentGeneralSettings\Models\GeneralSetting;
 
@@ -48,33 +49,18 @@ class AppServiceProvider extends ServiceProvider
             fn (): string => Blade::render('@vite(\'resources/css/custom-login.css\')'),
         );
 
-        // ===== INTERCEPTOR DE PASSWORD RESET =====
-        // Esto intercepta TODOS los intentos de reset de contraseña
-        // y se asegura de que el correo se envíe correctamente
-        Password::useResetNotifier(function (User $user, string $token) {
-            Log::info('=== INTERCEPTOR PASSWORD RESET ACTIVADO ===');
-            Log::info("Usuario: {$user->email}");
-            Log::info("Token generado: {$token}");
+        // ===== CUSTOM PASSWORD BROKER =====
+        // Reemplazar el password broker por defecto con uno personalizado
+        // que asegura que el correo de reset se envíe correctamente
+        Password::broker('users', function ($app) {
+            Log::info('Inicializando CustomPasswordBroker');
             
-            try {
-                // Construir la URL de reset
-                $url = route('filament.administrativo.auth.password-reset.reset', [
-                    'token' => $token,
-                    'email' => $user->email,
-                ]);
-                
-                Log::info("URL de reset: {$url}");
-                
-                // Enviar el correo directamente
-                Mail::to($user->email)->send(new ResetPasswordMail($url));
-                
-                Log::info("✓ Correo enviado exitosamente a: {$user->email}");
-                
-            } catch (\Exception $e) {
-                Log::error("✗ ERROR enviando correo: " . $e->getMessage());
-                Log::error("Stack trace: " . $e->getTraceAsString());
-                throw $e;
-            }
+            return new CustomPasswordBroker(
+                $app['auth.password.tokens'],
+                $app['auth']->createUserProvider(config('auth.providers.users')),
+                $app['hash'],
+                $app['config']['auth.passwords']['users']
+            );
         });
     }
 }
