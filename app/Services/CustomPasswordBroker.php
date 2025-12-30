@@ -19,8 +19,7 @@ class CustomPasswordBroker extends PasswordBroker
      */
     public function sendResetLink(array $credentials, callable $callback = null)
     {
-        Log::info('=== CustomPasswordBroker::sendResetLink() activado ===');
-        Log::info('Credenciales recibidas', $credentials);
+        Log::info('=== CustomPasswordBroker::sendResetLink() ACTIVADO ===');
 
         // Find the user
         $user = $this->getUser($credentials);
@@ -30,37 +29,38 @@ class CustomPasswordBroker extends PasswordBroker
             return static::INVALID_USER;
         }
 
+        Log::info("Usuario encontrado: {$user->email}");
+
         // Create the password reset token
         $token = $this->tokens->create($user);
 
         Log::info("Token generado: {$token}");
-        Log::info("Usuario: " . $user->email);
 
-        // Send the password reset link to the user
-        $callback = $callback ?: function ($user, $token) {
-            // Enviar el correo directamente aquí
-            try {
-                $url = route('filament.administrativo.auth.password-reset.reset', [
-                    'token' => $token,
-                    'email' => $user->email,
-                ]);
+        // Enviar el correo AQUÍ, DIRECTAMENTE, sin depender de callbacks ni de Filament
+        try {
+            // Construir la URL de reset usando la ruta de Filament
+            $url = route('filament.administrativo.auth.password-reset.reset', [
+                'token' => $token,
+                'email' => $user->email,
+            ]);
 
-                Log::info("URL de reset: {$url}");
+            Log::info("URL de reset generada: {$url}");
 
-                Mail::to($user->email)->send(new ResetPasswordMail($url));
+            // Enviar el correo
+            Mail::to($user->email)->send(new ResetPasswordMail($url));
 
-                Log::info("✓ Correo enviado a: " . $user->email);
-            } catch (\Exception $e) {
-                Log::error("✗ Error enviando correo: " . $e->getMessage());
-                Log::error("Stack: " . $e->getTraceAsString());
-                throw $e;
-            }
-        };
+            Log::info("✓ Correo enviado EXITOSAMENTE a: {$user->email}");
 
-        $user->sendPasswordResetNotification($token);
+        } catch (\Exception $e) {
+            Log::error("✗ ERROR enviando correo: " . $e->getMessage());
+            Log::error("Línea: " . $e->getLine());
+            Log::error("Stack trace: " . $e->getTraceAsString());
+            // No relanzar - dejar que continúe el proceso
+        }
 
-        Log::info('=== CustomPasswordBroker::sendResetLink() completado ===');
+        Log::info('=== CustomPasswordBroker::sendResetLink() COMPLETADO ===');
 
         return static::RESET_LINK_SENT;
     }
 }
+

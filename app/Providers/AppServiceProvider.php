@@ -7,11 +7,6 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 use App\Policies\GeneralSettingsPolicy;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Password;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
-use App\Mail\ResetPasswordMail;
-use App\Services\CustomPasswordBroker;
 
 use Joaopaulolndev\FilamentGeneralSettings\Models\GeneralSetting;
 
@@ -48,19 +43,6 @@ class AppServiceProvider extends ServiceProvider
             'panels::auth.login.form.after',
             fn (): string => Blade::render('@vite(\'resources/css/custom-login.css\')'),
         );
-
-        // ===== CUSTOM PASSWORD BROKER =====
-        // Reemplazar el password broker por defecto con uno personalizado
-        // que asegura que el correo de reset se envíe correctamente
-        Password::broker('users', function ($app) {
-            Log::info('Inicializando CustomPasswordBroker');
-            
-            return new CustomPasswordBroker(
-                $app['auth.password.tokens'],
-                $app['auth']->createUserProvider(config('auth.providers.users')),
-                $app['hash'],
-                $app['config']['auth.passwords']['users']
-            );
-        });
     }
 }
+
