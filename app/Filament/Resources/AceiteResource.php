@@ -163,6 +163,13 @@ class AceiteResource extends Resource
         return $table
             ->defaultSort('marca.nombre')
             ->columns([
+                TextColumn::make('producto.nombre')
+                    ->label('Producto Asociado')
+                    ->searchable()
+                    ->sortable()
+                    ->weight('bold')
+                    ->description(fn($record) => "Código: " . ($record->producto->codigo ?? 'N/A')),
+
                 TextColumn::make('marca.nombre')
                     ->label('Marca')
                     ->searchable()
@@ -214,6 +221,12 @@ class AceiteResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
+                SelectFilter::make('producto')
+                    ->label('Producto')
+                    ->relationship('producto', 'nombre')
+                    ->searchable()
+                    ->preload(),
+
                 SelectFilter::make('marca')
                     ->label('Marca')
                     ->relationship('marca', 'nombre')
