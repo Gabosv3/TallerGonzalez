@@ -95,15 +95,22 @@ class Producto extends Model
     // Helper para obtener nombre completo con tipo
     public function getNombreCompletoAttribute(): string
     {
-        $tipo = $this->tipoProducto ? " ({$this->tipoProducto->nombre})" : '';
-        
-        // Si es aceite y tiene variantes, mostrar información de variantes
-        if ($this->es_aceite && $this->tiene_variantes) {
-            $totalVariantes = $this->aceites->count();
-            return "{$this->nombre} [{$totalVariantes} variantes]" . $tipo;
+        if ($this->es_aceite) {
+            $variante = $this->variante_principal;
+            if ($variante) {
+                $tipoAceite = $variante->tipoAceite->nombre ?? '';
+                $detalles = " - {$variante->viscosidad} - {$tipoAceite} - {$variante->capacidad_formateada}";
+                
+                if ($this->tiene_variantes) {
+                    $total = $this->aceites->count();
+                    return "{$this->nombre} [{$total} vars]{$detalles}";
+                }
+                
+                return "{$this->nombre}{$detalles}";
+            }
         }
-        
-        return $this->nombre . $tipo;
+
+        return $this->nombre;
     }
 
     // Helper para estado de stock

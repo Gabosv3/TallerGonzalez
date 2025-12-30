@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Sanctum\HasApiTokens;
 use MixCode\FilamentMulti2fa\Enums\TwoFactorAuthType;
 use MixCode\FilamentMulti2fa\Traits\UsingTwoFA;
@@ -18,7 +19,7 @@ use Spatie\Permission\Traits\HasRoles;
 class User extends Authenticatable implements FilamentUser
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasApiTokens,HasFactory, Notifiable,HasRoles,SoftDeletes,UsingTwoFA;
+    use HasApiTokens,HasFactory, Notifiable,HasRoles,SoftDeletes,TwoFactorAuthenticatable;
 
     /**
      * The attributes that are mass assignable.

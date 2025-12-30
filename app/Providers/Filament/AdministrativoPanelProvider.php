@@ -3,6 +3,7 @@
 namespace App\Providers\Filament;
 
 use App\Models\Setting;
+use Backstage\TwoFactorAuth\TwoFactorAuthPlugin;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
@@ -23,6 +24,8 @@ use Joaopaulolndev\FilamentEditProfile\FilamentEditProfilePlugin;
 use Joaopaulolndev\FilamentGeneralSettings\FilamentGeneralSettingsPlugin;
 use Joaopaulolndev\FilamentGeneralSettings\Models\GeneralSetting;
 use MixCode\FilamentMulti2fa\FilamentMulti2faPlugin;
+use ShuvroRoy\FilamentSpatieLaravelBackup\FilamentSpatieLaravelBackupPlugin;
+use ShuvroRoy\FilamentSpatieLaravelBackup\Pages\Backups;
 
 class AdministrativoPanelProvider extends PanelProvider
 {
@@ -92,8 +95,12 @@ class AdministrativoPanelProvider extends PanelProvider
                     ->setNavigationLabel('Mi Perfil')
                     ->setNavigationGroup('Configuración del Sistema')
                     ->setIcon('heroicon-o-user'),
+                TwoFactorAuthPlugin::make(),
+                FilamentSpatieLaravelBackupPlugin::make()
+    ->usingPage(Backups::class)
+    ->authorize(fn () => true),
 
-                
+
 
 
 
