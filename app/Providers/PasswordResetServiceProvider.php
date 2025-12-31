@@ -10,37 +10,28 @@ use Illuminate\Support\Facades\Log;
 class PasswordResetServiceProvider extends ServiceProvider
 {
     /**
-     * Register the password broker.
-     */
-    public function register(): void
-    {
-        $this->app->singleton('auth.password.broker', function ($app) {
-            Log::info('Registrando CustomPasswordBroker en el contenedor');
-            
-            // Obtener el manager de password brokers
-            $manager = new PasswordBrokerManager($app);
-
-            // Resolver el broker 'users' con nuestro broker personalizado
-            $manager->extend('users', function ($app, $config) {
-                Log::info('Usando CustomPasswordBroker para el broker "users"');
-                
-                return new CustomPasswordBroker(
-                    $app['auth.password.tokens'],
-                    $app['auth']->createUserProvider($config['provider']),
-                    $app['hash'],
-                    $config
-                );
-            });
-
-            return $manager;
-        });
-    }
-
-    /**
      * Bootstrap the service provider.
      */
     public function boot(): void
     {
-        Log::info('PasswordResetServiceProvider bootstrapped');
+        Log::info('PasswordResetServiceProvider::boot() iniciado');
+
+        // Extender el manager de password brokers para usar nuestro broker personalizado
+        $this->app['auth.password']->extend('users', function ($app, $config) {
+            Log::info('Registrando CustomPasswordBroker para el broker "users"');
+            
+            $broker = new CustomPasswordBroker(
+                $app['auth.password.tokens'],
+                $app['auth']->createUserProvider($config['provider'] ?? 'users'),
+                $app['hash'],
+                $config
+            );
+            
+            Log::info('CustomPasswordBroker registrado exitosamente');
+            return $broker;
+        });
+
+        Log::info('PasswordResetServiceProvider::boot() completado');
     }
 }
+

@@ -40,6 +40,8 @@ class AdministrativoPanelProvider extends PanelProvider
                 \App\Filament\Pages\Auth\RequestPasswordReset::class,
                 \App\Filament\Pages\Auth\ResetPassword::class
             )
+            ->authPasswordBroker('users')
+            ->emailVerification()
 
 
             ->colors([
@@ -102,5 +104,7 @@ class AdministrativoPanelProvider extends PanelProvider
             ->authMiddleware([
                 Authenticate::class,
             ]);
+
+            
     }
 }
