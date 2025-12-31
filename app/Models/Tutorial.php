@@ -17,12 +17,21 @@ class Tutorial extends Model
         'thumbnail_path',
         'orden',
         'activo',
+        'tipo_origen',
     ];
 
     protected $casts = [
         'activo' => 'boolean',
         'orden' => 'integer',
     ];
+
+    public function getTipoOrigenAttribute(): string
+    {
+        if (!empty($this->video_path)) {
+            return 'local';
+        }
+        return 'url';
+    }
 
     public function getEmbedUrlAttribute(): ?string
     {

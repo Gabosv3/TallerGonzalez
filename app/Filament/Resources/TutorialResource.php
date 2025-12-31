@@ -51,11 +51,16 @@ class TutorialResource extends Resource
                             ])
                             ->default('url')
                             ->live()
+                            ->dehydrated(false)
                             ->required()
+                            ->afterStateHydrated(function (Forms\Set $set, $state, $record) {
+                                if ($record) {
+                                    $set('tipo_origen', $record->video_path ? 'local' : 'url');
+                                }
+                            })
                             ->validationMessages([
                                 'required' => 'Debes seleccionar el origen del video.',
-                            ])
-                            ->afterStateUpdated(fn (Forms\Set $set) => $set('video_path', null) && $set('video_url', null)),
+                            ]),
 
                         Forms\Components\TextInput::make('video_url')
                             ->label('URL del Video')
