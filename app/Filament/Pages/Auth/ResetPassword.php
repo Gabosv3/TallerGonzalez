@@ -40,6 +40,7 @@ class ResetPassword extends BaseResetPassword
                     ->required()
                     ->same('password')
                     ->revealable()
+                    ->dehydrated(false)
                     ->validationMessages([
                         'same' => 'Las contraseñas no coinciden.',
                     ]),
