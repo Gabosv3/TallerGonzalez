@@ -118,7 +118,7 @@
                 </div>
 
                 <!-- Grid de videos -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-4">
                     @foreach($tutoriales as $tutorial)
                         <div 
                             x-show="search === '' || {{ json_encode(strtolower($tutorial->titulo)) }}.includes(search.toLowerCase()) || {{ json_encode(strtolower($tutorial->descripcion)) }}.includes(search.toLowerCase())"
