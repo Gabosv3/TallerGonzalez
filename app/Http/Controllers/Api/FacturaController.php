@@ -78,11 +78,16 @@ class FacturaController extends Controller
                     // Verificar si es un servicio o un producto
                     // Un producto requiere: producto_id numérico y que exista en BD
                     $productoId = $item['producto_id'] ?? null;
-                    $esProducto = !empty($productoId) && is_numeric($productoId) && Producto::find($productoId);
+                    
+                    // Convertir a string para validación segura
+                    $productoIdStr = (string)$productoId;
+                    
+                    // Verificar si es numérico e intenta buscar en BD
+                    $esProducto = !empty($productoIdStr) && is_numeric($productoIdStr) && Producto::find((int)$productoIdStr);
 
                     if ($esProducto) {
                         // Productos: bloquear y controlar stock
-                        $producto = Producto::where('id', $productoId)->lockForUpdate()->firstOrFail();
+                        $producto = Producto::where('id', (int)$productoIdStr)->lockForUpdate()->firstOrFail();
 
                         // Control de stock si aplica
                         if ($producto->control_stock && isset($item['cantidad'])) {
@@ -114,8 +119,8 @@ class FacturaController extends Controller
                         $descripcion = $item['descripcion'] ?? $item['nombre'] ?? 'Servicio';
                         
                         // Si viene producto_id custom, incluirlo en la descripción
-                        if (!empty($productoId)) {
-                            $descripcion = "[{$productoId}] {$descripcion}";
+                        if (!empty($productoIdStr)) {
+                            $descripcion = "[{$productoIdStr}] {$descripcion}";
                         }
 
                         $subtotal = round($cantidad * $precio, 2);
