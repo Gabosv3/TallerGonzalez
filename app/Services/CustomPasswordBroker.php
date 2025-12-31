@@ -19,22 +19,24 @@ class CustomPasswordBroker extends PasswordBroker
      */
     public function sendResetLink(array $credentials, callable $callback = null)
     {
-        Log::info('=== CustomPasswordBroker::sendResetLink() ACTIVADO ===');
+        Log::info('╔════════════════════════════════════════╗');
+        Log::info('║ CustomPasswordBroker::sendResetLink()  ║');
+        Log::info('╚════════════════════════════════════════╝');
 
         // Find the user
         $user = $this->getUser($credentials);
 
         if (is_null($user)) {
-            Log::warning('Usuario no encontrado para: ' . ($credentials['email'] ?? 'unknown'));
+            Log::warning('❌ Usuario no encontrado: ' . ($credentials['email'] ?? 'desconocido'));
             return static::INVALID_USER;
         }
 
-        Log::info("Usuario encontrado: {$user->email}");
+        Log::info("✓ Usuario encontrado: {$user->email}");
 
         // Create the password reset token
         $token = $this->tokens->create($user);
 
-        Log::info("Token generado: {$token}");
+        Log::info("✓ Token generado exitosamente");
 
         // Enviar el correo AQUÍ, DIRECTAMENTE, sin depender de callbacks ni de Filament
         try {
@@ -44,23 +46,26 @@ class CustomPasswordBroker extends PasswordBroker
                 'email' => $user->email,
             ]);
 
-            Log::info("URL de reset generada: {$url}");
+            Log::info("✓ URL de reset generada");
 
             // Enviar el correo
             Mail::to($user->email)->send(new ResetPasswordMail($url));
 
-            Log::info("✓ Correo enviado EXITOSAMENTE a: {$user->email}");
+            Log::info("✅ Correo enviado EXITOSAMENTE a: {$user->email}");
 
         } catch (\Exception $e) {
-            Log::error("✗ ERROR enviando correo: " . $e->getMessage());
+            Log::error("❌ ERROR enviando correo: " . $e->getMessage());
             Log::error("Línea: " . $e->getLine());
-            Log::error("Stack trace: " . $e->getTraceAsString());
+            Log::error("Archivo: " . $e->getFile());
             // No relanzar - dejar que continúe el proceso
         }
 
-        Log::info('=== CustomPasswordBroker::sendResetLink() COMPLETADO ===');
+        Log::info('╔════════════════════════════════════════╗');
+        Log::info('║        Proceso Completado ✓            ║');
+        Log::info('╚════════════════════════════════════════╝');
 
         return static::RESET_LINK_SENT;
     }
 }
+
 
