@@ -20,7 +20,7 @@ class StoreFacturaRequest extends FormRequest
             'cliente_id' => ['nullable', 'exists:clientes,id'],
             'cliente' => ['required_without:cliente_id', 'string', 'max:255'],
             'items' => ['required', 'array', 'min:1'],
-            'items.*.producto_id' => ['nullable', 'string|numeric'],
+            'items.*.producto_id' => ['nullable'],
             'items.*.nombre' => ['nullable', 'string', 'max:255'],
             'items.*.descripcion' => ['nullable', 'string'],
             'items.*.cantidad' => ['required', 'numeric', 'min:1'],
