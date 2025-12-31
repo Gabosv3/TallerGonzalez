@@ -5,6 +5,7 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use App\Services\CustomPasswordBroker;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Password;
 
 class PasswordResetServiceProvider extends ServiceProvider
 {
@@ -14,26 +15,6 @@ class PasswordResetServiceProvider extends ServiceProvider
     public function register(): void
     {
         Log::info('PasswordResetServiceProvider::register() iniciado');
-
-        // Extender el manager de password brokers para usar nuestro broker personalizado
-        $this->app->extend('auth.password', function ($manager, $app) {
-            Log::info('Extendiendo auth.password manager para registrar CustomPasswordBroker');
-            
-            $manager->extend('users', function ($app, $config) {
-                Log::info('Creando instancia de CustomPasswordBroker');
-                
-                return new CustomPasswordBroker(
-                    $app['auth.password.tokens'],
-                    $app['auth']->createUserProvider($config['provider'] ?? 'users'),
-                    $app['hash'],
-                    $config
-                );
-            });
-            
-            return $manager;
-        });
-
-        Log::info('PasswordResetServiceProvider::register() completado');
     }
 
     /**
@@ -41,8 +22,28 @@ class PasswordResetServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Log::info('PasswordResetServiceProvider::boot() ejecutado');
+        Log::info('PasswordResetServiceProvider::boot() iniciado');
+
+        // Registrar nuestro broker personalizado usando Password::resolver()
+        Password::broker('users', function ($app) {
+            Log::info('Resolviendo CustomPasswordBroker para el broker "users"');
+            
+            $config = $app['config']['auth.passwords.users'];
+            
+            $broker = new CustomPasswordBroker(
+                $app['auth.password.tokens'],
+                $app['auth']->createUserProvider($config['provider'] ?? 'users'),
+                $app['hash'],
+                $config
+            );
+            
+            Log::info('✓ CustomPasswordBroker creado exitosamente');
+            return $broker;
+        });
+
+        Log::info('PasswordResetServiceProvider::boot() completado');
     }
 }
+
 
 
