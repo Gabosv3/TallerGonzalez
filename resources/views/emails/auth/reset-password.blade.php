@@ -1,16 +1,25 @@
 <x-mail::message>
-# Restablecer Contraseña
+# 🔐 Restablecer Contraseña
 
-Has recibido este correo porque hemos recibido una solicitud de restablecimiento de contraseña para tu cuenta.
+¡Hola!
+
+Has recibido este correo porque se ha solicitado un restablecimiento de contraseña para tu cuenta en **{{ config('app.name') }}**.
 
 <x-mail::button :url="$url">
 Restablecer Contraseña
 </x-mail::button>
 
-Este enlace de restablecimiento de contraseña caducará en 60 minutos.
+**Información importante:**
+- Este enlace es **válido solo por 60 minutos**
+- Si no solicitaste el restablecimiento, **ignora este correo**
+- No compartas este enlace con nadie
 
-Si no has solicitado un restablecimiento de contraseña, no es necesario realizar ninguna otra acción.
+Si tienes problemas al hacer clic en el botón, puedes copiar y pegar esta dirección en tu navegador:
+{{ $url }}
 
-Gracias,<br>
-{{ config('app.name') }}
+---
+
+Atentamente,<br>
+**{{ config('app.name') }}**<br>
+Sistema de Administración
 </x-mail::message>

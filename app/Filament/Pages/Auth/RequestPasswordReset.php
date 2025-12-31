@@ -11,8 +11,6 @@ use Illuminate\Support\Facades\Log;
 
 class RequestPasswordReset extends BaseRequestPasswordReset
 {
-    protected static string $view = 'filament.pages.auth.password-reset.request-password-reset';
-
     public function form(Form $form): Form
     {
         return $form
