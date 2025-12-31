@@ -30,12 +30,14 @@ class ResetPassword extends BaseResetPassword
                     ->regex('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/')
                     ->validationMessages([
                         'regex' => 'La contraseña debe contener minúscula, mayúscula, número y carácter especial (@$!%*?&).',
-                    ])
+                        'minLength' => 'La contraseña debe tener al menos 8 caracteres.',
+                        'required' => 'La contraseña es requerida.',
+                        ])
                     ->helperText('Mínimo 8 caracteres con mayúscula, minúscula, número y símbolo')
                     ->revealable(),
                     
-                TextInput::make('password_confirmation')
-                    ->label('Confirmar Contraseña')
+                TextInput::make('passwordConfirmation')
+                    ->label('Confirmar Contraseñas')
                     ->password()
                     ->required()
                     ->same('password')
@@ -43,6 +45,7 @@ class ResetPassword extends BaseResetPassword
                     ->dehydrated(false)
                     ->validationMessages([
                         'same' => 'Las contraseñas no coinciden.',
+                        'required' => 'La confirmación de la contraseña es requerida.',
                     ]),
             ]);
     }

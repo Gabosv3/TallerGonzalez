@@ -26,11 +26,6 @@ class ChangePasswordRequest extends FormRequest
                 'confirmed',
                 'different:current_password',
             ],
-            'password_confirmation' => [
-                'required',
-                'string',
-                'min:8',
-            ],
         ];
     }
 
