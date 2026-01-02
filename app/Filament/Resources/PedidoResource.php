@@ -63,6 +63,9 @@ class PedidoResource extends Resource
                                                 ->label('Número de Orden')
                                                 
                                                 ->unique(ignoreRecord: true)
+                                                ->validationMessages([
+                                                    'unique' => 'Este número de orden ya existe.',
+                                                ])
                                                 ->maxLength(50)
                                                 ->placeholder('PED-' . date('Ymd') . '-0001')
                                                 ->disabled()
@@ -73,6 +76,9 @@ class PedidoResource extends Resource
                                                 ->label('Proveedor')
                                                 ->relationship('proveedor', 'nombre')
                                                 ->required()
+                                                ->validationMessages([
+                                                    'required' => 'Debes seleccionar un proveedor.',
+                                                ])
                                                 ->searchable()
                                                 ->preload()
                                                 ->live()
@@ -105,12 +111,20 @@ class PedidoResource extends Resource
                                                 ->required()
                                                 ->default(now())
                                                 ->maxDate(now())
+                                                ->validationMessages([
+                                                    'max_date' => 'La fecha de orden no puede ser futura.',
+                                                    'required' => 'La fecha de orden es obligatoria.',
+                                                ])
                                                 ->helperText('Fecha de emisión de la orden'),
 
                                             DatePicker::make('fecha_esperada')
                                                 ->label('Fecha Esperada')
                                                 ->required()
-                                                ->minDate(now())
+                                                ->minDate(now()->startOfDay())
+                                                ->validationMessages([
+                                                    'after_or_equal' => 'La fecha esperada debe ser igual o posterior a hoy.',
+                                                    'required' => 'La fecha esperada es obligatoria.',
+                                                ])
                                                 ->default(now()->addDays(7))
                                                 ->helperText('Fecha esperada de entrega'),
 
@@ -126,6 +140,9 @@ class PedidoResource extends Resource
                                                 ])
                                                 ->default('pendiente')
                                                 ->required()
+                                                ->validationMessages([
+                                                    'required' => 'El estado es obligatorio.',
+                                                ])
                                                 ->native(false),
                                         ]),
 
@@ -162,6 +179,9 @@ class PedidoResource extends Resource
                                                         ->label('Producto')
                                                         ->relationship('producto', 'nombre')
                                                         ->required()
+                                                        ->validationMessages([
+                                                            'required' => 'Selecciona un producto.',
+                                                        ])
                                                         ->searchable(['codigo', 'nombre'])
                                                         ->preload()
                                                         ->live()
@@ -176,6 +196,10 @@ class PedidoResource extends Resource
                                                                 if ($producto) {
                                                                     // Usar precio de compra SIN IVA
                                                                     $set('precio_unitario', $producto->precio_compra);
+                                                                    
+                                                                    // Calcular y setear precio con IVA
+                                                                    $precioConIva = round($producto->precio_compra * 1.13, 2);
+                                                                    $set('precio_con_iva_temp', $precioConIva);
 
                                                                     self::actualizarSubtotal($set, $get);
                                                                 }
@@ -189,6 +213,10 @@ class PedidoResource extends Resource
                                                         ->required()
                                                         ->default(1)
                                                         ->minValue(1)
+                                                        ->validationMessages([
+                                                            'required' => 'Ingresa una cantidad.',
+                                                            'min' => 'La cantidad debe ser al menos 1.',
+                                                        ])
                                                         ->live(onBlur: true)
                                                         ->afterStateUpdated(fn(Set $set, Get $get) => self::actualizarSubtotal($set, $get)),
 
@@ -196,6 +224,9 @@ class PedidoResource extends Resource
                                                         ->label('Precio Sin IVA')
                                                         ->numeric()
                                                         ->required()
+                                                        ->validationMessages([
+                                                            'required' => 'El precio es obligatorio.',
+                                                        ])
                                                         ->prefix('$')
                                                         ->step(0.01)
                                                         ->live(debounce: 500)
@@ -315,6 +346,9 @@ class PedidoResource extends Resource
                                                 ->label('Total General')
                                                 ->numeric()
                                                 ->required()
+                                                ->validationMessages([
+                                                    'required' => 'El total no puede estar vacío.',
+                                                ])
                                                 ->prefix('$')
                                                 ->default(0)
                                                 ->extraInputAttributes(['class' => 'text-xl font-bold text-green-600']),
@@ -396,7 +430,7 @@ class PedidoResource extends Resource
             $subtotal += $cantidad * $precio;
         }
 
-        $impuestoPorcentaje = (float) ($get('impuesto_porcentaje') ?? 16);
+        $impuestoPorcentaje = (float) ($get('impuesto_porcentaje') ?? 13);
         $montoImpuesto = $subtotal * ($impuestoPorcentaje / 100);
         $total = $subtotal + $montoImpuesto;
 
@@ -434,23 +468,23 @@ class PedidoResource extends Resource
                 TextColumn::make('estado')
                     ->label('Estado')
                     ->badge()
-                    ->formatStateUsing(fn($state) => match ($state) {
-                        'pendiente' => '🟡 Pendiente',
-                        'confirmado' => '🔵 Confirmado',
-                        'en_camino' => '🟠 En Camino',
-                        'parcial' => '🟣 Parcial',
-                        'completado' => '🟢 Completado',
-                        'cancelado' => '🔴 Cancelado',
-                        default => $state
+                    ->formatStateUsing(function ($state) {
+                        if ($state === 'pendiente') return '🟡 Pendiente';
+                        if ($state === 'confirmado') return '🔵 Confirmado';
+                        if ($state === 'en_camino') return '🟠 En Camino';
+                        if ($state === 'parcial') return '🟣 Parcial';
+                        if ($state === 'completado') return '🟢 Completado';
+                        if ($state === 'cancelado') return '🔴 Cancelado';
+                        return $state;
                     })
-                    ->color(fn($state) => match ($state) {
-                        'pendiente' => 'warning',
-                        'confirmado' => 'info',
-                        'en_camino' => 'primary',
-                        'parcial' => 'purple',
-                        'completado' => 'success',
-                        'cancelado' => 'danger',
-                        default => 'gray'
+                    ->color(function ($state) {
+                        if ($state === 'pendiente') return 'warning';
+                        if ($state === 'confirmado') return 'info';
+                        if ($state === 'en_camino') return 'primary';
+                        if ($state === 'parcial') return 'purple';
+                        if ($state === 'completado') return 'success';
+                        if ($state === 'cancelado') return 'danger';
+                        return 'gray';
                     }),
 
                 TextColumn::make('total')
@@ -694,6 +728,21 @@ class PedidoResource extends Resource
                             $pedidosIds = $records->pluck('id')->toArray();
                             return redirect()->route('pedidos.reporte.multiple', [
                                 'pedidos' => $pedidosIds,
+                            ]);
+                        }),
+
+                    Tables\Actions\BulkAction::make('reporte_compras_por_producto')
+                        ->label('Reporte de Compras por Producto')
+                        ->icon('heroicon-o-chart-pie')
+                        ->color('warning')
+                        ->action(function ($records) {
+                            // Obtener las fechas del primer y último pedido seleccionado
+                            $fechaInicio = $records->min('fecha_orden');
+                            $fechaFin = $records->max('fecha_orden');
+                            
+                            return redirect()->route('pedidos.reporte.compras_por_producto', [
+                                'fecha_inicio' => $fechaInicio?->format('Y-m-d'),
+                                'fecha_fin' => $fechaFin?->format('Y-m-d'),
                             ]);
                         }),
 

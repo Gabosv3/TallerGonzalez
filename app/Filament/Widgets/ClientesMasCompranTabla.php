@@ -12,7 +12,8 @@ use Illuminate\Database\Eloquent\Builder;
 class ClientesMasCompranTabla extends BaseWidget
 {
     protected static ?string $heading = '👨‍💼 Clientes Más Compradores - Detalle';
-    protected static ?int $sort = 5;
+    protected static ?int $sort = 7;
+    protected int | string | array $columnSpan = 'full';
 
     protected function getTableQuery(): Builder
     {

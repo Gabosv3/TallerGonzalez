@@ -56,7 +56,7 @@ return [
         'pages' => true,
         'widgets' => true,
         'resources' => true,
-        'custom_permissions' => false,
+        'custom_permissions' => true,
     ],
 
     'generator' => [
@@ -87,6 +87,22 @@ return [
 
     'register_role_policy' => [
         'enabled' => true,
+    ],
+
+    'custom_permissions' => [
+        'download-backup',
+        'delete-backup',
+        'create-backup',
+        'view_reporte',
+        'view_any_reporte',
+        'view_reporte_facturas',
+        'view_any_reporte_facturas',
+        'view_reporte_ventas',
+        'view_any_reporte_ventas',
+        'view_reporte_clientes',
+        'view_any_reporte_clientes',
+        'view_reporte_productos',
+        'view_any_reporte_productos',
     ],
 
 ];

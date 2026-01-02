@@ -12,6 +12,11 @@ class ReportesGenerales extends Page
     protected static string $view = 'filament.pages.reportes-generales';
     protected static bool $shouldRegisterNavigation = true;
 
+    public static function canAccess(): bool
+    {
+        return auth()->user()?->can('view_reporte') ?? false;
+    }
+
     public function getViewData(): array
     {
         return [];

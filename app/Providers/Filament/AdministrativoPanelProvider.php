@@ -2,14 +2,13 @@
 
 namespace App\Providers\Filament;
 
-use App\Models\Setting;
+use Backstage\TwoFactorAuth\TwoFactorAuthPlugin;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
-use Filament\Support\Colors\Color;
 use Filament\Widgets;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
@@ -22,6 +21,8 @@ use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Joaopaulolndev\FilamentEditProfile\FilamentEditProfilePlugin;
 use Joaopaulolndev\FilamentGeneralSettings\FilamentGeneralSettingsPlugin;
 use Joaopaulolndev\FilamentGeneralSettings\Models\GeneralSetting;
+use ShuvroRoy\FilamentSpatieLaravelBackup\FilamentSpatieLaravelBackupPlugin;
+use ShuvroRoy\FilamentSpatieLaravelBackup\Pages\Backups;
 
 class AdministrativoPanelProvider extends PanelProvider
 {
@@ -34,7 +35,14 @@ class AdministrativoPanelProvider extends PanelProvider
             ->default()
             ->id('administrativo')
             ->path('administrativo')
-            ->login()
+            ->login(\App\Filament\Pages\Auth\Login::class)
+            ->passwordReset(
+                \App\Filament\Pages\Auth\RequestPasswordReset::class,
+                \App\Filament\Pages\Auth\ResetPassword::class
+            )
+            ->authPasswordBroker('users')
+            ->emailVerification()
+
 
             ->colors([
                 'primary' => $settings && $settings->theme_color ? $settings->theme_color : '#FFA500',  // Si es null, se pone el color predeterminado
@@ -43,20 +51,19 @@ class AdministrativoPanelProvider extends PanelProvider
             ->brandLogoHeight('3.5rem')
             ->brandName($settings && $settings->site_name ? $settings->site_name : 'No se encontró')  // Si el nombre del sitio es null, se pone 'No se encontró'
             ->darkModeBrandLogo(asset($settings && $settings->site_logo ? 'storage/' . $settings->site_logo : 'assets/img/tallergonzalez.png'))
-            ->globalSearch(true)
-            ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
-            ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
+            ->discoverResources(app_path('Filament/Resources'), 'App\\Filament\\Resources')
+            ->discoverPages(app_path('Filament/Pages'), 'App\\Filament\\Pages')
             ->pages([
                 Pages\Dashboard::class,
             ])
-            ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
+            ->discoverWidgets(app_path('Filament/Widgets'), 'App\\Filament\\Widgets')
             ->widgets([
                 Widgets\AccountWidget::class,
-                \App\Filament\Widgets\TotalClientes::class,
-                \App\Filament\Widgets\TotalProductos::class,
-                \App\Filament\Widgets\TotalPedidos::class,
+                \App\Filament\Widgets\StatsOverview::class,
+                \App\Filament\Widgets\PedidosPorMes::class,
                 \App\Filament\Widgets\Top10ProductosMes::class,
                 \App\Filament\Widgets\Top10ClientesMes::class,
+                \App\Filament\Widgets\ProductosPorMarca::class,
                 \App\Filament\Widgets\ProductosMasVendidosTabla::class,
                 \App\Filament\Widgets\ClientesMasCompranTabla::class,
             ])
@@ -88,13 +95,16 @@ class AdministrativoPanelProvider extends PanelProvider
                     ->setNavigationLabel('Mi Perfil')
                     ->setNavigationGroup('Configuración del Sistema')
                     ->setIcon('heroicon-o-user'),
-
-
-
-
+                TwoFactorAuthPlugin::make(),
+                FilamentSpatieLaravelBackupPlugin::make()
+                    ->usingPage(Backups::class)
+                    ->authorize(fn() => true),
             ])
+            ->registration(null) // Deshabilitar registro explícitamente
             ->authMiddleware([
                 Authenticate::class,
             ]);
+
+            
     }
 }

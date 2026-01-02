@@ -19,8 +19,13 @@ class ProductosRelationManager extends RelationManager
         return $form
             ->schema([
                 Forms\Components\TextInput::make('nombre')
+                    ->label('Nombre del Producto')
                     ->required()
-                    ->maxLength(255),
+                    ->maxLength(255)
+                    ->validationMessages([
+                        'required' => 'El nombre del producto es obligatorio.',
+                        'max' => 'El nombre no puede exceder los 255 caracteres.',
+                    ]),
             ]);
     }
 

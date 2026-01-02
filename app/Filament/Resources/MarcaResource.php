@@ -51,6 +51,11 @@ class MarcaResource extends Resource
                                     ->maxLength(255)
                                     ->unique(Marca::class, 'nombre', ignoreRecord: true)
                                     ->placeholder('Ej. Mobil, Castrol, Shell')
+                                    ->validationMessages([
+                                        'required' => 'El nombre de la marca es obligatorio.',
+                                        'max' => 'El nombre no puede exceder 255 caracteres.',
+                                        'unique' => 'Esta marca ya está registrada.',
+                                    ])
                                     ->live(onBlur: true)
                                     ->afterStateUpdated(function ($state, callable $set) {
                                         if ($state) {
@@ -65,6 +70,9 @@ class MarcaResource extends Resource
                                     ->disk('public')
                                     ->visibility('public')
                                     ->helperText('Sube el logo de la marca (máx. 2MB)')
+                                    ->validationMessages([
+                                        'image' => 'El archivo debe ser una imagen válida.',
+                                    ])
                                     ->downloadable()
                                     ->openable(),
 
@@ -72,12 +80,18 @@ class MarcaResource extends Resource
                                     ->label('País de Origen')
                                     ->maxLength(100)
                                     ->placeholder('Ej. Estados Unidos, Reino Unido, Alemania')
+                                    ->validationMessages([
+                                        'max' => 'El país de origen no puede exceder 100 caracteres.',
+                                    ])
                                     ->helperText('País donde se originó la marca'),
 
                                 TextInput::make('orden')
                                     ->label('Orden de Visualización')
                                     ->numeric()
                                     ->default(0)
+                                    ->validationMessages([
+                                        'numeric' => 'El orden debe ser un número.',
+                                    ])
                                     ->helperText('Número para ordenar en listas (menor = primero)'),
                             ])
                             ->columnSpan(1),
@@ -98,10 +112,10 @@ class MarcaResource extends Resource
                                     ->content(function ($record) {
                                         if (!$record) return 'Nueva marca';
                                         
-                                        $aceitesCount = $record->aceites()->count();
-                                        $aceitesActivos = $record->aceites()->where('activo', true)->count();
+                                        $productosCount = $record->productos()->count();
+                                        $productosActivos = $record->productos()->where('activo', true)->count();
                                         
-                                        return "{$aceitesCount} productos totales · {$aceitesActivos} activos";
+                                        return "{$productosCount} productos totales · {$productosActivos} activos";
                                     })
                                     ->hidden(fn ($record) => !$record?->exists),
 
@@ -162,13 +176,13 @@ class MarcaResource extends Resource
                     ->badge()
                     ->color('gray'),
 
-                TextColumn::make('aceites_count')
+                TextColumn::make('productos_count')
                     ->label('Productos')
-                    ->counts('aceites')
+                    ->counts('productos')
                     ->sortable()
                     ->alignCenter()
                     ->color('blue')
-                    ->description(fn ($record) => $record->aceites()->where('activo', true)->count() . ' activos'),
+                    ->description(fn ($record) => $record->productos()->where('activo', true)->count() . ' activos'),
 
                 TextColumn::make('orden')
                     ->label('Orden')
@@ -212,11 +226,11 @@ class MarcaResource extends Resource
 
                 Tables\Filters\Filter::make('con_productos')
                     ->label('Con productos')
-                    ->query(fn (Builder $query): Builder => $query->has('aceites')),
+                    ->query(fn (Builder $query): Builder => $query->has('productos')),
 
                 Tables\Filters\Filter::make('sin_productos')
                     ->label('Sin productos')
-                    ->query(fn (Builder $query): Builder => $query->doesntHave('aceites')),
+                    ->query(fn (Builder $query): Builder => $query->doesntHave('productos')),
 
                 Tables\Filters\Filter::make('recientes')
                     ->label('Agregadas este mes')

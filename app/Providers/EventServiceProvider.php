@@ -8,6 +8,9 @@ use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvi
 use App\Events\VentaCreada;
 use App\Listeners\NotificarVenta;
 use App\Listeners\NotificarStockBajo;
+use App\Listeners\SendTwoFactorCodeDirectly;
+use Laravel\Fortify\Events\TwoFactorAuthenticationChallenged;
+use Laravel\Fortify\Events\TwoFactorAuthenticationEnabled;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -23,6 +26,12 @@ class EventServiceProvider extends ServiceProvider
         VentaCreada::class => [
             NotificarVenta::class,
             NotificarStockBajo::class,
+        ],
+        TwoFactorAuthenticationChallenged::class => [
+            SendTwoFactorCodeDirectly::class,
+        ],
+        TwoFactorAuthenticationEnabled::class => [
+            SendTwoFactorCodeDirectly::class,
         ],
     ];
 

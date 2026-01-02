@@ -14,8 +14,8 @@ class TipoProductoSeeder extends Seeder
     public function run(): void
     {
         $rows = [
-            ['nombre' => 'normal', 'descripcion' => 'Productos normales sin especificaciones técnicas', 'clase_modelo' => null, 'requiere_especificaciones' => 0, 'activo' => 1],
-            ['nombre' => 'aceite', 'descripcion' => 'Aceites lubricantes y fluidos', 'clase_modelo' => 'App\\Models\\Aceite', 'requiere_especificaciones' => 1, 'activo' => 1],
+            ['nombre' => 'Normal', 'descripcion' => 'Productos normales sin especificaciones técnicas', 'clase_modelo' => null, 'requiere_especificaciones' => 0, 'activo' => 1],
+            ['nombre' => 'Aceite', 'descripcion' => 'Aceites lubricantes y fluidos', 'clase_modelo' => 'App\\Models\\Aceite', 'requiere_especificaciones' => 1, 'activo' => 1],
         ];
 
         // Usar upsert para evitar error si los registros ya existen (evita UniqueConstraintViolation)

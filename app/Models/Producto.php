@@ -83,7 +83,7 @@ class Producto extends Model
     // Helper para saber si es aceite
     public function getEsAceiteAttribute(): bool
     {
-        return optional($this->tipoProducto)->nombre === 'aceite';
+        return strtolower(optional($this->tipoProducto)->nombre) === 'aceite';
     }
 
     // Helper para calcular precio con IVA (13%)
@@ -95,15 +95,22 @@ class Producto extends Model
     // Helper para obtener nombre completo con tipo
     public function getNombreCompletoAttribute(): string
     {
-        $tipo = $this->tipoProducto ? " ({$this->tipoProducto->nombre})" : '';
-        
-        // Si es aceite y tiene variantes, mostrar información de variantes
-        if ($this->es_aceite && $this->tiene_variantes) {
-            $totalVariantes = $this->aceites->count();
-            return "{$this->nombre} [{$totalVariantes} variantes]" . $tipo;
+        if ($this->es_aceite) {
+            $variante = $this->variante_principal;
+            if ($variante) {
+                $tipoAceite = $variante->tipoAceite->nombre ?? '';
+                $detalles = " - {$variante->viscosidad} - {$tipoAceite} - {$variante->capacidad_formateada}";
+                
+                if ($this->tiene_variantes) {
+                    $total = $this->aceites->count();
+                    return "{$this->nombre} [{$total} vars]{$detalles}";
+                }
+                
+                return "{$this->nombre}{$detalles}";
+            }
         }
-        
-        return $this->nombre . $tipo;
+
+        return $this->nombre;
     }
 
     // Helper para estado de stock
@@ -157,6 +164,7 @@ class Producto extends Model
                     'viscosidad' => $aceite->viscosidad,
                     'tipo_aceite' => $aceite->tipoAceite->nombre ?? 'N/A',
                     'capacidad' => $aceite->capacidad_formateada,
+                    'capacidad_ml' => $aceite->capacidad_ml,
                     'presentacion' => $aceite->presentacion,
                     'stock_disponible' => $aceite->stock_disponible,
                     'precio_venta' => $this->precio_venta, // Usa el precio del producto principal

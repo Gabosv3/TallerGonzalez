@@ -13,6 +13,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Notifications\Notification;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
@@ -47,12 +48,20 @@ class RoleResource extends Resource implements HasShieldPermissions
                                     ->label(__('filament-shield::filament-shield.field.name'))
                                     ->unique(ignoreRecord: true)
                                     ->required()
+                                    ->validationMessages([
+                                        'required' => 'El nombre del rol es obligatorio.',
+                                        'unique' => 'Este rol ya existe.',
+                                        'max' => 'El nombre no puede exceder 255 caracteres.',
+                                    ])
                                     ->maxLength(255),
 
                                 Forms\Components\TextInput::make('guard_name')
                                     ->label(__('filament-shield::filament-shield.field.guard_name'))
                                     ->default(Utils::getFilamentAuthGuard())
                                     ->nullable()
+                                    ->validationMessages([
+                                        'max' => 'El nombre del guard no puede exceder 255 caracteres.',
+                                    ])
                                     ->maxLength(255),
 
                                 Forms\Components\Select::make(config('permission.column_names.team_foreign_key'))
@@ -115,10 +124,35 @@ class RoleResource extends Resource implements HasShieldPermissions
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\DeleteAction::make()
+                    ->before(function (Tables\Actions\DeleteAction $action, $record) {
+                        // Verificar si el rol esta en uso (asignado a usuarios)
+                        if ($record->users()->count() > 0) {
+                            $action->halt();
+                            Notification::make()
+                                ->danger()
+                                ->title('No se puede eliminar el rol')
+                                ->body('Este rol esta siendo utilizado por ' . $record->users()->count() . ' usuario(s). Asigne otros roles a estos usuarios antes de eliminar.')
+                                ->send();
+                        }
+                    }),
             ])
             ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make(),
+                Tables\Actions\DeleteBulkAction::make()
+                    ->before(function (Tables\Actions\DeleteBulkAction $action, $records) {
+                        // Verificar si alguno de los roles estan en uso
+                        foreach ($records as $record) {
+                            if ($record->users()->count() > 0) {
+                                $action->halt();
+                                Notification::make()
+                                    ->danger()
+                                    ->title('No se puede eliminar los roles')
+                                    ->body('El rol "' . $record->name . '" esta siendo utilizado por usuarios. Elimine estos roles uno por uno para obtener mas detalles.')
+                                    ->send();
+                                break;
+                            }
+                        }
+                    }),
             ]);
     }
 
@@ -196,6 +230,11 @@ class RoleResource extends Resource implements HasShieldPermissions
         return Utils::isResourceNavigationBadgeEnabled()
             ? strval(static::getEloquentQuery()->count())
             : null;
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'success';
     }
 
     public static function isScopedToTenant(): bool

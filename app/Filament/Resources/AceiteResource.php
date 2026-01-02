@@ -50,12 +50,18 @@ class AceiteResource extends Resource
                                     ->label('Producto Asociado')
                                     ->relationship('producto', 'nombre')
                                     ->required()
+                                    ->validationMessages([
+                                        'required' => 'Debes seleccionar un producto asociado.',
+                                    ])
                                     ->searchable()
                                     ->preload()
                                     ->helperText('Producto general al que pertenece este aceite')
                                     ->createOptionForm([
                                         TextInput::make('nombre')
                                             ->required()
+                                            ->validationMessages([
+                                                'required' => 'El nombre del producto es obligatorio.',
+                                            ])
                                             ->maxLength(255),
                                         TextInput::make('codigo')
                                             ->maxLength(50),
@@ -65,12 +71,18 @@ class AceiteResource extends Resource
                                     ->label('Marca')
                                     ->relationship('marca', 'nombre')
                                     ->required()
+                                    ->validationMessages([
+                                        'required' => 'Debes seleccionar una marca.',
+                                    ])
                                     ->searchable()
                                     ->preload()
                                     ->helperText('Marca del aceite')
                                     ->createOptionForm([
                                         TextInput::make('nombre')
                                             ->required()
+                                            ->validationMessages([
+                                                'required' => 'El nombre de la marca es obligatorio.',
+                                            ])
                                             ->maxLength(255),
                                     ]),
 
@@ -84,12 +96,18 @@ class AceiteResource extends Resource
                                     ->label('Tipo de Aceite')
                                     ->relationship('tipoAceite', 'nombre')
                                     ->required()
+                                    ->validationMessages([
+                                        'required' => 'Debes seleccionar un tipo de aceite.',
+                                    ])
                                     ->searchable()
                                     ->preload()
                                     ->helperText('Clasificación por composición')
                                     ->createOptionForm([
                                         TextInput::make('nombre')
                                             ->required()
+                                            ->validationMessages([
+                                                'required' => 'El nombre del tipo de aceite es obligatorio.',
+                                            ])
                                             ->maxLength(255),
                                         TextInput::make('clave')
                                             ->maxLength(50),
@@ -104,6 +122,9 @@ class AceiteResource extends Resource
                                 TextInput::make('viscosidad')
                                     ->label('Viscosidad')
                                     ->required()
+                                    ->validationMessages([
+                                        'required' => 'La viscosidad es obligatoria.',
+                                    ])
                                     ->maxLength(50)
                                     ->placeholder('Ej. 5W-30, 10W-40')
                                     ->helperText('Clasificación de viscosidad SAE'),
@@ -112,6 +133,10 @@ class AceiteResource extends Resource
                                     ->label('Capacidad (ml)')
                                     ->numeric()
                                     ->required()
+                                    ->validationMessages([
+                                        'required' => 'La capacidad es obligatoria.',
+                                        'numeric' => 'La capacidad debe ser un número.',
+                                    ])
                                     ->step(0.01)
                                     ->suffix('ml')
                                     ->placeholder('Ej. 1000, 946, 5000')
@@ -138,38 +163,10 @@ class AceiteResource extends Resource
                     ]),
 
                 Section::make('Gestión de Inventario')
-                    ->description('Control de stock y disponibilidad')
+                    ->description('Control de disponibilidad y compatibilidad')
                     ->icon('heroicon-o-cube')
                     ->collapsible()
                     ->schema([
-                        Grid::make(3)
-                            ->schema([
-                                TextInput::make('stock_disponible')
-                                    ->label('Stock Disponible')
-                                    ->numeric()
-                                    ->required()
-                                    ->default(0)
-                                    ->minValue(0)
-                                    ->suffix('unidades')
-                                    ->helperText('Cantidad actual en inventario'),
-
-                                TextInput::make('stock_minimo')
-                                    ->label('Stock Mínimo')
-                                    ->numeric()
-                                    ->required()
-                                    ->default(5)
-                                    ->minValue(0)
-                                    ->suffix('unidades')
-                                    ->helperText('Alerta de stock bajo'),
-
-                                TextInput::make('stock_maximo')
-                                    ->label('Stock Máximo')
-                                    ->numeric()
-                                    ->minValue(0)
-                                    ->suffix('unidades')
-                                    ->helperText('Capacidad máxima recomendada'),
-                            ]),
-
                         Textarea::make('compatibilidad')
                             ->label('Compatibilidad')
                             ->rows(2)
@@ -191,6 +188,13 @@ class AceiteResource extends Resource
         return $table
             ->defaultSort('marca.nombre')
             ->columns([
+                TextColumn::make('producto.nombre')
+                    ->label('Producto Asociado')
+                    ->searchable()
+                    ->sortable()
+                    ->weight('bold')
+                    ->description(fn($record) => "Código: " . ($record->producto->codigo ?? 'N/A')),
+
                 TextColumn::make('marca.nombre')
                     ->label('Marca')
                     ->searchable()
@@ -211,11 +215,12 @@ class AceiteResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->badge()
-                    ->color(fn($record) => match ($record->tipoAceite->clave ?? '') {
-                        'sintetico' => 'success',
-                        'semi-sintetico' => 'warning',
-                        'mineral' => 'gray',
-                        default => 'primary'
+                    ->color(function ($record) {
+                        $clave = $record->tipoAceite->clave ?? '';
+                        if ($clave === 'sintetico') return 'success';
+                        if ($clave === 'semi-sintetico') return 'warning';
+                        if ($clave === 'mineral') return 'gray';
+                        return 'primary';
                     }),
 
                 TextColumn::make('capacidad_ml')
@@ -224,20 +229,6 @@ class AceiteResource extends Resource
                     ->sortable()
                     ->alignCenter()
                     ->color('gray'),
-
-                TextColumn::make('stock_disponible')
-                    ->label('Stock')
-                    ->sortable()
-                    ->alignCenter()
-                    ->color(
-                        fn($record) =>
-                        $record->stock_disponible == 0 ? 'danger' : 
-                        ($record->stock_disponible <= $record->stock_minimo ? 'warning' : 'success')
-                    )
-                    ->description(
-                        fn($record) =>
-                        $record->stock_minimo > 0 ? "Mín: {$record->stock_minimo}" : ''
-                    ),
 
                 IconColumn::make('activo')
                     ->label('Activo')
@@ -255,6 +246,12 @@ class AceiteResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
+                SelectFilter::make('producto')
+                    ->label('Producto')
+                    ->relationship('producto', 'nombre')
+                    ->searchable()
+                    ->preload(),
+
                 SelectFilter::make('marca')
                     ->label('Marca')
                     ->relationship('marca', 'nombre')
@@ -282,22 +279,6 @@ class AceiteResource extends Resource
                     ->placeholder('Todos los productos')
                     ->trueLabel('Solo activos')
                     ->falseLabel('Solo inactivos'),
-
-                Tables\Filters\Filter::make('bajo_stock')
-                    ->label('Stock Bajo')
-                    ->query(
-                        fn(Builder $query): Builder =>
-                        $query->whereColumn('stock_disponible', '<=', 'stock_minimo')
-                    )
-                    ->toggle(),
-
-                Tables\Filters\Filter::make('sin_stock')
-                    ->label('Sin Stock')
-                    ->query(
-                        fn(Builder $query): Builder =>
-                        $query->where('stock_disponible', '<=', 0)
-                    )
-                    ->toggle(),
             ])
             ->actions([
                 Tables\Actions\ActionGroup::make([
@@ -373,10 +354,9 @@ class AceiteResource extends Resource
         return static::getModel()::where('activo', true)->count();
     }
 
-    public static function getNavigationBadgeColor(): string|array|null
+    public static function getNavigationBadgeColor(): ?string
     {
-        $lowStockCount = static::getModel()::whereColumn('stock_disponible', '<=', 'stock_minimo')->count();
-        return $lowStockCount > 0 ? 'warning' : 'success';
+        return 'success';
     }
 
     public static function getEloquentQuery(): Builder

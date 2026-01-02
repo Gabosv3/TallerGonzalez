@@ -157,7 +157,7 @@
                 <table class="w-full" id="tabla-facturas">
                     <thead class="bg-gray-50 dark:bg-gray-700">
                         <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">ID Factura</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">Número Factura</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">Cliente</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">Fecha</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">Subtotal</th>
@@ -169,8 +169,8 @@
                     <tbody class="divide-y divide-gray-200 dark:divide-gray-700" id="tbody-facturas">
                         @forelse(\App\Models\Factura::with('cliente', 'detalles')->latest()->get() as $factura)
                             <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 fila-factura" data-fecha="{{ $factura->created_at->format('Y-m-d') }}" data-cliente="{{ $factura->cliente_id }}">
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">#{{ str_pad($factura->id, 6, '0', STR_PAD_LEFT) }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{{ $factura->cliente?->nombre ?? 'N/A' }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">{{ $factura->numero_factura }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{{ $factura->cliente?->nombre ?? $factura->cliente ?? 'N/A' }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{{ $factura->created_at->format('d/m/Y H:i') }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">$ {{ number_format($factura->subtotal ?? 0, 2) }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">$ {{ number_format($factura->impuesto ?? 0, 2) }}</td>
@@ -422,14 +422,13 @@
                 }
             });
 
-            // Mostrar mensaje si no hay resultados
+            // Mostrar/ocultar mensaje si no hay resultados
             if (filasVisibles === 0) {
                 const tbody = document.getElementById('tbody-facturas');
                 if (!tbody.querySelector('.sin-resultados')) {
                     const fila = document.createElement('tr');
                     fila.className = 'sin-resultados';
                     fila.innerHTML = '<td colspan="7" class="px-6 py-4 text-center text-sm text-gray-700 dark:text-gray-300">No hay facturas que coincidan con los filtros seleccionados</td>';
-                    tbody.innerHTML = '';
                     tbody.appendChild(fila);
                 }
             } else {
@@ -471,14 +470,13 @@
                 }
             });
 
-            // Mostrar mensaje si no hay resultados
+            // Mostrar/ocultar mensaje si no hay resultados
             if (filasVisibles === 0) {
                 const tbody = document.getElementById('tbody-productos');
                 if (!tbody.querySelector('.sin-resultados')) {
                     const fila = document.createElement('tr');
                     fila.className = 'sin-resultados';
                     fila.innerHTML = '<td colspan="7" class="px-6 py-4 text-center text-sm text-gray-700 dark:text-gray-300">No hay productos que coincidan con los filtros seleccionados</td>';
-                    tbody.innerHTML = '';
                     tbody.appendChild(fila);
                 }
             } else {
@@ -513,14 +511,13 @@
                 }
             });
 
-            // Mostrar mensaje si no hay resultados
+            // Mostrar/ocultar mensaje si no hay resultados
             if (filasVisibles === 0) {
                 const tbody = document.getElementById('tbody-clientes');
                 if (!tbody.querySelector('.sin-resultados')) {
                     const fila = document.createElement('tr');
                     fila.className = 'sin-resultados';
                     fila.innerHTML = '<td colspan="7" class="px-6 py-4 text-center text-sm text-gray-700 dark:text-gray-300">No hay clientes que coincidan con los filtros seleccionados</td>';
-                    tbody.innerHTML = '';
                     tbody.appendChild(fila);
                 }
             } else {

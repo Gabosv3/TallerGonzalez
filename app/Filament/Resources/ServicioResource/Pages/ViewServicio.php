@@ -43,22 +43,18 @@ class ViewServicio extends ViewRecord
                             ->icon('heroicon-o-check-badge')
                             ->badge()
                             ->formatStateUsing(function ($state) {
-                                return match($state) {
-                                    'pendiente' => 'Pendiente',
-                                    'en_proceso' => 'En Proceso',
-                                    'completado' => 'Completado',
-                                    'cancelado' => 'Cancelado',
-                                    default => $state,
-                                };
+                                if ($state === 'pendiente') return 'Pendiente';
+                                if ($state === 'en_proceso') return 'En Proceso';
+                                if ($state === 'completado') return 'Completado';
+                                if ($state === 'cancelado') return 'Cancelado';
+                                return $state;
                             })
                             ->color(function ($state) {
-                                return match($state) {
-                                    'pendiente' => 'warning',
-                                    'en_proceso' => 'info',
-                                    'completado' => 'success',
-                                    'cancelado' => 'danger',
-                                    default => 'gray',
-                                };
+                                if ($state === 'pendiente') return 'warning';
+                                if ($state === 'en_proceso') return 'info';
+                                if ($state === 'completado') return 'success';
+                                if ($state === 'cancelado') return 'danger';
+                                return 'gray';
                             })
                             ->columnSpan(1),
                         

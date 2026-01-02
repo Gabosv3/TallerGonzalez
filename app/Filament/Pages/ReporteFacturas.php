@@ -12,6 +12,11 @@ class ReporteFacturas extends Page
     protected static string $view = 'filament.pages.reporte-facturas';
     protected static bool $shouldRegisterNavigation = false;
 
+    public static function canAccess(): bool
+    {
+        return auth()->user()?->can('view_reporte_facturas') ?? false;
+    }
+
     public function getViewData(): array
     {
         return [];

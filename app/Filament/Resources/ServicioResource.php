@@ -13,6 +13,7 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Filament\Notifications\Notification;
 
 class ServicioResource extends Resource
 {
@@ -46,7 +47,7 @@ class ServicioResource extends Resource
                                     ->placeholder('ABC-123')
                                     ->prefix('🚗')
                                     ->validationMessages([
-                                        'required' => 'La placa es obligatoria.',
+                                        'required' => 'La placa del vehículo es obligatoria.',
                                         'max' => 'La placa no puede exceder 10 caracteres.',
                                     ])
                                     ->helperText('Placa única del vehículo')
@@ -72,6 +73,9 @@ class ServicioResource extends Resource
                                     ])
                                     ->default('pendiente')
                                     ->required()
+                                    ->validationMessages([
+                                        'required' => 'El estado del servicio es obligatorio.',
+                                    ])
                                     ->live()
                                     ->helperText('Selecciona el estado actual del servicio')
                                     ->columnSpan(1),
@@ -108,6 +112,9 @@ class ServicioResource extends Resource
                                             ->live()
                                             ->dehydrated(true)
                                             ->required()
+                                            ->validationMessages([
+                                                'required' => 'Selecciona un producto.',
+                                            ])
                                             ->afterStateUpdated(function ($state, Set $set) {
                                                 if ($state) {
                                                     $producto = Producto::where('codigo', $state)->first();
@@ -123,7 +130,25 @@ class ServicioResource extends Resource
                                                     ->pluck('codigo', 'codigo')
                                                     ->toArray();
                                             })
-                                            ->columnSpan(1),
+                                            ->columnSpan(1)
+                                            ->hintAction(
+                                                Forms\Components\Actions\Action::make('copy_codigo')
+                                                    ->label('Copiar')
+                                                    ->icon('heroicon-m-clipboard')
+                                                    ->color('primary')
+                                                    ->requiresConfirmation(false)
+                                                    ->action(function (Get $get) {
+                                                        $codigo = $get('codigo_producto');
+                                                        if ($codigo) {
+                                                            Notification::make()
+                                                                ->title('Código copiado')
+                                                                ->body($codigo)
+                                                                ->icon('heroicon-o-clipboard-document-check')
+                                                                ->success()
+                                                                ->send();
+                                                        }
+                                                    })
+                                            ),
 
                                         Forms\Components\TextInput::make('nombre_producto')
                                             ->label('Producto')
@@ -142,9 +167,9 @@ class ServicioResource extends Resource
                                             ->dehydrated(true)
                                             ->suffix('x')
                                             ->validationMessages([
-                                                'required' => 'Requerido',
-                                                'numeric' => 'Número válido',
-                                                'min' => '> 0',
+                                                'required' => 'La cantidad es obligatoria.',
+                                                'numeric' => 'Debe ser un número válido.',
+                                                'min' => 'La cantidad debe ser mayor a 0.',
                                             ])
                                             ->columnSpan(1),
                                     ]),
@@ -186,8 +211,8 @@ class ServicioResource extends Resource
                                             ->dehydrated(true)
                                             ->placeholder('Ej: Cambio de aceite')
                                             ->validationMessages([
-                                                'required' => 'Requerido',
-                                                'max' => 'Máx 100 caracteres',
+                                                'required' => 'El nombre del servicio es obligatorio.',
+                                                'max' => 'El nombre no puede exceder 100 caracteres.',
                                             ])
                                             ->columnSpan(1),
 
@@ -201,8 +226,8 @@ class ServicioResource extends Resource
                                             ->dehydrated(true)
                                             ->prefix('$')
                                             ->validationMessages([
-                                                'required' => 'Requerido',
-                                                'numeric' => 'Número válido',
+                                                'required' => 'El precio es obligatorio.',
+                                                'numeric' => 'Debe ser un número válido.',
                                             ])
                                             ->columnSpan(1),
 
@@ -217,8 +242,8 @@ class ServicioResource extends Resource
                                             ->dehydrated(true)
                                             ->suffix('x')
                                             ->validationMessages([
-                                                'required' => 'Requerido',
-                                                'numeric' => 'Número válido',
+                                                'required' => 'La cantidad es obligatoria.',
+                                                'numeric' => 'Debe ser un número válido.',
                                             ])
                                             ->columnSpan(1),
                                     ]),
@@ -266,12 +291,12 @@ class ServicioResource extends Resource
                 Tables\Columns\TextColumn::make('estado')
                     ->label('Estado')
                     ->badge()
-                    ->formatStateUsing(fn($state) => match($state) {
-                        'pendiente' => '🟡 Pendiente',
-                        'en_proceso' => '🔵 En Proceso',
-                        'completado' => '🟢 Completado',
-                        'cancelado' => '🔴 Cancelado',
-                        default => $state
+                    ->formatStateUsing(function ($state) {
+                        if ($state === 'pendiente') return '🟡 Pendiente';
+                        if ($state === 'en_proceso') return '🔵 En Proceso';
+                        if ($state === 'completado') return '🟢 Completado';
+                        if ($state === 'cancelado') return '🔴 Cancelado';
+                        return $state;
                     })
                     ->colors([
                         'warning' => 'pendiente',
@@ -344,7 +369,7 @@ class ServicioResource extends Resource
                         ->action(fn(Servicio $record) => $record->update(['estado' => 'cancelado']))
                         ->hidden(fn(Servicio $record) => $record->estado === 'cancelado')
                         ->requiresConfirmation(),
-                    
+
                     Tables\Actions\DeleteAction::make()
                         ->color('danger')
                         ->icon('heroicon-o-trash'),

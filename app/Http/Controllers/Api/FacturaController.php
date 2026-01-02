@@ -75,31 +75,67 @@ class FacturaController extends Controller
                 $total = 0;
 
                 foreach ($data['items'] as $item) {
-                    // Bloquear fila del producto para evitar condiciones de carrera
-                    $producto = Producto::where('id', $item['producto_id'])->lockForUpdate()->firstOrFail();
+                    // Verificar si es un servicio o un producto
+                    // Un producto requiere: producto_id numérico y que exista en BD
+                    $productoId = $item['producto_id'] ?? null;
+                    
+                    // Convertir a string para validación segura
+                    $productoIdStr = (string)$productoId;
+                    
+                    // Verificar si es numérico e intenta buscar en BD
+                    $esProducto = !empty($productoIdStr) && is_numeric($productoIdStr) && Producto::find((int)$productoIdStr);
 
-                    // Control de stock si aplica
-                    if ($producto->control_stock && isset($item['cantidad'])) {
-                        if ($producto->stock_actual < $item['cantidad']) {
-                            throw new \Exception("Stock insuficiente para producto ID {$producto->id}");
+                    if ($esProducto) {
+                        // Productos: bloquear y controlar stock
+                        $producto = Producto::where('id', (int)$productoIdStr)->lockForUpdate()->firstOrFail();
+
+                        // Control de stock si aplica
+                        if ($producto->control_stock && isset($item['cantidad'])) {
+                            if ($producto->stock_actual < $item['cantidad']) {
+                                throw new \Exception("Stock insuficiente para producto ID {$producto->id}");
+                            }
+                            // actualizarStock asume decremento; al tener lock, es seguro
+                            $producto->actualizarStock((int)$item['cantidad'], 'salida');
                         }
-                        // actualizarStock asume decremento; al tener lock, es seguro
-                        $producto->actualizarStock((int)$item['cantidad'], 'salida');
+
+                        $cantidad = $item['cantidad'];
+                        $precio = $item['precio_unitario'];
+                        $subtotal = round($cantidad * $precio, 2);
+
+                        DetalleFactura::create([
+                            'factura_id' => $factura->id,
+                            'producto_id' => $producto->id,
+                            'cantidad' => $cantidad,
+                            'precio_unitario' => $precio,
+                            'subtotal' => $subtotal,
+                        ]);
+
+                        $total += $subtotal;
+                    } else {
+                        // Servicios: se usan directamente sin consultar BD
+                        // El producto_id puede ser un código custom (ej: "serv-001")
+                        $cantidad = $item['cantidad'];
+                        $precio = $item['precio_unitario'];
+                        $descripcion = $item['descripcion'] ?? $item['nombre'] ?? 'Servicio';
+                        
+                        // Si viene producto_id custom, incluirlo en la descripción
+                        if (!empty($productoIdStr)) {
+                            $descripcion = "[{$productoIdStr}] {$descripcion}";
+                        }
+
+                        $subtotal = round($cantidad * $precio, 2);
+
+                        DetalleFactura::create([
+                            'factura_id' => $factura->id,
+                            'producto_id' => null,
+                            'descripcion' => $descripcion,
+                            'cantidad' => $cantidad,
+                            'precio_unitario' => $precio,
+                            'subtotal' => $subtotal,
+                        ]);
+
+                        $total += $subtotal;
                     }
-
-                    $cantidad = $item['cantidad'];
-                    $precio = $item['precio_unitario'];
-                    $subtotal = round($cantidad * $precio, 2);
-
-                    DetalleFactura::create([
-                        'factura_id' => $factura->id,
-                        'producto_id' => $producto->id,
-                        'cantidad' => $cantidad,
-                        'precio_unitario' => $precio,
-                        'subtotal' => $subtotal,
-                    ]);
-
-                    $total += $subtotal;
                 }
 
                 $factura->update(['total' => $total]);

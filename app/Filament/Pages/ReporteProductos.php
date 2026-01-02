@@ -12,6 +12,11 @@ class ReporteProductos extends Page
     protected static string $view = 'filament.pages.reporte-productos';
     protected static bool $shouldRegisterNavigation = false;
 
+    public static function canAccess(): bool
+    {
+        return auth()->user()?->can('view_reporte_productos') ?? false;
+    }
+
     public function getViewData(): array
     {
         return [];

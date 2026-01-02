@@ -12,6 +12,11 @@ class ReporteClientes extends Page
     protected static string $view = 'filament.pages.reporte-clientes';
     protected static bool $shouldRegisterNavigation = false;
 
+    public static function canAccess(): bool
+    {
+        return auth()->user()?->can('view_reporte_clientes') ?? false;
+    }
+
     public function getViewData(): array
     {
         return [];

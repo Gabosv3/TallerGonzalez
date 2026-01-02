@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\UserResource\Pages;
+use App\Mail\VerifyEmailMail;
 use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -13,8 +14,10 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\HtmlString;
 use Spatie\Permission\Models\Role;
+use Filament\Notifications\Notification;
 
 class UserResource extends Resource
 {
@@ -41,9 +44,11 @@ class UserResource extends Resource
                             ->maxLength(255)
                             ->placeholder('Ej: Juan Carlos Pérez')
                             ->regex('/^[a-zA-Z\s]+$/')
-                            ->validationMessages(
-                                ['regex' => 'El nombre debe contener solo letras y espacios.']
-                            )
+                            ->validationMessages([
+                                'required' => 'El nombre es obligatorio.',
+                                'max' => 'El nombre no puede exceder 255 caracteres.',
+                                'regex' => 'El nombre debe contener solo letras y espacios.',
+                            ])
                             ->helperText('Nombre completo del usuario'),
 
                         Forms\Components\TextInput::make('email')
@@ -53,16 +58,22 @@ class UserResource extends Resource
                             ->unique(ignoreRecord: true)
                             ->maxLength(255)
                             ->regex('/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/')
-                            ->validationMessages(
-                                ['regex' => 'El correo electrónica debe ser una dirección de correo electrónica válida.']
-                            )
+                            ->validationMessages([
+                                'required' => 'El correo electrónico es obligatorio.',
+                                'email' => 'Ingresa un correo electrónico válido.',
+                                'unique' => 'Este correo ya está registrado.',
+                                'max' => 'El correo no puede exceder 255 caracteres.',
+                                'regex' => 'El formato del correo no es válido.',
+                            ])
                             ->placeholder('usuario@empresa.com')
                             ->helperText('Correo para inicio de sesión y notificaciones'),
 
                         Forms\Components\DateTimePicker::make('email_verified_at')
                             ->label('Correo Verificado')
                             ->displayFormat('d/m/Y H:i')
-                            ->helperText('Fecha de verificación del correo'),
+                            ->helperText('Fecha de verificación del correo')
+                            ->disabled()
+                            ->dehydrated(false),
 
 
                     ])
@@ -79,9 +90,11 @@ class UserResource extends Resource
                             ->minLength(8)
                             ->dehydrated(fn($state) => filled($state))
                             ->regex('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/')
-                            ->validationMessages(
-                                ['regex' => 'La contraseña debe contener al menos 8 caracteres, una letra mayúscula, una letra minúscula, un número y un carácter especial.']
-                            )
+                            ->validationMessages([
+                                'required' => 'La contraseña es obligatoria.',
+                                'min' => 'La contraseña debe tener al menos 8 caracteres.',
+                                'regex' => 'La contraseña debe contener al menos 8 caracteres, una letra mayúscula, una letra minúscula, un número y un carácter especial.',
+                            ])
                             ->dehydrateStateUsing(fn($state) => Hash::make($state))
                             ->revealable()
                             ->helperText(fn($operation) => $operation === 'create'
@@ -140,6 +153,11 @@ class UserResource extends Resource
                                     ->required()
                                     ->maxLength(255)
                                     ->unique('roles', 'name')
+                                    ->validationMessages([
+                                        'required' => 'El nombre del rol es obligatorio.',
+                                        'max' => 'El nombre no puede exceder 255 caracteres.',
+                                        'unique' => 'Este rol ya existe.',
+                                    ])
                                     ->placeholder('Ej: Vendedor, Administrador'),
 
                                 Forms\Components\Select::make('guard_name')
@@ -149,7 +167,10 @@ class UserResource extends Resource
                                         'web' => 'Web',
                                         'api' => 'API',
                                     ])
-                                    ->required(),
+                                    ->required()
+                                    ->validationMessages([
+                                        'required' => 'El guard es obligatorio.',
+                                    ]),
                             ])
                             ->createOptionUsing(function (array $data) {
                                 $role = Role::create($data);
@@ -287,13 +308,48 @@ class UserResource extends Resource
                         ->color('green')
                         ->icon('heroicon-o-pencil'),
 
-                    Tables\Actions\Action::make('verify_email')
-                        ->label('Verificar Email')
-                        ->icon('heroicon-o-check-badge')
-                        ->color('success')
-                        ->action(fn($record) => $record->update(['email_verified_at' => now()]))
+                    Tables\Actions\Action::make('send_verification_email')
+                        ->label('Enviar Email de Verificacion')
+                        ->icon('heroicon-o-envelope')
+                        ->color('info')
+                        ->action(function ($record) {
+                            Mail::send(new VerifyEmailMail($record->email, $record->id));
+                            Notification::make()
+                                ->success()
+                                ->title('Correo enviado')
+                                ->body('Se ha enviado un correo de verificacion a ' . $record->email)
+                                ->send();
+                        })
                         ->requiresConfirmation()
                         ->hidden(fn($record) => $record->email_verified_at !== null),
+
+                    Tables\Actions\Action::make('send_password_reset_email')
+                        ->label('Enviar Reset de Contraseña')
+                        ->icon('heroicon-o-key')
+                        ->color('warning')
+                        ->requiresConfirmation()
+                        ->modalHeading('Enviar correo de restablecimiento')
+                        ->modalDescription('¿Está seguro de que desea enviar un enlace de restablecimiento de contraseña a este usuario?')
+                        ->modalSubmitActionLabel('Sí, enviar')
+                        ->action(function (User $record) {
+                            $status = \Illuminate\Support\Facades\Password::broker()->sendResetLink(
+                                ['email' => $record->email]
+                            );
+
+                            if ($status === \Illuminate\Support\Facades\Password::RESET_LINK_SENT) {
+                                Notification::make()
+                                    ->title('Enlace enviado')
+                                    ->body('Se ha enviado el enlace de restablecimiento de contraseña al correo del usuario.')
+                                    ->success()
+                                    ->send();
+                            } else {
+                                Notification::make()
+                                    ->title('Error')
+                                    ->body('No se pudo enviar el enlace. Verifique la configuración de correo.')
+                                    ->danger()
+                                    ->send();
+                            }
+                        }),
 
                     Tables\Actions\Action::make('impersonate')
                         ->label('Suplantar')
@@ -304,7 +360,18 @@ class UserResource extends Resource
 
                     Tables\Actions\DeleteAction::make()
                         ->color('danger')
-                        ->icon('heroicon-o-trash'),
+                        ->icon('heroicon-o-trash')
+                        ->before(function (Tables\Actions\DeleteAction $action, $record) {
+                            // Verificar si el usuario tiene rol de super admin
+                            if ($record->hasRole('super_admin') || $record->hasRole('admin')) {
+                                $action->halt();
+                                Notification::make()
+                                    ->danger()
+                                    ->title('No se puede eliminar este usuario')
+                                    ->body('No puedes eliminar usuarios con rol Super Admin o Administrador. Asignalos a otro rol primero.')
+                                    ->send();
+                            }
+                        }),
                     Tables\Actions\RestoreAction::make()
                         ->icon('heroicon-o-arrow-uturn-left')
                         ->color('success')
@@ -322,10 +389,32 @@ class UserResource extends Resource
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
 
-                    Tables\Actions\BulkAction::make('verify_emails')
-                        ->icon('heroicon-o-check-badge')
-                        ->color('success')
-                        ->action(fn($records) => $records->each->update(['email_verified_at' => now()])),
+                    Tables\Actions\BulkAction::make('send_verification_emails')
+                        ->icon('heroicon-o-envelope')
+                        ->color('info')
+                        ->label('Enviar Emails de Verificacion')
+                        ->action(function ($records) {
+                            $sent = 0;
+                            foreach ($records as $record) {
+                                if ($record->email_verified_at === null) {
+                                    Mail::send(new VerifyEmailMail($record->email, $record->id));
+                                    $sent++;
+                                }
+                            }
+                            if ($sent > 0) {
+                                Notification::make()
+                                    ->success()
+                                    ->title('Correos enviados')
+                                    ->body('Se han enviado ' . $sent . ' correo(s) de verificacion.')
+                                    ->send();
+                            } else {
+                                Notification::make()
+                                    ->info()
+                                    ->title('Sin cambios')
+                                    ->body('Los usuarios seleccionados ya tienen el correo verificado.')
+                                    ->send();
+                            }
+                        }),
 
                     Tables\Actions\BulkAction::make('assign_role')
                         ->icon('heroicon-o-tag')
@@ -334,7 +423,10 @@ class UserResource extends Resource
                             Forms\Components\Select::make('role')
                                 ->label('Rol a asignar')
                                 ->options(Role::all()->pluck('name', 'id'))
-                                ->required(),
+                                ->required()
+                                ->validationMessages([
+                                    'required' => 'Debes seleccionar un rol.',
+                                ]),
                         ])
                         ->action(function ($records, array $data) {
                             $role = Role::find($data['role']);

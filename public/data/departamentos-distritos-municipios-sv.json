@@ -1,1094 +1,1094 @@
 {
-  "departamentos": [
-    {
-      "idMDepa": "d1",
-      "nombre": "Ahuachapán",
-      "municipios": [
+    "departamentos": [
         {
-          "nombre": "AHUACHAPAN NORTE",
-          "distritos": [
-            {
-              "nombre": "ATIQUIZAYA"
-            },
-            {
-              "nombre": "EL REFUGIO"
-            },
-            {
-              "nombre": "SAN LORENZO"
-            },
-            {
-              "nombre": "TURIN"
-            }
-          ]
+            "idMDepa": "d1",
+            "nombre": "Ahuachapán",
+            "municipios": [
+                {
+                    "nombre": "Ahuachapan Norte",
+                    "distritos": [
+                        {
+                            "nombre": "Atiquizaya"
+                        },
+                        {
+                            "nombre": "El Refugio"
+                        },
+                        {
+                            "nombre": "San Lorenzo"
+                        },
+                        {
+                            "nombre": "Turin"
+                        }
+                    ]
+                },
+                {
+                    "nombre": "Ahuachapan Centro",
+                    "distritos": [
+                        {
+                            "nombre": "Ahuachapan"
+                        },
+                        {
+                            "nombre": "Apaneca"
+                        },
+                        {
+                            "nombre": "Concepcion De Ataco"
+                        },
+                        {
+                            "nombre": "Tacuba"
+                        }
+                    ]
+                },
+                {
+                    "nombre": "Ahuachapan Sur",
+                    "distritos": [
+                        {
+                            "nombre": "Guaymango"
+                        },
+                        {
+                            "nombre": "Jujutla"
+                        },
+                        {
+                            "nombre": "San Francisco Menendez"
+                        },
+                        {
+                            "nombre": "San Pedro Puxtla"
+                        }
+                    ]
+                }
+            ]
         },
         {
-          "nombre": "AHUACHAPAN CENTRO",
-          "distritos": [
-            {
-              "nombre": "AHUACHAPAN"
-            },
-            {
-              "nombre": "APANECA"
-            },
-            {
-              "nombre": "CONCEPCION DE ATACO"
-            },
-            {
-              "nombre": "TACUBA"
-            }
-          ]
+            "idMDepa": "d2",
+            "nombre": "Cabañas",
+            "municipios": [
+                {
+                    "nombre": "Cabañas Este",
+                    "distritos": [
+                        {
+                            "nombre": "Sensuntepeque"
+                        },
+                        {
+                            "nombre": "Victoria"
+                        },
+                        {
+                            "nombre": "Dolores"
+                        },
+                        {
+                            "nombre": "Guacotecti"
+                        },
+                        {
+                            "nombre": "San Isidro"
+                        }
+                    ]
+                },
+                {
+                    "nombre": "Cabañas Oeste",
+                    "distritos": [
+                        {
+                            "nombre": "Ilobasco"
+                        },
+                        {
+                            "nombre": "Tejutepeque"
+                        },
+                        {
+                            "nombre": "Jutiapa"
+                        },
+                        {
+                            "nombre": "Cinquera"
+                        }
+                    ]
+                }
+            ]
         },
         {
-          "nombre": "AHUACHAPAN SUR",
-          "distritos": [
-            {
-              "nombre": "GUAYMANGO"
-            },
-            {
-              "nombre": "JUJUTLA"
-            },
-            {
-              "nombre": "SAN FRANCISCO MENENDEZ"
-            },
-            {
-              "nombre": "SAN PEDRO PUXTLA"
-            }
-          ]
+            "idMDepa": "d3",
+            "nombre": "Chalatenango",
+            "municipios": [
+                {
+                    "nombre": "Chalatenango Norte",
+                    "distritos": [
+                        {
+                            "nombre": "La Palma"
+                        },
+                        {
+                            "nombre": "Citala"
+                        },
+                        {
+                            "nombre": "San Ignacio"
+                        }
+                    ]
+                },
+                {
+                    "nombre": "Chalatenango Centro",
+                    "distritos": [
+                        {
+                            "nombre": "Nueva Concepcion"
+                        },
+                        {
+                            "nombre": "Tejutla"
+                        },
+                        {
+                            "nombre": "La Reina"
+                        },
+                        {
+                            "nombre": "Agua Caliente"
+                        },
+                        {
+                            "nombre": "Dulce Nombre De Maria"
+                        },
+                        {
+                            "nombre": "El Paraiso"
+                        },
+                        {
+                            "nombre": "San Francisco Morazan"
+                        },
+                        {
+                            "nombre": "San Rafael"
+                        },
+                        {
+                            "nombre": "Santa Rita"
+                        },
+                        {
+                            "nombre": "San Fernando"
+                        }
+                    ]
+                },
+                {
+                    "nombre": "Chalatenango Sur",
+                    "distritos": [
+                        {
+                            "nombre": "Chalatenango"
+                        },
+                        {
+                            "nombre": "Arcatao"
+                        },
+                        {
+                            "nombre": "Azacualpa"
+                        },
+                        {
+                            "nombre": "Comalapa"
+                        },
+                        {
+                            "nombre": "Concepcion Quezaltepeque"
+                        },
+                        {
+                            "nombre": "El Carrizal"
+                        },
+                        {
+                            "nombre": "La Laguna"
+                        },
+                        {
+                            "nombre": "Las Vueltas"
+                        },
+                        {
+                            "nombre": "Nombre De Jesus"
+                        },
+                        {
+                            "nombre": "Nueva Trinidad"
+                        },
+                        {
+                            "nombre": "Ojos De Agua"
+                        },
+                        {
+                            "nombre": "Potonico"
+                        },
+                        {
+                            "nombre": "San Antonio De La Cruz"
+                        },
+                        {
+                            "nombre": "San Antonio Los Ranchos"
+                        },
+                        {
+                            "nombre": "San Francisco Lempa"
+                        },
+                        {
+                            "nombre": "San Isidro Labrador"
+                        },
+                        {
+                            "nombre": "San Jose Cancasque"
+                        },
+                        {
+                            "nombre": "San Miguel De Mercedes"
+                        },
+                        {
+                            "nombre": "San Jose Las Flores"
+                        },
+                        {
+                            "nombre": "San Luis Del Carmen"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "idMDepa": "d4",
+            "nombre": "Cuscatlán",
+            "municipios": [
+                {
+                    "nombre": "Cuscatlan Norte",
+                    "distritos": [
+                        {
+                            "nombre": "Suchitoto"
+                        },
+                        {
+                            "nombre": "San Jose Guayabal"
+                        },
+                        {
+                            "nombre": "Oratorio De Concepcion"
+                        },
+                        {
+                            "nombre": "San Bartolome Perulapan"
+                        },
+                        {
+                            "nombre": "San Pedro Perulapan"
+                        }
+                    ]
+                },
+                {
+                    "nombre": "Cuscatlan Sur",
+                    "distritos": [
+                        {
+                            "nombre": "Cojutepeque"
+                        },
+                        {
+                            "nombre": "San Rafael Cedros"
+                        },
+                        {
+                            "nombre": "Candelaria"
+                        },
+                        {
+                            "nombre": "Monte San Juan"
+                        },
+                        {
+                            "nombre": "El Carmen"
+                        },
+                        {
+                            "nombre": "San Cristobal"
+                        },
+                        {
+                            "nombre": "Santa Cruz Michapa"
+                        },
+                        {
+                            "nombre": "San Ramon"
+                        },
+                        {
+                            "nombre": "El Rosario"
+                        },
+                        {
+                            "nombre": "Santa Cruz Analquito"
+                        },
+                        {
+                            "nombre": "Tenancingo"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "idMDepa": "d5",
+            "nombre": "La Libertad",
+            "municipios": [
+                {
+                    "nombre": "La Libertad Norte",
+                    "distritos": [
+                        {
+                            "nombre": "Quezaltepeque"
+                        },
+                        {
+                            "nombre": "San Matias"
+                        },
+                        {
+                            "nombre": "San Pablo Tacachico"
+                        }
+                    ]
+                },
+                {
+                    "nombre": "La Libertad Centro",
+                    "distritos": [
+                        {
+                            "nombre": "San Juan Opico"
+                        },
+                        {
+                            "nombre": "Ciudad Arce"
+                        }
+                    ]
+                },
+                {
+                    "nombre": "La Libertad Oeste",
+                    "distritos": [
+                        {
+                            "nombre": "Colon"
+                        },
+                        {
+                            "nombre": "Jayaque"
+                        },
+                        {
+                            "nombre": "Sacacoyo"
+                        },
+                        {
+                            "nombre": "Tepecoyo"
+                        },
+                        {
+                            "nombre": "Talnique"
+                        }
+                    ]
+                },
+                {
+                    "nombre": "La Libertad Este",
+                    "distritos": [
+                        {
+                            "nombre": "Antiguo Cuscatlan"
+                        },
+                        {
+                            "nombre": "Huizucar"
+                        },
+                        {
+                            "nombre": "Nuevo Cuscatlan"
+                        },
+                        {
+                            "nombre": "San Jose Villanueva"
+                        },
+                        {
+                            "nombre": "Zaragoza"
+                        }
+                    ]
+                },
+                {
+                    "nombre": "La Libertad Costa",
+                    "distritos": [
+                        {
+                            "nombre": "Chiltuipan"
+                        },
+                        {
+                            "nombre": "Jicalapa"
+                        },
+                        {
+                            "nombre": "La Libertad"
+                        },
+                        {
+                            "nombre": "Tamanique"
+                        },
+                        {
+                            "nombre": "Teotepeque"
+                        }
+                    ]
+                },
+                {
+                    "nombre": "La Libertad Sur",
+                    "distritos": [
+                        {
+                            "nombre": "Comasagua"
+                        },
+                        {
+                            "nombre": "Santa Tecla"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "idMDepa": "d6",
+            "nombre": "La Paz",
+            "municipios": [
+                {
+                    "nombre": "La Paz Oeste",
+                    "distritos": [
+                        {
+                            "nombre": "Cuyultitan"
+                        },
+                        {
+                            "nombre": "Olocuilta"
+                        },
+                        {
+                            "nombre": "San Juan Talpa"
+                        },
+                        {
+                            "nombre": "San Luis Talpa"
+                        },
+                        {
+                            "nombre": "San Pedro Masahuat"
+                        },
+                        {
+                            "nombre": "Tapalhuaca"
+                        },
+                        {
+                            "nombre": "San Francisco Chinameca"
+                        }
+                    ]
+                },
+                {
+                    "nombre": "La Paz Centro",
+                    "distritos": [
+                        {
+                            "nombre": "El Rosario"
+                        },
+                        {
+                            "nombre": "Jerusalen"
+                        },
+                        {
+                            "nombre": "Mercedes La Ceiba"
+                        },
+                        {
+                            "nombre": "Paraiso De Osorio"
+                        },
+                        {
+                            "nombre": "San Antonio Masahuat"
+                        },
+                        {
+                            "nombre": "San Emigdio"
+                        },
+                        {
+                            "nombre": "San Juan Tepezontes"
+                        },
+                        {
+                            "nombre": "San Luis La Herradura"
+                        },
+                        {
+                            "nombre": "San Miguel Tepezontes"
+                        },
+                        {
+                            "nombre": "San Pedro Nonualco"
+                        },
+                        {
+                            "nombre": "Santa Maria Ostuma"
+                        },
+                        {
+                            "nombre": "Santiago Nonualco"
+                        }
+                    ]
+                },
+                {
+                    "nombre": "La Paz Este",
+                    "distritos": [
+                        {
+                            "nombre": "San Juan Nonualco"
+                        },
+                        {
+                            "nombre": "San Rafael Obrajuelo"
+                        },
+                        {
+                            "nombre": "Zacatecoluca"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "idMDepa": "d7",
+            "nombre": "La Unión",
+            "municipios": [
+                {
+                    "nombre": "La Union Norte",
+                    "distritos": [
+                        {
+                            "nombre": "Anamoros"
+                        },
+                        {
+                            "nombre": "Bolivar"
+                        },
+                        {
+                            "nombre": "Concepcion De Oriente"
+                        },
+                        {
+                            "nombre": "El Sauce"
+                        },
+                        {
+                            "nombre": "Lislique"
+                        },
+                        {
+                            "nombre": "Nueva Esparta"
+                        },
+                        {
+                            "nombre": "Pasaquina"
+                        },
+                        {
+                            "nombre": "Poloros"
+                        },
+                        {
+                            "nombre": "San Jose La Fuente"
+                        },
+                        {
+                            "nombre": "Santa Rosa De Lima"
+                        }
+                    ]
+                },
+                {
+                    "nombre": "La Union Sur",
+                    "distritos": [
+                        {
+                            "nombre": "Conchagua"
+                        },
+                        {
+                            "nombre": "El Carmen"
+                        },
+                        {
+                            "nombre": "Intipuca"
+                        },
+                        {
+                            "nombre": "La Union"
+                        },
+                        {
+                            "nombre": "Meanguera Del Golfo"
+                        },
+                        {
+                            "nombre": "San Alejo"
+                        },
+                        {
+                            "nombre": "Yayantique"
+                        },
+                        {
+                            "nombre": "Yucuaiquin"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "idMDepa": "d8",
+            "nombre": "Morazán",
+            "municipios": [
+                {
+                    "nombre": "Morazan Norte",
+                    "distritos": [
+                        {
+                            "nombre": "Arambala"
+                        },
+                        {
+                            "nombre": "Cacaopera"
+                        },
+                        {
+                            "nombre": "Corinto"
+                        },
+                        {
+                            "nombre": "El Rosario"
+                        },
+                        {
+                            "nombre": "Joateca"
+                        },
+                        {
+                            "nombre": "Jocoaitique"
+                        },
+                        {
+                            "nombre": "Meanguera"
+                        },
+                        {
+                            "nombre": "Perquin"
+                        },
+                        {
+                            "nombre": "San Fernando"
+                        },
+                        {
+                            "nombre": "San Isidro"
+                        },
+                        {
+                            "nombre": "Torola"
+                        }
+                    ]
+                },
+                {
+                    "nombre": "Morazan Sur",
+                    "distritos": [
+                        {
+                            "nombre": "Chilanga"
+                        },
+                        {
+                            "nombre": "Delicias De Concepcion"
+                        },
+                        {
+                            "nombre": "El Divisadero"
+                        },
+                        {
+                            "nombre": "Gualococti"
+                        },
+                        {
+                            "nombre": "Guatajiagua"
+                        },
+                        {
+                            "nombre": "Jocoro"
+                        },
+                        {
+                            "nombre": "Lolotiquillo"
+                        },
+                        {
+                            "nombre": "Osicala"
+                        },
+                        {
+                            "nombre": "San Carlos"
+                        },
+                        {
+                            "nombre": "San Francisco Gotera"
+                        },
+                        {
+                            "nombre": "San Simon"
+                        },
+                        {
+                            "nombre": "Sensembra"
+                        },
+                        {
+                            "nombre": "Sociedad"
+                        },
+                        {
+                            "nombre": "Yamabal"
+                        },
+                        {
+                            "nombre": "Yoloaiquin"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "idMDepa": "d9",
+            "nombre": "San Miguel",
+            "municipios": [
+                {
+                    "nombre": "San Miguel Norte",
+                    "distritos": [
+                        {
+                            "nombre": "Ciudad Barrios"
+                        },
+                        {
+                            "nombre": "Sesori"
+                        },
+                        {
+                            "nombre": "Nuevo Eden De San Juan"
+                        },
+                        {
+                            "nombre": "San Gerardo"
+                        },
+                        {
+                            "nombre": "San Luis De La Reina"
+                        },
+                        {
+                            "nombre": "Carolina"
+                        },
+                        {
+                            "nombre": "San Antonio Del Mosco"
+                        },
+                        {
+                            "nombre": "Chapeltique"
+                        }
+                    ]
+                },
+                {
+                    "nombre": "San Miguel Centro",
+                    "distritos": [
+                        {
+                            "nombre": "San Miguel"
+                        },
+                        {
+                            "nombre": "Comacaran"
+                        },
+                        {
+                            "nombre": "Uluazapa"
+                        },
+                        {
+                            "nombre": "Moncagua"
+                        },
+                        {
+                            "nombre": "Quelepa"
+                        },
+                        {
+                            "nombre": "Chirilagua"
+                        }
+                    ]
+                },
+                {
+                    "nombre": "San Miguel Oeste",
+                    "distritos": [
+                        {
+                            "nombre": "Chinameca"
+                        },
+                        {
+                            "nombre": "Nueva Guadalupe"
+                        },
+                        {
+                            "nombre": "Lolotique"
+                        },
+                        {
+                            "nombre": "San Jorge"
+                        },
+                        {
+                            "nombre": "San Rafael Oriente"
+                        },
+                        {
+                            "nombre": "El Transito"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "idMDepa": "d10",
+            "nombre": "San Salvador",
+            "municipios": [
+                {
+                    "nombre": "San Salvador Norte",
+                    "distritos": [
+                        {
+                            "nombre": "Aguilares"
+                        },
+                        {
+                            "nombre": "El Paisnal"
+                        },
+                        {
+                            "nombre": "Guazapa"
+                        }
+                    ]
+                },
+                {
+                    "nombre": "San Salvador Oeste",
+                    "distritos": [
+                        {
+                            "nombre": "Apopa"
+                        },
+                        {
+                            "nombre": "Nejapa"
+                        }
+                    ]
+                },
+                {
+                    "nombre": "San Salvador Este",
+                    "distritos": [
+                        {
+                            "nombre": "Ilopango"
+                        },
+                        {
+                            "nombre": "San Martin"
+                        },
+                        {
+                            "nombre": "Soyapango"
+                        },
+                        {
+                            "nombre": "Tonacatepeque"
+                        }
+                    ]
+                },
+                {
+                    "nombre": "San Salvador Centro",
+                    "distritos": [
+                        {
+                            "nombre": "Ayutuxtepeque"
+                        },
+                        {
+                            "nombre": "Mejicanos"
+                        },
+                        {
+                            "nombre": "San Salvador"
+                        },
+                        {
+                            "nombre": "Cuscatancingo"
+                        },
+                        {
+                            "nombre": "Ciudad Delgado"
+                        }
+                    ]
+                },
+                {
+                    "nombre": "San Salvador Sur",
+                    "distritos": [
+                        {
+                            "nombre": "Panchimalco"
+                        },
+                        {
+                            "nombre": "Rosario De Mora"
+                        },
+                        {
+                            "nombre": "San Marcos"
+                        },
+                        {
+                            "nombre": "Santo Tomas"
+                        },
+                        {
+                            "nombre": "Santiago Texacuangos"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "idMDepa": "d11",
+            "nombre": "San Vicente",
+            "municipios": [
+                {
+                    "nombre": "San Vicente Norte",
+                    "distritos": [
+                        {
+                            "nombre": "Apastepeque"
+                        },
+                        {
+                            "nombre": "Santa Clara"
+                        },
+                        {
+                            "nombre": "San Ildefonso"
+                        },
+                        {
+                            "nombre": "San Esteban Catarina"
+                        },
+                        {
+                            "nombre": "San Sebastian"
+                        },
+                        {
+                            "nombre": "San Lorenzo"
+                        },
+                        {
+                            "nombre": "Santo Domingo"
+                        }
+                    ]
+                },
+                {
+                    "nombre": "San Vicente Sur",
+                    "distritos": [
+                        {
+                            "nombre": "San Vicente"
+                        },
+                        {
+                            "nombre": "Guadalupe"
+                        },
+                        {
+                            "nombre": "Verapaz"
+                        },
+                        {
+                            "nombre": "Tepetitan"
+                        },
+                        {
+                            "nombre": "Tecoluca"
+                        },
+                        {
+                            "nombre": "San Cayetano Istepeque"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "idMDepa": "d12",
+            "nombre": "Santa Ana",
+            "municipios": [
+                {
+                    "nombre": "Santa Ana Norte",
+                    "distritos": [
+                        {
+                            "nombre": "Masahuat"
+                        },
+                        {
+                            "nombre": "Metapan"
+                        },
+                        {
+                            "nombre": "Santa Rosa Guachipilin"
+                        },
+                        {
+                            "nombre": "Texistepeque"
+                        }
+                    ]
+                },
+                {
+                    "nombre": "Santa Ana Centro",
+                    "distritos": [
+                        {
+                            "nombre": "Santa Ana"
+                        }
+                    ]
+                },
+                {
+                    "nombre": "Santa Ana Este",
+                    "distritos": [
+                        {
+                            "nombre": "Coatepeque"
+                        },
+                        {
+                            "nombre": "El Congo"
+                        }
+                    ]
+                },
+                {
+                    "nombre": "Santa Ana Oeste",
+                    "distritos": [
+                        {
+                            "nombre": "Candelaria De La Frontera"
+                        },
+                        {
+                            "nombre": "Chalchuapa"
+                        },
+                        {
+                            "nombre": "El Porvenir"
+                        },
+                        {
+                            "nombre": "San Antonio Pajonal"
+                        },
+                        {
+                            "nombre": "San Sebastian Salitrillo"
+                        },
+                        {
+                            "nombre": "Santiago De La Frontera"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "idMDepa": "d13",
+            "nombre": "Sonsonate",
+            "municipios": [
+                {
+                    "nombre": "Sonsonate Norte",
+                    "distritos": [
+                        {
+                            "nombre": "Juayua"
+                        },
+                        {
+                            "nombre": "Nahuizalco"
+                        },
+                        {
+                            "nombre": "Salcoatitan"
+                        },
+                        {
+                            "nombre": "Santa Catarina Masahuat"
+                        }
+                    ]
+                },
+                {
+                    "nombre": "Sonsonate Centro",
+                    "distritos": [
+                        {
+                            "nombre": "Sonsonate"
+                        },
+                        {
+                            "nombre": "Sonzacate"
+                        },
+                        {
+                            "nombre": "Nahulingo"
+                        },
+                        {
+                            "nombre": "San Antonio Del Monte"
+                        },
+                        {
+                            "nombre": "Santo Domingo De Guzman"
+                        }
+                    ]
+                },
+                {
+                    "nombre": "Sonsonate Este",
+                    "distritos": [
+                        {
+                            "nombre": "Izalco"
+                        },
+                        {
+                            "nombre": "Armenia"
+                        },
+                        {
+                            "nombre": "Caluco"
+                        },
+                        {
+                            "nombre": "San Julian"
+                        },
+                        {
+                            "nombre": "Cuisnahuat"
+                        },
+                        {
+                            "nombre": "Santa Isabel Ishuatan"
+                        }
+                    ]
+                },
+                {
+                    "nombre": "Sonsonate Oeste",
+                    "distritos": [
+                        {
+                            "nombre": "Acajutla"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "idMDepa": "d14",
+            "nombre": "Usulután",
+            "municipios": [
+                {
+                    "nombre": "Usulutan Norte",
+                    "distritos": [
+                        {
+                            "nombre": "Santiago De Maria"
+                        },
+                        {
+                            "nombre": "Alegria"
+                        },
+                        {
+                            "nombre": "Berlin"
+                        },
+                        {
+                            "nombre": "Mercedes Umana"
+                        },
+                        {
+                            "nombre": "Jucuapa"
+                        },
+                        {
+                            "nombre": "El Triunfo"
+                        },
+                        {
+                            "nombre": "Estanzuelas"
+                        },
+                        {
+                            "nombre": "San Buenaventura"
+                        },
+                        {
+                            "nombre": "Nueva Granada"
+                        }
+                    ]
+                },
+                {
+                    "nombre": "Usulutan Este",
+                    "distritos": [
+                        {
+                            "nombre": "Usulutan"
+                        },
+                        {
+                            "nombre": "Jucuaran"
+                        },
+                        {
+                            "nombre": "San Dionisio"
+                        },
+                        {
+                            "nombre": "Concepcion Batres"
+                        },
+                        {
+                            "nombre": "Santa Maria"
+                        },
+                        {
+                            "nombre": "Ozatlan"
+                        },
+                        {
+                            "nombre": "Tecapan"
+                        },
+                        {
+                            "nombre": "Santa Elena"
+                        },
+                        {
+                            "nombre": "California"
+                        },
+                        {
+                            "nombre": "Ereguayquin"
+                        }
+                    ]
+                },
+                {
+                    "nombre": "Usulutan Oeste",
+                    "distritos": [
+                        {
+                            "nombre": "Jiquilisco"
+                        },
+                        {
+                            "nombre": "Puerto El Triunfo"
+                        },
+                        {
+                            "nombre": "San Agustin"
+                        },
+                        {
+                            "nombre": "San Francisco Javier"
+                        }
+                    ]
+                }
+            ]
         }
-      ]
-    },
-    {
-      "idMDepa": "d2",
-      "nombre": "Cabañas",
-      "municipios": [
-        {
-          "nombre": "CABAÑAS ESTE",
-          "distritos": [
-            {
-              "nombre": "SENSUNTEPEQUE"
-            },
-            {
-              "nombre": "VICTORIA"
-            },
-            {
-              "nombre": "DOLORES"
-            },
-            {
-              "nombre": "GUACOTECTI"
-            },
-            {
-              "nombre": "SAN ISIDRO"
-            }
-          ]
-        },
-        {
-          "nombre": "CABAÑAS OESTE",
-          "distritos": [
-            {
-              "nombre": "ILOBASCO"
-            },
-            {
-              "nombre": "TEJUTEPEQUE"
-            },
-            {
-              "nombre": "JUTIAPA"
-            },
-            {
-              "nombre": "CINQUERA"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "idMDepa": "d3",
-      "nombre": "Chalatenango",
-      "municipios": [
-        {
-          "nombre": "CHALATENANGO NORTE",
-          "distritos": [
-            {
-              "nombre": "LA PALMA"
-            },
-            {
-              "nombre": "CITALA"
-            },
-            {
-              "nombre": "SAN IGNACIO"
-            }
-          ]
-        },
-        {
-          "nombre": "CHALATENANGO CENTRO",
-          "distritos": [
-            {
-              "nombre": "NUEVA CONCEPCION"
-            },
-            {
-              "nombre": "TEJUTLA"
-            },
-            {
-              "nombre": "LA REINA"
-            },
-            {
-              "nombre": "AGUA CALIENTE"
-            },
-            {
-              "nombre": "DULCE NOMBRE DE MARIA"
-            },
-            {
-              "nombre": "EL PARAISO"
-            },
-            {
-              "nombre": "SAN FRANCISCO MORAZAN"
-            },
-            {
-              "nombre": "SAN RAFAEL"
-            },
-            {
-              "nombre": "SANTA RITA"
-            },
-            {
-              "nombre": "SAN FERNANDO"
-            }
-          ]
-        },
-        {
-          "nombre": "CHALATENANGO SUR",
-          "distritos": [
-            {
-              "nombre": "CHALATENANGO"
-            },
-            {
-              "nombre": "ARCATAO"
-            },
-            {
-              "nombre": "AZACUALPA"
-            },
-            {
-              "nombre": "COMALAPA"
-            },
-            {
-              "nombre": "CONCEPCION QUEZALTEPEQUE"
-            },
-            {
-              "nombre": "EL CARRIZAL"
-            },
-            {
-              "nombre": "LA LAGUNA"
-            },
-            {
-              "nombre": "LAS VUELTAS"
-            },
-            {
-              "nombre": "NOMBRE DE JESUS"
-            },
-            {
-              "nombre": "NUEVA TRINIDAD"
-            },
-            {
-              "nombre": "OJOS DE AGUA"
-            },
-            {
-              "nombre": "POTONICO"
-            },
-            {
-              "nombre": "SAN ANTONIO DE LA CRUZ"
-            },
-            {
-              "nombre": "SAN ANTONIO LOS RANCHOS"
-            },
-            {
-              "nombre": "SAN FRANCISCO LEMPA"
-            },
-            {
-              "nombre": "SAN ISIDRO LABRADOR"
-            },
-            {
-              "nombre": "SAN JOSE CANCASQUE"
-            },
-            {
-              "nombre": "SAN MIGUEL DE MERCEDES"
-            },
-            {
-              "nombre": "SAN JOSE LAS FLORES"
-            },
-            {
-              "nombre": "SAN LUIS DEL CARMEN"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "idMDepa": "d4",
-      "nombre": "Cuscatlán",
-      "municipios": [
-        {
-          "nombre": "CUSCATLAN NORTE",
-          "distritos": [
-            {
-              "nombre": "SUCHITOTO"
-            },
-            {
-              "nombre": "SAN JOSE GUAYABAL"
-            },
-            {
-              "nombre": "ORATORIO DE CONCEPCION"
-            },
-            {
-              "nombre": "SAN BARTOLOME PERULAPAN"
-            },
-            {
-              "nombre": "SAN PEDRO PERULAPAN"
-            }
-          ]
-        },
-        {
-          "nombre": "CUSCATLAN SUR",
-          "distritos": [
-            {
-              "nombre": "COJUTEPEQUE"
-            },
-            {
-              "nombre": "SAN RAFAEL CEDROS"
-            },
-            {
-              "nombre": "CANDELARIA"
-            },
-            {
-              "nombre": "MONTE SAN JUAN"
-            },
-            {
-              "nombre": "EL CARMEN"
-            },
-            {
-              "nombre": "SAN CRISTOBAL"
-            },
-            {
-              "nombre": "SANTA CRUZ MICHAPA"
-            },
-            {
-              "nombre": "SAN RAMON"
-            },
-            {
-              "nombre": "EL ROSARIO"
-            },
-            {
-              "nombre": "SANTA CRUZ ANALQUITO"
-            },
-            {
-              "nombre": "TENANCINGO"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "idMDepa": "d5",
-      "nombre": "La Libertad",
-      "municipios": [
-        {
-          "nombre": "LA LIBERTAD NORTE",
-          "distritos": [
-            {
-              "nombre": "QUEZALTEPEQUE"
-            },
-            {
-              "nombre": "SAN MATIAS"
-            },
-            {
-              "nombre": "SAN PABLO TACACHICO"
-            }
-          ]
-        },
-        {
-          "nombre": "LA LIBERTAD CENTRO",
-          "distritos": [
-            {
-              "nombre": "SAN JUAN OPICO"
-            },
-            {
-              "nombre": "CIUDAD ARCE"
-            }
-          ]
-        },
-        {
-          "nombre": "LA LIBERTAD OESTE",
-          "distritos": [
-            {
-              "nombre": "COLON"
-            },
-            {
-              "nombre": "JAYAQUE"
-            },
-            {
-              "nombre": "SACACOYO"
-            },
-            {
-              "nombre": "TEPECOYO"
-            },
-            {
-              "nombre": "TALNIQUE"
-            }
-          ]
-        },
-        {
-          "nombre": "LA LIBERTAD ESTE",
-          "distritos": [
-            {
-              "nombre": "ANTIGUO CUSCATLAN"
-            },
-            {
-              "nombre": "HUIZUCAR"
-            },
-            {
-              "nombre": "NUEVO CUSCATLAN"
-            },
-            {
-              "nombre": "SAN JOSE VILLANUEVA"
-            },
-            {
-              "nombre": "ZARAGOZA"
-            }
-          ]
-        },
-        {
-          "nombre": "LA LIBERTAD COSTA",
-          "distritos": [
-            {
-              "nombre": "CHILTUIPAN"
-            },
-            {
-              "nombre": "JICALAPA"
-            },
-            {
-              "nombre": "LA LIBERTAD"
-            },
-            {
-              "nombre": "TAMANIQUE"
-            },
-            {
-              "nombre": "TEOTEPEQUE"
-            }
-          ]
-        },
-        {
-          "nombre": "LA LIBERTAD SUR",
-          "distritos": [
-            {
-              "nombre": "COMASAGUA"
-            },
-            {
-              "nombre": "SANTA TECLA"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "idMDepa": "d6",
-      "nombre": "La Paz",
-      "municipios": [
-        {
-          "nombre": "LA PAZ OESTE",
-          "distritos": [
-            {
-              "nombre": "CUYULTITAN"
-            },
-            {
-              "nombre": "OLOCUILTA"
-            },
-            {
-              "nombre": "SAN JUAN TALPA"
-            },
-            {
-              "nombre": "SAN LUIS TALPA"
-            },
-            {
-              "nombre": "SAN PEDRO MASAHUAT"
-            },
-            {
-              "nombre": "TAPALHUACA"
-            },
-            {
-              "nombre": "SAN FRANCISCO CHINAMECA"
-            }
-          ]
-        },
-        {
-          "nombre": "LA PAZ CENTRO",
-          "distritos": [
-            {
-              "nombre": "EL ROSARIO"
-            },
-            {
-              "nombre": "JERUSALEN"
-            },
-            {
-              "nombre": "MERCEDES LA CEIBA"
-            },
-            {
-              "nombre": "PARAISO DE OSORIO"
-            },
-            {
-              "nombre": "SAN ANTONIO MASAHUAT"
-            },
-            {
-              "nombre": "SAN EMIGDIO"
-            },
-            {
-              "nombre": "SAN JUAN TEPEZONTES"
-            },
-            {
-              "nombre": "SAN LUIS LA HERRADURA"
-            },
-            {
-              "nombre": "SAN MIGUEL TEPEZONTES"
-            },
-            {
-              "nombre": "SAN PEDRO NONUALCO"
-            },
-            {
-              "nombre": "SANTA MARIA OSTUMA"
-            },
-            {
-              "nombre": "SANTIAGO NONUALCO"
-            }
-          ]
-        },
-        {
-          "nombre": "LA PAZ ESTE",
-          "distritos": [
-            {
-              "nombre": "SAN JUAN NONUALCO"
-            },
-            {
-              "nombre": "SAN RAFAEL OBRAJUELO"
-            },
-            {
-              "nombre": "ZACATECOLUCA"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "idMDepa": "d7",
-      "nombre": "La Unión",
-      "municipios": [
-        {
-          "nombre": "LA UNION NORTE",
-          "distritos": [
-            {
-              "nombre": "ANAMOROS"
-            },
-            {
-              "nombre": "BOLIVAR"
-            },
-            {
-              "nombre": "CONCEPCION DE ORIENTE"
-            },
-            {
-              "nombre": "EL SAUCE"
-            },
-            {
-              "nombre": "LISLIQUE"
-            },
-            {
-              "nombre": "NUEVA ESPARTA"
-            },
-            {
-              "nombre": "PASAQUINA"
-            },
-            {
-              "nombre": "POLOROS"
-            },
-            {
-              "nombre": "SAN JOSE LA FUENTE"
-            },
-            {
-              "nombre": "SANTA ROSA DE LIMA"
-            }
-          ]
-        },
-        {
-          "nombre": "LA UNION SUR",
-          "distritos": [
-            {
-              "nombre": "CONCHAGUA"
-            },
-            {
-              "nombre": "EL CARMEN"
-            },
-            {
-              "nombre": "INTIPUCA"
-            },
-            {
-              "nombre": "LA UNION"
-            },
-            {
-              "nombre": "MEANGUERA DEL GOLFO"
-            },
-            {
-              "nombre": "SAN ALEJO"
-            },
-            {
-              "nombre": "YAYANTIQUE"
-            },
-            {
-              "nombre": "YUCUAIQUIN"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "idMDepa": "d8",
-      "nombre": "Morazán",
-      "municipios": [
-        {
-          "nombre": "MORAZAN NORTE",
-          "distritos": [
-            {
-              "nombre": "ARAMBALA"
-            },
-            {
-              "nombre": "CACAOPERA"
-            },
-            {
-              "nombre": "CORINTO"
-            },
-            {
-              "nombre": "EL ROSARIO"
-            },
-            {
-              "nombre": "JOATECA"
-            },
-            {
-              "nombre": "JOCOAITIQUE"
-            },
-            {
-              "nombre": "MEANGUERA"
-            },
-            {
-              "nombre": "PERQUIN"
-            },
-            {
-              "nombre": "SAN FERNANDO"
-            },
-            {
-              "nombre": "SAN ISIDRO"
-            },
-            {
-              "nombre": "TOROLA"
-            }
-          ]
-        },
-        {
-          "nombre": "MORAZAN SUR",
-          "distritos": [
-            {
-              "nombre": "CHILANGA"
-            },
-            {
-              "nombre": "DELICIAS DE CONCEPCION"
-            },
-            {
-              "nombre": "EL DIVISADERO"
-            },
-            {
-              "nombre": "GUALOCOCTI"
-            },
-            {
-              "nombre": "GUATAJIAGUA"
-            },
-            {
-              "nombre": "JOCORO"
-            },
-            {
-              "nombre": "LOLOTIQUILLO"
-            },
-            {
-              "nombre": "OSICALA"
-            },
-            {
-              "nombre": "SAN CARLOS"
-            },
-            {
-              "nombre": "SAN FRANCISCO GOTERA"
-            },
-            {
-              "nombre": "SAN SIMON"
-            },
-            {
-              "nombre": "SENSEMBRA"
-            },
-            {
-              "nombre": "SOCIEDAD"
-            },
-            {
-              "nombre": "YAMABAL"
-            },
-            {
-              "nombre": "YOLOAIQUIN"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "idMDepa": "d9",
-      "nombre": "San Miguel",
-      "municipios": [
-        {
-          "nombre": "SAN MIGUEL NORTE",
-          "distritos": [
-            {
-              "nombre": "CIUDAD BARRIOS"
-            },
-            {
-              "nombre": "SESORI"
-            },
-            {
-              "nombre": "NUEVO EDEN DE SAN JUAN"
-            },
-            {
-              "nombre": "SAN GERARDO"
-            },
-            {
-              "nombre": "SAN LUIS DE LA REINA"
-            },
-            {
-              "nombre": "CAROLINA"
-            },
-            {
-              "nombre": "SAN ANTONIO DEL MOSCO"
-            },
-            {
-              "nombre": "CHAPELTIQUE"
-            }
-          ]
-        },
-        {
-          "nombre": "SAN MIGUEL CENTRO",
-          "distritos": [
-            {
-              "nombre": "SAN MIGUEL"
-            },
-            {
-              "nombre": "COMACARAN"
-            },
-            {
-              "nombre": "ULUAZAPA"
-            },
-            {
-              "nombre": "MONCAGUA"
-            },
-            {
-              "nombre": "QUELEPA"
-            },
-            {
-              "nombre": "CHIRILAGUA"
-            }
-          ]
-        },
-        {
-          "nombre": "SAN MIGUEL OESTE",
-          "distritos": [
-            {
-              "nombre": "CHINAMECA"
-            },
-            {
-              "nombre": "NUEVA GUADALUPE"
-            },
-            {
-              "nombre": "LOLOTIQUE"
-            },
-            {
-              "nombre": "SAN JORGE"
-            },
-            {
-              "nombre": "SAN RAFAEL ORIENTE"
-            },
-            {
-              "nombre": "EL TRANSITO"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "idMDepa": "d10",
-      "nombre": "San Salvador",
-      "municipios": [
-        {
-          "nombre": "SAN SALVADOR NORTE",
-          "distritos": [
-            {
-              "nombre": "AGUILARES"
-            },
-            {
-              "nombre": "EL PAISNAL"
-            },
-            {
-              "nombre": "GUAZAPA"
-            }
-          ]
-        },
-        {
-          "nombre": "SAN SALVADOR OESTE",
-          "distritos": [
-            {
-              "nombre": "APOPA"
-            },
-            {
-              "nombre": "NEJAPA"
-            }
-          ]
-        },
-        {
-          "nombre": "SAN SALVADOR ESTE",
-          "distritos": [
-            {
-              "nombre": "ILOPANGO"
-            },
-            {
-              "nombre": "SAN MARTIN"
-            },
-            {
-              "nombre": "SOYAPANGO"
-            },
-            {
-              "nombre": "TONACATEPEQUE"
-            }
-          ]
-        },
-        {
-          "nombre": "SAN SALVADOR CENTRO",
-          "distritos": [
-            {
-              "nombre": "AYUTUXTEPEQUE"
-            },
-            {
-              "nombre": "MEJICANOS"
-            },
-            {
-              "nombre": "SAN SALVADOR"
-            },
-            {
-              "nombre": "CUSCATANCINGO"
-            },
-            {
-              "nombre": "CIUDAD DELGADO"
-            }
-          ]
-        },
-        {
-          "nombre": "SAN SALVADOR SUR",
-          "distritos": [
-            {
-              "nombre": "PANCHIMALCO"
-            },
-            {
-              "nombre": "ROSARIO DE MORA"
-            },
-            {
-              "nombre": "SAN MARCOS"
-            },
-            {
-              "nombre": "SANTO TOMAS"
-            },
-            {
-              "nombre": "SANTIAGO TEXACUANGOS"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "idMDepa": "d11",
-      "nombre": "San Vicente",
-      "municipios": [
-        {
-          "nombre": "SAN VICENTE NORTE",
-          "distritos": [
-            {
-              "nombre": "APASTEPEQUE"
-            },
-            {
-              "nombre": "SANTA CLARA"
-            },
-            {
-              "nombre": "SAN ILDEFONSO"
-            },
-            {
-              "nombre": "SAN ESTEBAN CATARINA"
-            },
-            {
-              "nombre": "SAN SEBASTIAN"
-            },
-            {
-              "nombre": "SAN LORENZO"
-            },
-            {
-              "nombre": "SANTO DOMINGO"
-            }
-          ]
-        },
-        {
-          "nombre": "SAN VICENTE SUR",
-          "distritos": [
-            {
-              "nombre": "SAN VICENTE"
-            },
-            {
-              "nombre": "GUADALUPE"
-            },
-            {
-              "nombre": "VERAPAZ"
-            },
-            {
-              "nombre": "TEPETITAN"
-            },
-            {
-              "nombre": "TECOLUCA"
-            },
-            {
-              "nombre": "SAN CAYETANO ISTEPEQUE"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "idMDepa": "d12",
-      "nombre": "Santa Ana",
-      "municipios": [
-        {
-          "nombre": "SANTA ANA NORTE",
-          "distritos": [
-            {
-              "nombre": "MASAHUAT"
-            },
-            {
-              "nombre": "METAPAN"
-            },
-            {
-              "nombre": "SANTA ROSA GUACHIPILIN"
-            },
-            {
-              "nombre": "TEXISTEPEQUE"
-            }
-          ]
-        },
-        {
-          "nombre": "SANTA ANA CENTRO",
-          "distritos": [
-            {
-              "nombre": "SANTA ANA"
-            }
-          ]
-        },
-        {
-          "nombre": "SANTA ANA ESTE",
-          "distritos": [
-            {
-              "nombre": "COATEPEQUE"
-            },
-            {
-              "nombre": "EL CONGO"
-            }
-          ]
-        },
-        {
-          "nombre": "SANTA ANA OESTE",
-          "distritos": [
-            {
-              "nombre": "CANDELARIA DE LA FRONTERA"
-            },
-            {
-              "nombre": "CHALCHUAPA"
-            },
-            {
-              "nombre": "EL PORVENIR"
-            },
-            {
-              "nombre": "SAN ANTONIO PAJONAL"
-            },
-            {
-              "nombre": "SAN SEBASTIAN SALITRILLO"
-            },
-            {
-              "nombre": "SANTIAGO DE LA FRONTERA"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "idMDepa": "d13",
-      "nombre": "Sonsonate",
-      "municipios": [
-        {
-          "nombre": "SONSONATE NORTE",
-          "distritos": [
-            {
-              "nombre": "JUAYUA"
-            },
-            {
-              "nombre": "NAHUIZALCO"
-            },
-            {
-              "nombre": "SALCOATITAN"
-            },
-            {
-              "nombre": "SANTA CATARINA MASAHUAT"
-            }
-          ]
-        },
-        {
-          "nombre": "SONSONATE CENTRO",
-          "distritos": [
-            {
-              "nombre": "SONSONATE"
-            },
-            {
-              "nombre": "SONZACATE"
-            },
-            {
-              "nombre": "NAHULINGO"
-            },
-            {
-              "nombre": "SAN ANTONIO DEL MONTE"
-            },
-            {
-              "nombre": "SANTO DOMINGO DE GUZMAN"
-            }
-          ]
-        },
-        {
-          "nombre": "SONSONATE ESTE",
-          "distritos": [
-            {
-              "nombre": "IZALCO"
-            },
-            {
-              "nombre": "ARMENIA"
-            },
-            {
-              "nombre": "CALUCO"
-            },
-            {
-              "nombre": "SAN JULIAN"
-            },
-            {
-              "nombre": "CUISNAHUAT"
-            },
-            {
-              "nombre": "SANTA ISABEL ISHUATAN"
-            }
-          ]
-        },
-        {
-          "nombre": "SONSONATE OESTE",
-          "distritos": [
-            {
-              "nombre": "ACAJUTLA"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "idMDepa": "d14",
-      "nombre": "Usulután",
-      "municipios": [
-        {
-          "nombre": "USULUTAN NORTE",
-          "distritos": [
-            {
-              "nombre": "SANTIAGO DE MARIA"
-            },
-            {
-              "nombre": "ALEGRIA"
-            },
-            {
-              "nombre": "BERLIN"
-            },
-            {
-              "nombre": "MERCEDES UMANA"
-            },
-            {
-              "nombre": "JUCUAPA"
-            },
-            {
-              "nombre": "EL TRIUNFO"
-            },
-            {
-              "nombre": "ESTANZUELAS"
-            },
-            {
-              "nombre": "SAN BUENAVENTURA"
-            },
-            {
-              "nombre": "NUEVA GRANADA"
-            }
-          ]
-        },
-        {
-          "nombre": "USULUTAN ESTE",
-          "distritos": [
-            {
-              "nombre": "USULUTAN"
-            },
-            {
-              "nombre": "JUCUARAN"
-            },
-            {
-              "nombre": "SAN DIONISIO"
-            },
-            {
-              "nombre": "CONCEPCION BATRES"
-            },
-            {
-              "nombre": "SANTA MARIA"
-            },
-            {
-              "nombre": "OZATLAN"
-            },
-            {
-              "nombre": "TECAPAN"
-            },
-            {
-              "nombre": "SANTA ELENA"
-            },
-            {
-              "nombre": "CALIFORNIA"
-            },
-            {
-              "nombre": "EREGUAYQUIN"
-            }
-          ]
-        },
-        {
-          "nombre": "USULUTAN OESTE",
-          "distritos": [
-            {
-              "nombre": "JIQUILISCO"
-            },
-            {
-              "nombre": "PUERTO EL TRIUNFO"
-            },
-            {
-              "nombre": "SAN AGUSTIN"
-            },
-            {
-              "nombre": "SAN FRANCISCO JAVIER"
-            }
-          ]
-        }
-      ]
-    }
-  ]
+    ]
 }

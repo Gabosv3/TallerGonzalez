@@ -61,6 +61,8 @@ class ReportExportController extends Controller
     public function exportClientesPDF(Request $request)
     {
         $estado = $request->query('estado');
+        $desde = $request->query('desde');
+        $hasta = $request->query('hasta');
         
         $query = Cliente::withCount('facturas')->withSum('facturas', 'total');
         
@@ -72,7 +74,7 @@ class ReportExportController extends Controller
         
         $clientes = $query->get();
         
-        $html = view('exports.clientes-pdf', compact('clientes'))->render();
+        $html = view('exports.clientes-pdf', compact('clientes', 'desde', 'hasta'))->render();
         
         return $this->downloadPDF($html, 'reporte-clientes-' . date('Y-m-d-His'));
     }

@@ -128,7 +128,13 @@ class ClienteResource extends Resource
                                     ->schema([
                         TextInput::make('dui')
                             ->label('DUI')
-                            ->required()
+                            ->required(fn (\Filament\Forms\Get $get) => blank($get('nit')))
+                            ->live()
+                            ->afterStateUpdated(function (\Filament\Forms\Get $get, \Filament\Forms\Set $set, ?string $state) {
+                                if ($get('nit_homologado')) {
+                                    $set('nit', $state);
+                                }
+                            })
                             ->unique(Cliente::class, 'dui', ignoreRecord: true)
                             ->minLength(9)
                             ->maxLength(9)
@@ -137,7 +143,7 @@ class ClienteResource extends Resource
                             ->numeric()
                             ->placeholder('059863879')
                             ->validationMessages([
-                                'required' => 'El DUI es obligatorio.',
+                                'required' => 'El DUI es obligatorio si no se ingresa NIT.',
                                 'unique' => 'Este DUI ya está registrado en el sistema.',
                                 'min' => 'El DUI debe tener exactamente 9 dígitos.',
                                 'max' => 'El DUI debe tener exactamente 9 dígitos.',
@@ -147,26 +153,53 @@ class ClienteResource extends Resource
                             ->helperText('✓ Exactamente 9 dígitos numéricos (sin guiones)')
                             ->hint('Formato requerido: 059863879'),
 
+                        Toggle::make('nit_homologado')
+                            ->label('NIT Homologado')
+                            ->inline(false)
+                            ->dehydrated(false)
+                            ->live()
+                            ->default(function ($record) {
+                                // Activar si el NIT es igual al DUI (homologado)
+                                if ($record && $record->nit && $record->dui && $record->nit === $record->dui) {
+                                    return true;
+                                }
+                                return false;
+                            })
+                            ->afterStateUpdated(function (\Filament\Forms\Get $get, \Filament\Forms\Set $set, bool $state) {
+                                if ($state) {
+                                    $set('nit', $get('dui'));
+                                } else {
+                                    $set('nit', null);
+                                }
+                            }),
+
                         TextInput::make('nit')
                             ->label('NIT')
-                            
+                            ->disabled(fn (\Filament\Forms\Get $get) => $get('nit_homologado'))
+                            ->dehydrated()
+                            ->live()
+                            ->afterStateUpdated(function (\Filament\Forms\Get $get, \Filament\Forms\Set $set, ?string $state) {
+                                // Si el NIT es igual al DUI, activar el toggle de NIT Homologado
+                                if ($state && $state === $get('dui')) {
+                                    $set('nit_homologado', true);
+                                }
+                            })
                             ->unique(Cliente::class, 'nit', ignoreRecord: true)
-                            ->minLength(14)
+                            ->minLength(fn (\Filament\Forms\Get $get) => $get('nit_homologado') ? 9 : 14)
                             ->maxLength(14)
-                            ->regex('/^\\d{14}$/', 'El NIT debe tener exactamente 14 dígitos numéricos')
-                            ->mask('99999999999999')
+                            ->regex(fn (\Filament\Forms\Get $get) => $get('nit_homologado') ? '/^\\d{9}$/' : '/^\\d{14}$/')
+                            ->mask(fn (\Filament\Forms\Get $get) => $get('nit_homologado') ? '999999999' : '99999999999999')
                             ->numeric()
-                            ->placeholder('06141510901234')
-                            ->validationMessages(
-                                [
+                            ->placeholder(fn (\Filament\Forms\Get $get) => $get('nit_homologado') ? '059863879' : '06141510901234')
+                            ->validationMessages([
                                 'unique' => 'Este NIT ya está registrado en el sistema.',
-                                'min' => 'El NIT debe tener exactamente 14 dígitos.',
-                                'max' => 'El NIT debe tener exactamente 14 dígitos.',
-                                'regex' => 'El NIT debe contener solo 14 dígitos numéricos.',
+                                'min' => 'El NIT debe tener la longitud correcta.',
+                                'max' => 'El NIT debe tener la longitud correcta.',
+                                'regex' => 'El NIT debe contener solo dígitos numéricos válidos.',
                                 'numeric' => 'El NIT solo puede contener números.',
                             ])
-                            ->helperText('✓ Exactamente 14 dígitos numéricos (sin guiones)')
-                            ->hint('Formato requerido: 06141510901234'),                                        TextInput::make('nrc')
+                            ->helperText(fn (\Filament\Forms\Get $get) => $get('nit_homologado') ? '✓ Copia del DUI (9 dígitos)' : '✓ Exactamente 14 dígitos numéricos (sin guiones)')
+                            ->hint(fn (\Filament\Forms\Get $get) => $get('nit_homologado') ? 'Homologado con DUI' : 'Formato requerido: 06141510901234'),                                        TextInput::make('nrc')
                                             ->label('NRC')
                                             ->maxLength(20)
                                             ->placeholder('123456-7')
@@ -189,6 +222,9 @@ class ClienteResource extends Resource
                                             ])
                                             ->default('consumidor_final')
                                             ->required()
+                                            ->validationMessages([
+                                                'required' => 'Debes seleccionar un tipo de cliente.',
+                                            ])
                                             ->helperText('Seleccione el tipo para facturación'),
 
                                         Select::make('categoria_economica_codigo')
@@ -311,6 +347,9 @@ class ClienteResource extends Resource
                                 TextInput::make('codigo_postal')
                                     ->label('Código Postal')
                                     ->maxLength(10)
+                                    ->validationMessages([
+                                        'max' => 'El código postal no puede exceder 10 caracteres.',
+                                    ])
                                     ->placeholder('Ej: 01101')
                                     ->helperText('Código postal de la zona'),
                             ])
@@ -330,6 +369,9 @@ class ClienteResource extends Resource
                                     ->label('Dirección de Envío')
                                     ->rows(3)
                                     ->maxLength(255)
+                                    ->validationMessages([
+                                        'max' => 'La dirección de envío no puede exceder 255 caracteres.',
+                                    ])
                                     ->placeholder('Ej: Calle Secundaria #456, Colonia...')
                                     ->hidden(fn ($get) => $get('usar_misma_direccion'))
                                     ->helperText('Dirección específica para entregas'),
@@ -353,6 +395,9 @@ class ClienteResource extends Resource
                                     ->label('Referencias de Envío')
                                     ->rows(2)
                                     ->maxLength(255)
+                                    ->validationMessages([
+                                        'max' => 'Las referencias no pueden exceder 255 caracteres.',
+                                    ])
                                     ->placeholder('Ej: Frente al parque, casa color azul...')
                                     ->helperText('Puntos de referencia para la entrega'),
                             ])
@@ -369,10 +414,13 @@ class ClienteResource extends Resource
                                 TextInput::make('limite_credito')
                                     ->label('Límite de Crédito ($)')
                                     ->numeric()
-                                    ->default(0)
+                                    ->live()
+                                    ->required(fn ($get) => filled($get('dias_credito')) || filled($get('descuento_autorizado')))
+                                    ->dehydrateStateUsing(fn ($state) => $state ?? 0)
                                     ->prefix('$')
                                     ->step(0.01)
                                     ->validationMessages([
+                                        'required' => 'El límite de crédito es obligatorio si se definen otras condiciones.',
                                         'numeric' => 'El límite de crédito debe ser un número válido.',
                                     ])
                                     ->helperText('Límite máximo de crédito autorizado'),
@@ -380,9 +428,12 @@ class ClienteResource extends Resource
                                 TextInput::make('dias_credito')
                                     ->label('Días de Crédito')
                                     ->numeric()
-                                    ->default(0)
+                                    ->live()
+                                    ->required(fn ($get) => filled($get('limite_credito')) || filled($get('descuento_autorizado')))
+                                    ->dehydrateStateUsing(fn ($state) => $state ?? 0)
                                     ->suffix('días')
                                     ->validationMessages([
+                                        'required' => 'Los días de crédito son obligatorios si se definen otras condiciones.',
                                         'numeric' => 'Los días de crédito deben ser un número válido.',
                                     ])
                                     ->helperText('Plazo de pago en días'),
@@ -390,11 +441,14 @@ class ClienteResource extends Resource
                                 TextInput::make('descuento_autorizado')
                                     ->label('Descuento Autorizado (%)')
                                     ->numeric()
-                                    ->default(0)
+                                    ->live()
+                                    ->required(fn ($get) => filled($get('limite_credito')) || filled($get('dias_credito')))
+                                    ->dehydrateStateUsing(fn ($state) => $state ?? 0)
                                     ->suffix('%')
                                     ->minValue(0)
                                     ->maxValue(100)
                                     ->validationMessages([
+                                        'required' => 'El descuento autorizado es obligatorio si se definen otras condiciones.',
                                         'numeric' => 'El descuento debe ser un número válido.',
                                         'min' => 'El descuento no puede ser menor a 0%.',
                                         'max' => 'El descuento no puede ser mayor a 100%.',
@@ -462,13 +516,13 @@ class ClienteResource extends Resource
 
                 BadgeColumn::make('tipo_cliente')
                     ->label('Tipo')
-                    ->formatStateUsing(fn ($state) => match($state) {
-                        'consumidor_final' => '👤 Final',
-                        'contribuyente' => '🏢 Contribuyente',
-                        'empresa' => '🏭 Empresa',
-                        'distribuidor' => '🚚 Distribuidor',
-                        'mayorista' => '📦 Mayorista',
-                        default => $state
+                    ->formatStateUsing(function ($state) {
+                        if ($state === 'consumidor_final') return '👤 Final';
+                        if ($state === 'contribuyente') return '🏢 Contribuyente';
+                        if ($state === 'empresa') return '🏭 Empresa';
+                        if ($state === 'distribuidor') return '🚚 Distribuidor';
+                        if ($state === 'mayorista') return '📦 Mayorista';
+                        return $state;
                     })
                     ->colors([
                         'gray' => 'consumidor_final',

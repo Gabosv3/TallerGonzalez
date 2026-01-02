@@ -39,6 +39,16 @@ class Aceite extends Model
         'activo' => 'boolean',
     ];
 
+    /**
+     * Atributos con valores por defecto
+     */
+    protected $attributes = [
+        'stock_disponible' => 0,
+        'stock_minimo' => 0,
+        'stock_maximo' => null,
+        'activo' => true,
+    ];
+
     protected static $logAttributes = ['*'];
 
     /**

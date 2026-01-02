@@ -2,33 +2,49 @@
 
 namespace App\Filament\Widgets;
 
-use Filament\Widgets\Widget;
 use App\Models\Pedido;
 use Carbon\Carbon;
+use Filament\Widgets\ChartWidget;
 
-class PedidosPorMes extends Widget
+class PedidosPorMes extends ChartWidget
 {
-    protected static string $view = 'filament.widgets.pedidos-por-mes';
+    protected static ?string $heading = '📈 Pedidos por Mes (Últimos 6 meses)';
+    protected static ?int $sort = 2;
+    protected int | string | array $columnSpan = 'full';
 
-    public array $labels = [];
-    public array $data = [];
-
-    public function mount(): void
+    protected function getData(): array
     {
-        $this->labels = [];
-        $this->data = [];
+        $labels = [];
+        $data = [];
 
-        // Últimos 6 meses
         for ($i = 5; $i >= 0; $i--) {
             $date = Carbon::now()->subMonths($i);
-            $monthLabel = $date->format('M Y');
-            $start = $date->copy()->startOfMonth()->toDateString();
-            $end = $date->copy()->endOfMonth()->toDateString();
+            $monthLabel = $date->translatedFormat('M Y');
+            $start = $date->copy()->startOfMonth();
+            $end = $date->copy()->endOfMonth();
 
             $count = Pedido::whereBetween('created_at', [$start, $end])->count();
 
-            $this->labels[] = $monthLabel;
-            $this->data[] = $count;
+            $labels[] = $monthLabel;
+            $data[] = $count;
         }
+
+        return [
+            'datasets' => [
+                [
+                    'label' => 'Pedidos',
+                    'data' => $data,
+                    'fill' => 'start',
+                    'borderColor' => '#3B82F6',
+                    'backgroundColor' => 'rgba(59, 130, 246, 0.1)',
+                ],
+            ],
+            'labels' => $labels,
+        ];
+    }
+
+    protected function getType(): string
+    {
+        return 'line';
     }
 }
