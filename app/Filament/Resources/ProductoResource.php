@@ -308,6 +308,7 @@ class ProductoResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->persistSearchInSession()
             ->columns([
                 // Columna con badge de tipo
                 Tables\Columns\TextColumn::make('tipoProducto.nombre')
@@ -326,7 +327,7 @@ class ProductoResource extends Resource
                 // Columna de código con icono
                 Tables\Columns\TextColumn::make('codigo')
                     ->label('Código')
-                    ->searchable()
+                    ->searchable(['codigo', 'nombre'])
                     ->sortable()
                     ->description(function ($record) {
                         $desc = $record->nombre;
