@@ -38,6 +38,10 @@ class ProductoResource extends Resource
                                     ->label('Nombre del Producto')
                                     ->required()
                                     ->maxLength(255)
+                                    ->validationMessages([
+                                        'required' => 'El nombre del producto es obligatorio.',
+                                        'max' => 'El nombre no puede exceder 255 caracteres.',
+                                    ])
                                     ->placeholder('Ej: Aceite Motor 5W-30 Sintético')
                                     ->columnSpanFull(),
 
@@ -47,6 +51,10 @@ class ProductoResource extends Resource
                                             ->label('Código SKU')
                                             ->unique(ignoreRecord: true)
                                             ->maxLength(50)
+                                            ->validationMessages([
+                                                'unique' => 'Este código SKU ya está registrado.',
+                                                'max' => 'El código no puede exceder 50 caracteres.',
+                                            ])
                                             ->placeholder('PROD-001')
                                             ->helperText('Código único del producto'),
 
@@ -62,6 +70,9 @@ class ProductoResource extends Resource
                                     ->label('Tipo de Producto')
                                     ->relationship('tipoProducto', 'nombre')
                                     ->required()
+                                    ->validationMessages([
+                                        'required' => 'Debes seleccionar un tipo de producto.',
+                                    ])
                                     ->live()
                                     ->preload()
                                     ->searchable()
@@ -92,7 +103,10 @@ class ProductoResource extends Resource
                                         'par' => 'Par',
                                     ])
                                     ->default('pza')
-                                    ->required(),
+                                    ->required()
+                                    ->validationMessages([
+                                        'required' => 'La unidad de medida es obligatoria.',
+                                    ]),
 
                                 Forms\Components\Textarea::make('especificaciones_generales')
                                     ->label('Especificaciones Técnicas')
@@ -206,6 +220,10 @@ class ProductoResource extends Resource
                                     ->prefix('$')
                                     ->step(0.01)
                                     ->required()
+                                    ->validationMessages([
+                                        'required' => 'El precio de compra es obligatorio.',
+                                        'numeric' => 'El precio debe ser un número válido.',
+                                    ])
                                     ->live(debounce: 500)
                                     ->afterStateUpdated(function ($state, callable $set) {
                                         if ($state !== null && $state !== '') {
@@ -236,6 +254,10 @@ class ProductoResource extends Resource
                                     ->prefix('$')
                                     ->step(0.01)
                                     ->required()
+                                    ->validationMessages([
+                                        'required' => 'El precio de venta es obligatorio.',
+                                        'numeric' => 'El precio debe ser un número válido.',
+                                    ])
                                     ->live(debounce: 500)
                                     ->afterStateUpdated(function ($state, callable $set) {
                                         if ($state !== null && $state !== '') {
@@ -276,12 +298,20 @@ class ProductoResource extends Resource
                                     ->label('Stock Actual')
                                     ->numeric()
                                     ->required()
+                                    ->validationMessages([
+                                        'required' => 'El stock actual es obligatorio.',
+                                        'numeric' => 'El stock debe ser un número.',
+                                    ])
                                     ->default(0),
 
                                 Forms\Components\TextInput::make('stock_minimo')
                                     ->label('Stock Mínimo')
                                     ->numeric()
                                     ->required()
+                                    ->validationMessages([
+                                        'required' => 'El stock mínimo es obligatorio.',
+                                        'numeric' => 'El stock debe ser un número.',
+                                    ])
                                     ->default(0),
 
                                 Forms\Components\TextInput::make('stock_maximo')

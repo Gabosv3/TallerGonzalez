@@ -51,6 +51,11 @@ class MarcaResource extends Resource
                                     ->maxLength(255)
                                     ->unique(Marca::class, 'nombre', ignoreRecord: true)
                                     ->placeholder('Ej. Mobil, Castrol, Shell')
+                                    ->validationMessages([
+                                        'required' => 'El nombre de la marca es obligatorio.',
+                                        'max' => 'El nombre no puede exceder 255 caracteres.',
+                                        'unique' => 'Esta marca ya está registrada.',
+                                    ])
                                     ->live(onBlur: true)
                                     ->afterStateUpdated(function ($state, callable $set) {
                                         if ($state) {
@@ -65,6 +70,9 @@ class MarcaResource extends Resource
                                     ->disk('public')
                                     ->visibility('public')
                                     ->helperText('Sube el logo de la marca (máx. 2MB)')
+                                    ->validationMessages([
+                                        'image' => 'El archivo debe ser una imagen válida.',
+                                    ])
                                     ->downloadable()
                                     ->openable(),
 
@@ -72,12 +80,18 @@ class MarcaResource extends Resource
                                     ->label('País de Origen')
                                     ->maxLength(100)
                                     ->placeholder('Ej. Estados Unidos, Reino Unido, Alemania')
+                                    ->validationMessages([
+                                        'max' => 'El país de origen no puede exceder 100 caracteres.',
+                                    ])
                                     ->helperText('País donde se originó la marca'),
 
                                 TextInput::make('orden')
                                     ->label('Orden de Visualización')
                                     ->numeric()
                                     ->default(0)
+                                    ->validationMessages([
+                                        'numeric' => 'El orden debe ser un número.',
+                                    ])
                                     ->helperText('Número para ordenar en listas (menor = primero)'),
                             ])
                             ->columnSpan(1),

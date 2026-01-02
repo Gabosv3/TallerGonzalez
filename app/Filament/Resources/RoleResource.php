@@ -48,12 +48,20 @@ class RoleResource extends Resource implements HasShieldPermissions
                                     ->label(__('filament-shield::filament-shield.field.name'))
                                     ->unique(ignoreRecord: true)
                                     ->required()
+                                    ->validationMessages([
+                                        'required' => 'El nombre del rol es obligatorio.',
+                                        'unique' => 'Este rol ya existe.',
+                                        'max' => 'El nombre no puede exceder 255 caracteres.',
+                                    ])
                                     ->maxLength(255),
 
                                 Forms\Components\TextInput::make('guard_name')
                                     ->label(__('filament-shield::filament-shield.field.guard_name'))
                                     ->default(Utils::getFilamentAuthGuard())
                                     ->nullable()
+                                    ->validationMessages([
+                                        'max' => 'El nombre del guard no puede exceder 255 caracteres.',
+                                    ])
                                     ->maxLength(255),
 
                                 Forms\Components\Select::make(config('permission.column_names.team_foreign_key'))

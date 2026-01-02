@@ -49,6 +49,11 @@ class TipoAceiteResource extends Resource
                                     ->required()
                                     ->maxLength(255)
                                     ->unique(TipoAceite::class, 'nombre', ignoreRecord: true)
+                                    ->validationMessages([
+                                        'required' => 'El nombre del tipo es obligatorio.',
+                                        'max' => 'El nombre no puede exceder 255 caracteres.',
+                                        'unique' => 'Este tipo de aceite ya existe.',
+                                    ])
                                     ->placeholder('Ej. Sintético, Semi-Sintético, Mineral')
                                     ->live(onBlur: true)
                                     ->afterStateUpdated(function ($state, callable $set) {
@@ -66,6 +71,11 @@ class TipoAceiteResource extends Resource
                                     ->required()
                                     ->maxLength(50)
                                     ->unique(TipoAceite::class, 'clave', ignoreRecord: true)
+                                    ->validationMessages([
+                                        'required' => 'La clave interna es obligatoria.',
+                                        'max' => 'La clave no puede exceder 50 caracteres.',
+                                        'unique' => 'Esta clave ya está registrada.',
+                                    ])
                                     ->placeholder('Ej. sintetico, semi-sintetico, mineral')
                                     ->helperText('Identificador único para uso interno (se genera automáticamente)'),
 
@@ -78,6 +88,9 @@ class TipoAceiteResource extends Resource
                                     ->label('Orden de Visualización')
                                     ->numeric()
                                     ->default(0)
+                                    ->validationMessages([
+                                        'numeric' => 'El orden debe ser un número.',
+                                    ])
                                     ->helperText('Número para ordenar en listas (menor = primero)'),
                             ])
                             ->columnSpan(1),

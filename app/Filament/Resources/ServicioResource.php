@@ -47,7 +47,7 @@ class ServicioResource extends Resource
                                     ->placeholder('ABC-123')
                                     ->prefix('🚗')
                                     ->validationMessages([
-                                        'required' => 'La placa es obligatoria.',
+                                        'required' => 'La placa del vehículo es obligatoria.',
                                         'max' => 'La placa no puede exceder 10 caracteres.',
                                     ])
                                     ->helperText('Placa única del vehículo')
@@ -73,6 +73,9 @@ class ServicioResource extends Resource
                                     ])
                                     ->default('pendiente')
                                     ->required()
+                                    ->validationMessages([
+                                        'required' => 'El estado del servicio es obligatorio.',
+                                    ])
                                     ->live()
                                     ->helperText('Selecciona el estado actual del servicio')
                                     ->columnSpan(1),
@@ -109,6 +112,9 @@ class ServicioResource extends Resource
                                             ->live()
                                             ->dehydrated(true)
                                             ->required()
+                                            ->validationMessages([
+                                                'required' => 'Selecciona un producto.',
+                                            ])
                                             ->afterStateUpdated(function ($state, Set $set) {
                                                 if ($state) {
                                                     $producto = Producto::where('codigo', $state)->first();
@@ -161,9 +167,9 @@ class ServicioResource extends Resource
                                             ->dehydrated(true)
                                             ->suffix('x')
                                             ->validationMessages([
-                                                'required' => 'Requerido',
-                                                'numeric' => 'Número válido',
-                                                'min' => '> 0',
+                                                'required' => 'La cantidad es obligatoria.',
+                                                'numeric' => 'Debe ser un número válido.',
+                                                'min' => 'La cantidad debe ser mayor a 0.',
                                             ])
                                             ->columnSpan(1),
                                     ]),
@@ -205,8 +211,8 @@ class ServicioResource extends Resource
                                             ->dehydrated(true)
                                             ->placeholder('Ej: Cambio de aceite')
                                             ->validationMessages([
-                                                'required' => 'Requerido',
-                                                'max' => 'Máx 100 caracteres',
+                                                'required' => 'El nombre del servicio es obligatorio.',
+                                                'max' => 'El nombre no puede exceder 100 caracteres.',
                                             ])
                                             ->columnSpan(1),
 
@@ -220,8 +226,8 @@ class ServicioResource extends Resource
                                             ->dehydrated(true)
                                             ->prefix('$')
                                             ->validationMessages([
-                                                'required' => 'Requerido',
-                                                'numeric' => 'Número válido',
+                                                'required' => 'El precio es obligatorio.',
+                                                'numeric' => 'Debe ser un número válido.',
                                             ])
                                             ->columnSpan(1),
 
@@ -236,8 +242,8 @@ class ServicioResource extends Resource
                                             ->dehydrated(true)
                                             ->suffix('x')
                                             ->validationMessages([
-                                                'required' => 'Requerido',
-                                                'numeric' => 'Número válido',
+                                                'required' => 'La cantidad es obligatoria.',
+                                                'numeric' => 'Debe ser un número válido.',
                                             ])
                                             ->columnSpan(1),
                                     ]),

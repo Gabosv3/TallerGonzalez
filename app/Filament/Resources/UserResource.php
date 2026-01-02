@@ -44,9 +44,11 @@ class UserResource extends Resource
                             ->maxLength(255)
                             ->placeholder('Ej: Juan Carlos Pérez')
                             ->regex('/^[a-zA-Z\s]+$/')
-                            ->validationMessages(
-                                ['regex' => 'El nombre debe contener solo letras y espacios.']
-                            )
+                            ->validationMessages([
+                                'required' => 'El nombre es obligatorio.',
+                                'max' => 'El nombre no puede exceder 255 caracteres.',
+                                'regex' => 'El nombre debe contener solo letras y espacios.',
+                            ])
                             ->helperText('Nombre completo del usuario'),
 
                         Forms\Components\TextInput::make('email')
@@ -56,9 +58,13 @@ class UserResource extends Resource
                             ->unique(ignoreRecord: true)
                             ->maxLength(255)
                             ->regex('/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/')
-                            ->validationMessages(
-                                ['regex' => 'El correo electrónica debe ser una dirección de correo electrónica válida.']
-                            )
+                            ->validationMessages([
+                                'required' => 'El correo electrónico es obligatorio.',
+                                'email' => 'Ingresa un correo electrónico válido.',
+                                'unique' => 'Este correo ya está registrado.',
+                                'max' => 'El correo no puede exceder 255 caracteres.',
+                                'regex' => 'El formato del correo no es válido.',
+                            ])
                             ->placeholder('usuario@empresa.com')
                             ->helperText('Correo para inicio de sesión y notificaciones'),
 
@@ -84,9 +90,11 @@ class UserResource extends Resource
                             ->minLength(8)
                             ->dehydrated(fn($state) => filled($state))
                             ->regex('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/')
-                            ->validationMessages(
-                                ['regex' => 'La contraseña debe contener al menos 8 caracteres, una letra mayúscula, una letra minúscula, un número y un carácter especial.']
-                            )
+                            ->validationMessages([
+                                'required' => 'La contraseña es obligatoria.',
+                                'min' => 'La contraseña debe tener al menos 8 caracteres.',
+                                'regex' => 'La contraseña debe contener al menos 8 caracteres, una letra mayúscula, una letra minúscula, un número y un carácter especial.',
+                            ])
                             ->dehydrateStateUsing(fn($state) => Hash::make($state))
                             ->revealable()
                             ->helperText(fn($operation) => $operation === 'create'
@@ -145,6 +153,11 @@ class UserResource extends Resource
                                     ->required()
                                     ->maxLength(255)
                                     ->unique('roles', 'name')
+                                    ->validationMessages([
+                                        'required' => 'El nombre del rol es obligatorio.',
+                                        'max' => 'El nombre no puede exceder 255 caracteres.',
+                                        'unique' => 'Este rol ya existe.',
+                                    ])
                                     ->placeholder('Ej: Vendedor, Administrador'),
 
                                 Forms\Components\Select::make('guard_name')
@@ -154,7 +167,10 @@ class UserResource extends Resource
                                         'web' => 'Web',
                                         'api' => 'API',
                                     ])
-                                    ->required(),
+                                    ->required()
+                                    ->validationMessages([
+                                        'required' => 'El guard es obligatorio.',
+                                    ]),
                             ])
                             ->createOptionUsing(function (array $data) {
                                 $role = Role::create($data);
@@ -407,7 +423,10 @@ class UserResource extends Resource
                             Forms\Components\Select::make('role')
                                 ->label('Rol a asignar')
                                 ->options(Role::all()->pluck('name', 'id'))
-                                ->required(),
+                                ->required()
+                                ->validationMessages([
+                                    'required' => 'Debes seleccionar un rol.',
+                                ]),
                         ])
                         ->action(function ($records, array $data) {
                             $role = Role::find($data['role']);

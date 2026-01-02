@@ -222,6 +222,9 @@ class ClienteResource extends Resource
                                             ])
                                             ->default('consumidor_final')
                                             ->required()
+                                            ->validationMessages([
+                                                'required' => 'Debes seleccionar un tipo de cliente.',
+                                            ])
                                             ->helperText('Seleccione el tipo para facturación'),
 
                                         Select::make('categoria_economica_codigo')
@@ -344,6 +347,9 @@ class ClienteResource extends Resource
                                 TextInput::make('codigo_postal')
                                     ->label('Código Postal')
                                     ->maxLength(10)
+                                    ->validationMessages([
+                                        'max' => 'El código postal no puede exceder 10 caracteres.',
+                                    ])
                                     ->placeholder('Ej: 01101')
                                     ->helperText('Código postal de la zona'),
                             ])
@@ -363,6 +369,9 @@ class ClienteResource extends Resource
                                     ->label('Dirección de Envío')
                                     ->rows(3)
                                     ->maxLength(255)
+                                    ->validationMessages([
+                                        'max' => 'La dirección de envío no puede exceder 255 caracteres.',
+                                    ])
                                     ->placeholder('Ej: Calle Secundaria #456, Colonia...')
                                     ->hidden(fn ($get) => $get('usar_misma_direccion'))
                                     ->helperText('Dirección específica para entregas'),
@@ -386,6 +395,9 @@ class ClienteResource extends Resource
                                     ->label('Referencias de Envío')
                                     ->rows(2)
                                     ->maxLength(255)
+                                    ->validationMessages([
+                                        'max' => 'Las referencias no pueden exceder 255 caracteres.',
+                                    ])
                                     ->placeholder('Ej: Frente al parque, casa color azul...')
                                     ->helperText('Puntos de referencia para la entrega'),
                             ])

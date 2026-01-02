@@ -50,12 +50,18 @@ class AceiteResource extends Resource
                                     ->label('Producto Asociado')
                                     ->relationship('producto', 'nombre')
                                     ->required()
+                                    ->validationMessages([
+                                        'required' => 'Debes seleccionar un producto asociado.',
+                                    ])
                                     ->searchable()
                                     ->preload()
                                     ->helperText('Producto general al que pertenece este aceite')
                                     ->createOptionForm([
                                         TextInput::make('nombre')
                                             ->required()
+                                            ->validationMessages([
+                                                'required' => 'El nombre del producto es obligatorio.',
+                                            ])
                                             ->maxLength(255),
                                         TextInput::make('codigo')
                                             ->maxLength(50),
@@ -65,12 +71,18 @@ class AceiteResource extends Resource
                                     ->label('Marca')
                                     ->relationship('marca', 'nombre')
                                     ->required()
+                                    ->validationMessages([
+                                        'required' => 'Debes seleccionar una marca.',
+                                    ])
                                     ->searchable()
                                     ->preload()
                                     ->helperText('Marca del aceite')
                                     ->createOptionForm([
                                         TextInput::make('nombre')
                                             ->required()
+                                            ->validationMessages([
+                                                'required' => 'El nombre de la marca es obligatorio.',
+                                            ])
                                             ->maxLength(255),
                                     ]),
 
@@ -84,12 +96,18 @@ class AceiteResource extends Resource
                                     ->label('Tipo de Aceite')
                                     ->relationship('tipoAceite', 'nombre')
                                     ->required()
+                                    ->validationMessages([
+                                        'required' => 'Debes seleccionar un tipo de aceite.',
+                                    ])
                                     ->searchable()
                                     ->preload()
                                     ->helperText('Clasificación por composición')
                                     ->createOptionForm([
                                         TextInput::make('nombre')
                                             ->required()
+                                            ->validationMessages([
+                                                'required' => 'El nombre del tipo de aceite es obligatorio.',
+                                            ])
                                             ->maxLength(255),
                                         TextInput::make('clave')
                                             ->maxLength(50),
@@ -104,6 +122,9 @@ class AceiteResource extends Resource
                                 TextInput::make('viscosidad')
                                     ->label('Viscosidad')
                                     ->required()
+                                    ->validationMessages([
+                                        'required' => 'La viscosidad es obligatoria.',
+                                    ])
                                     ->maxLength(50)
                                     ->placeholder('Ej. 5W-30, 10W-40')
                                     ->helperText('Clasificación de viscosidad SAE'),
@@ -112,6 +133,10 @@ class AceiteResource extends Resource
                                     ->label('Capacidad (ml)')
                                     ->numeric()
                                     ->required()
+                                    ->validationMessages([
+                                        'required' => 'La capacidad es obligatoria.',
+                                        'numeric' => 'La capacidad debe ser un número.',
+                                    ])
                                     ->step(0.01)
                                     ->suffix('ml')
                                     ->placeholder('Ej. 1000, 946, 5000')

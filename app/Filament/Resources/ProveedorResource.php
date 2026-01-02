@@ -46,6 +46,10 @@ class ProveedorResource extends Resource
                                     ->label('Código Interno')
                                     ->maxLength(50)
                                     ->unique(Proveedor::class, 'codigo', ignoreRecord: true)
+                                    ->validationMessages([
+                                        'unique' => 'Este código ya está registrado.',
+                                        'max' => 'El código no puede exceder 50 caracteres.',
+                                    ])
                                     ->placeholder('Ej. PROV-001')
                                     ->helperText('Código único para identificar al proveedor'),
 
@@ -54,12 +58,20 @@ class ProveedorResource extends Resource
                                     ->required()
                                     ->maxLength(255)
                                     ->unique(Proveedor::class, 'nombre', ignoreRecord: true)
+                                    ->validationMessages([
+                                        'required' => 'La razón social es obligatoria.',
+                                        'max' => 'La razón social no puede exceder 255 caracteres.',
+                                        'unique' => 'Este proveedor ya está registrado.',
+                                    ])
                                     ->placeholder('Ej. Distribuidora de Lubricantes S.A.')
                                     ->helperText('Nombre completo o razón social del proveedor'),
 
                                 TextInput::make('contacto')
                                     ->label('Persona de Contacto')
                                     ->maxLength(255)
+                                    ->validationMessages([
+                                        'max' => 'El nombre de contacto no puede exceder 255 caracteres.',
+                                    ])
                                     ->placeholder('Ej. Juan Pérez - Gerente de Ventas')
                                     ->helperText('Persona responsable para contactar'),
 
@@ -69,6 +81,9 @@ class ProveedorResource extends Resource
                                             ->label('Teléfono')
                                             ->tel()
                                             ->maxLength(20)
+                                            ->validationMessages([
+                                                'max' => 'El teléfono no puede exceder 20 caracteres.',
+                                            ])
                                             ->placeholder('+503 1234 5678')
                                             ->prefixIcon('heroicon-o-phone')
                                             ->helperText('Número de contacto principal'),
@@ -79,6 +94,11 @@ class ProveedorResource extends Resource
                                             ->maxLength(255)
                                             ->placeholder('contacto@proveedor.com')
                                             ->unique(Proveedor::class, 'email', ignoreRecord: true)
+                                            ->validationMessages([
+                                                'email' => 'Ingresa un correo electrónico válido.',
+                                                'max' => 'El correo no puede exceder 255 caracteres.',
+                                                'unique' => 'Este correo ya está registrado.',
+                                            ])
                                             ->prefixIcon('heroicon-o-envelope')
                                             ->helperText('Email para comunicaciones'),
                                     ]),
@@ -94,6 +114,10 @@ class ProveedorResource extends Resource
                                     ->maxLength(50)
                                     ->placeholder('Ej. ABC123456789')
                                     ->unique(Proveedor::class, 'rfc', ignoreRecord: true)
+                                    ->validationMessages([
+                                        'max' => 'El NIT no puede exceder 50 caracteres.',
+                                        'unique' => 'Este NIT ya está registrado.',
+                                    ])
                                     ->helperText('Registro Federal de Contribuyentes'),
 
                                 Grid::make(2)
@@ -101,6 +125,9 @@ class ProveedorResource extends Resource
                                         TextInput::make('ciudad')
                                             ->label('Ciudad')
                                             ->maxLength(100)
+                                            ->validationMessages([
+                                                'max' => 'La ciudad no puede exceder 100 caracteres.',
+                                            ])
                                             ->placeholder('Ej. San Salvador')
                                             ->helperText('Ciudad donde se ubica'),
 
@@ -108,6 +135,9 @@ class ProveedorResource extends Resource
                                             ->label('País')
                                             ->maxLength(100)
                                             ->default('El Salvador')
+                                            ->validationMessages([
+                                                'max' => 'El país no puede exceder 100 caracteres.',
+                                            ])
                                             ->placeholder('Ej. El Salvador')
                                             ->helperText('País del proveedor'),
                                     ]),

@@ -63,6 +63,9 @@ class PedidoResource extends Resource
                                                 ->label('Número de Orden')
                                                 
                                                 ->unique(ignoreRecord: true)
+                                                ->validationMessages([
+                                                    'unique' => 'Este número de orden ya existe.',
+                                                ])
                                                 ->maxLength(50)
                                                 ->placeholder('PED-' . date('Ymd') . '-0001')
                                                 ->disabled()
@@ -73,6 +76,9 @@ class PedidoResource extends Resource
                                                 ->label('Proveedor')
                                                 ->relationship('proveedor', 'nombre')
                                                 ->required()
+                                                ->validationMessages([
+                                                    'required' => 'Debes seleccionar un proveedor.',
+                                                ])
                                                 ->searchable()
                                                 ->preload()
                                                 ->live()
@@ -105,12 +111,20 @@ class PedidoResource extends Resource
                                                 ->required()
                                                 ->default(now())
                                                 ->maxDate(now())
+                                                ->validationMessages([
+                                                    'max_date' => 'La fecha de orden no puede ser futura.',
+                                                    'required' => 'La fecha de orden es obligatoria.',
+                                                ])
                                                 ->helperText('Fecha de emisión de la orden'),
 
                                             DatePicker::make('fecha_esperada')
                                                 ->label('Fecha Esperada')
                                                 ->required()
-                                                ->minDate(now())
+                                                ->minDate(now()->startOfDay())
+                                                ->validationMessages([
+                                                    'after_or_equal' => 'La fecha esperada debe ser igual o posterior a hoy.',
+                                                    'required' => 'La fecha esperada es obligatoria.',
+                                                ])
                                                 ->default(now()->addDays(7))
                                                 ->helperText('Fecha esperada de entrega'),
 
@@ -126,6 +140,9 @@ class PedidoResource extends Resource
                                                 ])
                                                 ->default('pendiente')
                                                 ->required()
+                                                ->validationMessages([
+                                                    'required' => 'El estado es obligatorio.',
+                                                ])
                                                 ->native(false),
                                         ]),
 
@@ -162,6 +179,9 @@ class PedidoResource extends Resource
                                                         ->label('Producto')
                                                         ->relationship('producto', 'nombre')
                                                         ->required()
+                                                        ->validationMessages([
+                                                            'required' => 'Selecciona un producto.',
+                                                        ])
                                                         ->searchable(['codigo', 'nombre'])
                                                         ->preload()
                                                         ->live()
@@ -193,6 +213,10 @@ class PedidoResource extends Resource
                                                         ->required()
                                                         ->default(1)
                                                         ->minValue(1)
+                                                        ->validationMessages([
+                                                            'required' => 'Ingresa una cantidad.',
+                                                            'min' => 'La cantidad debe ser al menos 1.',
+                                                        ])
                                                         ->live(onBlur: true)
                                                         ->afterStateUpdated(fn(Set $set, Get $get) => self::actualizarSubtotal($set, $get)),
 
@@ -200,6 +224,9 @@ class PedidoResource extends Resource
                                                         ->label('Precio Sin IVA')
                                                         ->numeric()
                                                         ->required()
+                                                        ->validationMessages([
+                                                            'required' => 'El precio es obligatorio.',
+                                                        ])
                                                         ->prefix('$')
                                                         ->step(0.01)
                                                         ->live(debounce: 500)
@@ -319,6 +346,9 @@ class PedidoResource extends Resource
                                                 ->label('Total General')
                                                 ->numeric()
                                                 ->required()
+                                                ->validationMessages([
+                                                    'required' => 'El total no puede estar vacío.',
+                                                ])
                                                 ->prefix('$')
                                                 ->default(0)
                                                 ->extraInputAttributes(['class' => 'text-xl font-bold text-green-600']),
