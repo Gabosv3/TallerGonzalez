@@ -158,6 +158,13 @@ class ClienteResource extends Resource
                             ->inline(false)
                             ->dehydrated(false)
                             ->live()
+                            ->default(function ($record) {
+                                // Activar si el NIT es igual al DUI (homologado)
+                                if ($record && $record->nit && $record->dui && $record->nit === $record->dui) {
+                                    return true;
+                                }
+                                return false;
+                            })
                             ->afterStateUpdated(function (\Filament\Forms\Get $get, \Filament\Forms\Set $set, bool $state) {
                                 if ($state) {
                                     $set('nit', $get('dui'));
@@ -170,6 +177,13 @@ class ClienteResource extends Resource
                             ->label('NIT')
                             ->disabled(fn (\Filament\Forms\Get $get) => $get('nit_homologado'))
                             ->dehydrated()
+                            ->live()
+                            ->afterStateUpdated(function (\Filament\Forms\Get $get, \Filament\Forms\Set $set, ?string $state) {
+                                // Si el NIT es igual al DUI, activar el toggle de NIT Homologado
+                                if ($state && $state === $get('dui')) {
+                                    $set('nit_homologado', true);
+                                }
+                            })
                             ->unique(Cliente::class, 'nit', ignoreRecord: true)
                             ->minLength(fn (\Filament\Forms\Get $get) => $get('nit_homologado') ? 9 : 14)
                             ->maxLength(14)

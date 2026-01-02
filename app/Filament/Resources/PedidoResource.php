@@ -176,6 +176,10 @@ class PedidoResource extends Resource
                                                                 if ($producto) {
                                                                     // Usar precio de compra SIN IVA
                                                                     $set('precio_unitario', $producto->precio_compra);
+                                                                    
+                                                                    // Calcular y setear precio con IVA
+                                                                    $precioConIva = round($producto->precio_compra * 1.13, 2);
+                                                                    $set('precio_con_iva_temp', $precioConIva);
 
                                                                     self::actualizarSubtotal($set, $get);
                                                                 }
@@ -396,7 +400,7 @@ class PedidoResource extends Resource
             $subtotal += $cantidad * $precio;
         }
 
-        $impuestoPorcentaje = (float) ($get('impuesto_porcentaje') ?? 16);
+        $impuestoPorcentaje = (float) ($get('impuesto_porcentaje') ?? 13);
         $montoImpuesto = $subtotal * ($impuestoPorcentaje / 100);
         $total = $subtotal + $montoImpuesto;
 
