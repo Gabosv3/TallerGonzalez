@@ -394,7 +394,10 @@ class ServicioResource extends Resource
                                     'completado' => '🟢 Completado',
                                     'cancelado' => '🔴 Cancelado',
                                 ])
-                                ->required(),
+                                ->required()
+                                ->validationMessages([
+                                    'required' => 'Debes seleccionar un estado.',
+                                ]),
                         ])
                         ->action(function ($records, array $data) {
                             $records->each->update(['estado' => $data['estado']]);

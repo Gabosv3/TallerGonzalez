@@ -88,9 +88,11 @@ class MarcaResource extends Resource
                                 TextInput::make('orden')
                                     ->label('Orden de Visualización')
                                     ->numeric()
+                                    ->minValue(0)
                                     ->default(0)
                                     ->validationMessages([
                                         'numeric' => 'El orden debe ser un número.',
+                                        'min' => 'El orden no puede ser negativo.',
                                     ])
                                     ->helperText('Número para ordenar en listas (menor = primero)'),
                             ])

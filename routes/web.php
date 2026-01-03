@@ -17,6 +17,8 @@ Route::get('administrativo/productos/{producto}/reporte', [\App\Http\Controllers
 Route::get('administrativo/productos/export-csv', [\App\Http\Controllers\ProductoReportController::class, 'exportCsv'])->name('productos.export_csv');
 Route::get('administrativo/productos/reporte-general', [\App\Http\Controllers\ProductoReportController::class, 'reporteGeneral'])->name('productos.reporte_general');
 Route::get('administrativo/productos/reporte-reorden', [\App\Http\Controllers\ProductoReportController::class, 'reorderReport'])->name('productos.reporte_reorden');
+Route::get('administrativo/productos/reporte-general-excel', [\App\Http\Controllers\ProductoReportController::class, 'exportarGeneralExcel'])->name('productos.reporte_general_excel');
+Route::get('administrativo/productos/reporte-reorden-excel', [\App\Http\Controllers\ProductoReportController::class, 'exportarReordenExcel'])->name('productos.reporte_reorden_excel');
 // Pedidos reports
 Route::get('administrativo/pedidos/{pedido}/reporte-pdf', [\App\Http\Controllers\PedidoReportController::class, 'reporte'])->name('pedidos.reporte.pdf');
 Route::get('administrativo/pedidos/reporte-multiple', [\App\Http\Controllers\PedidoReportController::class, 'multiple'])->name('pedidos.reporte.multiple');

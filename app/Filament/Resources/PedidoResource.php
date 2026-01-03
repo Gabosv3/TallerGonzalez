@@ -527,8 +527,16 @@ class PedidoResource extends Resource
                 // Filtros mejorados por fechas
                 Filter::make('fecha_orden')
                     ->form([
-                        DatePicker::make('desde')->label('Desde'),
-                        DatePicker::make('hasta')->label('Hasta'),
+                        DatePicker::make('desde')
+                            ->label('Desde')
+                            ->validationMessages([
+                                'date' => 'La fecha debe ser válida.',
+                            ]),
+                        DatePicker::make('hasta')
+                            ->label('Hasta')
+                            ->validationMessages([
+                                'date' => 'La fecha debe ser válida.',
+                            ]),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query
@@ -622,8 +630,20 @@ class PedidoResource extends Resource
                 // Filtros de rango de montos
                 Filter::make('rango_total')
                     ->form([
-                        TextInput::make('min_total')->label('Monto Mínimo')->numeric()->prefix('$'),
-                        TextInput::make('max_total')->label('Monto Máximo')->numeric()->prefix('$'),
+                        TextInput::make('min_total')
+                            ->label('Monto Mínimo')
+                            ->numeric()
+                            ->prefix('$')
+                            ->validationMessages([
+                                'numeric' => 'El monto mínimo debe ser un número.',
+                            ]),
+                        TextInput::make('max_total')
+                            ->label('Monto Máximo')
+                            ->numeric()
+                            ->prefix('$')
+                            ->validationMessages([
+                                'numeric' => 'El monto máximo debe ser un número.',
+                            ]),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query

@@ -29,6 +29,39 @@ class Marca extends Model
         'orden' => 'integer',
     ];
 
+    /**
+     * Reglas de validación para el modelo
+     */
+    public static function validationRules(): array
+    {
+        return [
+            'nombre' => 'required|string|max:255',
+            'logo' => 'nullable|image|max:2048',
+            'pais_origen' => 'nullable|string|max:100',
+            'descripcion' => 'nullable|string',
+            'activo' => 'boolean',
+            'orden' => 'integer|min:0',
+        ];
+    }
+
+    /**
+     * Mensajes de validación en español
+     */
+    public static function validationMessages(): array
+    {
+        return [
+            'nombre.required' => 'El nombre de la marca es obligatorio.',
+            'nombre.max' => 'El nombre no puede exceder 255 caracteres.',
+            'nombre.unique' => 'Esta marca ya está registrada.',
+            'logo.image' => 'El archivo debe ser una imagen válida.',
+            'logo.max' => 'El logo no puede exceder 2MB.',
+            'pais_origen.max' => 'El país de origen no puede exceder 100 caracteres.',
+            'orden.integer' => 'El orden debe ser un número entero.',
+            'orden.min' => 'El orden no puede ser negativo.',
+            'activo.boolean' => 'El estado debe ser verdadero o falso.',
+        ];
+    }
+
     protected static $logAttributes = ['*'];
 
     public function getActivitylogOptions(): LogOptions

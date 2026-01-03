@@ -24,6 +24,33 @@ class Servicio extends Model
     ];
 
     /**
+     * Reglas de validación para el modelo
+     */
+    public static function validationRules(): array
+    {
+        return [
+            'placa' => 'required|string|max:20',
+            'productos' => 'nullable|array',
+            'servicios' => 'nullable|array',
+            'estado' => 'required|in:pendiente,en_proceso,completado,cancelado',
+            'notas' => 'nullable|string',
+        ];
+    }
+
+    /**
+     * Mensajes de validación en español
+     */
+    public static function validationMessages(): array
+    {
+        return [
+            'placa.required' => 'La placa del vehículo es obligatoria.',
+            'placa.max' => 'La placa no puede exceder 20 caracteres.',
+            'estado.required' => 'El estado del servicio es obligatorio.',
+            'estado.in' => 'El estado debe ser: pendiente, en proceso, completado o cancelado.',
+        ];
+    }
+
+    /**
      * Obtener la cantidad de productos registrados
      */
     public function getCantidadProductosAttribute(): int

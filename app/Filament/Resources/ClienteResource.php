@@ -415,13 +415,15 @@ class ClienteResource extends Resource
                                     ->label('Límite de Crédito ($)')
                                     ->numeric()
                                     ->live()
+                                    ->minValue(0)
                                     ->required(fn ($get) => filled($get('dias_credito')) || filled($get('descuento_autorizado')))
                                     ->dehydrateStateUsing(fn ($state) => $state ?? 0)
                                     ->prefix('$')
                                     ->step(0.01)
                                     ->validationMessages([
                                         'required' => 'El límite de crédito es obligatorio si se definen otras condiciones.',
-                                        'numeric' => 'El límite de crédito debe ser un número válido.',
+                                        'numeric' => 'El límite debe ser un número válido.',
+                                        'min' => 'El límite de crédito no puede ser negativo.',
                                     ])
                                     ->helperText('Límite máximo de crédito autorizado'),
 
@@ -429,12 +431,16 @@ class ClienteResource extends Resource
                                     ->label('Días de Crédito')
                                     ->numeric()
                                     ->live()
+                                    ->minValue(0)
+                                    ->maxValue(365)
                                     ->required(fn ($get) => filled($get('limite_credito')) || filled($get('descuento_autorizado')))
                                     ->dehydrateStateUsing(fn ($state) => $state ?? 0)
                                     ->suffix('días')
                                     ->validationMessages([
                                         'required' => 'Los días de crédito son obligatorios si se definen otras condiciones.',
                                         'numeric' => 'Los días de crédito deben ser un número válido.',
+                                        'min' => 'Los días de crédito no pueden ser negativos.',
+                                        'max' => 'Los días de crédito no pueden exceder 365.',
                                     ])
                                     ->helperText('Plazo de pago en días'),
 
