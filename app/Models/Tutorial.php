@@ -25,6 +25,40 @@ class Tutorial extends Model
         'orden' => 'integer',
     ];
 
+    /**
+     * Reglas de validación para el modelo
+     */
+    public static function validationRules(): array
+    {
+        return [
+            'titulo' => 'required|string|max:255',
+            'descripcion' => 'nullable|string',
+            'video_url' => 'nullable|url|max:500',
+            'video_path' => 'nullable|string|max:255',
+            'thumbnail_path' => 'nullable|string|max:255',
+            'orden' => 'integer|min:0',
+            'activo' => 'boolean',
+        ];
+    }
+
+    /**
+     * Mensajes de validación en español
+     */
+    public static function validationMessages(): array
+    {
+        return [
+            'titulo.required' => 'El título del tutorial es obligatorio.',
+            'titulo.max' => 'El título no puede exceder 255 caracteres.',
+            'video_url.url' => 'La URL del video debe ser válida.',
+            'video_url.max' => 'La URL no puede exceder 500 caracteres.',
+            'video_path.max' => 'La ruta del video no puede exceder 255 caracteres.',
+            'thumbnail_path.max' => 'La ruta del thumbnail no puede exceder 255 caracteres.',
+            'orden.integer' => 'El orden debe ser un número entero.',
+            'orden.min' => 'El orden no puede ser negativo.',
+            'activo.boolean' => 'El estado debe ser verdadero o falso.',
+        ];
+    }
+
     public function getTipoOrigenAttribute(): string
     {
         if (!empty($this->video_path)) {

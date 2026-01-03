@@ -282,9 +282,15 @@ class UserResource extends Resource
                 Tables\Filters\Filter::make('created_at')
                     ->form([
                         Forms\Components\DatePicker::make('created_from')
-                            ->label('Desde'),
+                            ->label('Desde')
+                            ->validationMessages([
+                                'date' => 'La fecha debe ser válida.',
+                            ]),
                         Forms\Components\DatePicker::make('created_until')
-                            ->label('Hasta'),
+                            ->label('Hasta')
+                            ->validationMessages([
+                                'date' => 'La fecha debe ser válida.',
+                            ]),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query
@@ -361,17 +367,7 @@ class UserResource extends Resource
                     Tables\Actions\DeleteAction::make()
                         ->color('danger')
                         ->icon('heroicon-o-trash')
-                        ->before(function (Tables\Actions\DeleteAction $action, $record) {
-                            // Verificar si el usuario tiene rol de super admin
-                            if ($record->hasRole('super_admin') || $record->hasRole('admin')) {
-                                $action->halt();
-                                Notification::make()
-                                    ->danger()
-                                    ->title('No se puede eliminar este usuario')
-                                    ->body('No puedes eliminar usuarios con rol Super Admin o Administrador. Asignalos a otro rol primero.')
-                                    ->send();
-                            }
-                        }),
+                        ->disabled(fn($record) => $record->hasRole('super_admin') || $record->hasRole('admin')),
                     Tables\Actions\RestoreAction::make()
                         ->icon('heroicon-o-arrow-uturn-left')
                         ->color('success')

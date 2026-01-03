@@ -47,7 +47,56 @@ class Aceite extends Model
         'stock_minimo' => 0,
         'stock_maximo' => null,
         'activo' => true,
+        'unidad_medida' => 'ml',
     ];
+
+    /**
+     * Reglas de validación para el modelo
+     */
+    public static function validationRules(): array
+    {
+        return [
+            'producto_id' => 'required|exists:productos,id',
+            'marca_id' => 'required|exists:marcas,id',
+            'viscosidad' => 'required|string|max:50',
+            'tipo_aceite_id' => 'required|exists:tipos_aceites,id',
+            'capacidad_ml' => 'required|numeric|min:0.01|max:999999.99',
+            'modelo' => 'nullable|string|max:255',
+            'presentacion' => 'nullable|string|max:100',
+            'compatibilidad' => 'nullable|string',
+            'stock_disponible' => 'integer|min:0',
+            'stock_minimo' => 'integer|min:0',
+            'stock_maximo' => 'nullable|integer|min:0',
+            'activo' => 'boolean',
+        ];
+    }
+
+    /**
+     * Mensajes de validación en español
+     */
+    public static function validationMessages(): array
+    {
+        return [
+            'producto_id.required' => 'Debes seleccionar un producto asociado.',
+            'producto_id.exists' => 'El producto seleccionado no existe.',
+            'marca_id.required' => 'Debes seleccionar una marca.',
+            'marca_id.exists' => 'La marca seleccionada no existe.',
+            'viscosidad.required' => 'La viscosidad es obligatoria.',
+            'viscosidad.max' => 'La viscosidad no puede exceder 50 caracteres.',
+            'tipo_aceite_id.required' => 'Debes seleccionar un tipo de aceite.',
+            'tipo_aceite_id.exists' => 'El tipo de aceite seleccionado no existe.',
+            'capacidad_ml.required' => 'La capacidad es obligatoria.',
+            'capacidad_ml.numeric' => 'La capacidad debe ser un número.',
+            'capacidad_ml.min' => 'La capacidad debe ser mayor a 0.',
+            'stock_disponible.integer' => 'El stock debe ser un número entero.',
+            'stock_disponible.min' => 'El stock no puede ser negativo.',
+            'stock_minimo.integer' => 'El stock mínimo debe ser un número entero.',
+            'stock_minimo.min' => 'El stock mínimo no puede ser negativo.',
+            'stock_maximo.integer' => 'El stock máximo debe ser un número entero.',
+            'stock_maximo.min' => 'El stock máximo no puede ser negativo.',
+            'activo.boolean' => 'El estado debe ser verdadero o falso.',
+        ];
+    }
 
     protected static $logAttributes = ['*'];
 

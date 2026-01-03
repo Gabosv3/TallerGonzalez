@@ -63,6 +63,65 @@ class Cliente extends Model
     ];
 
     /**
+     * Reglas de validación para el modelo
+     */
+    public static function validationRules(): array
+    {
+        return [
+            'nombre' => 'required|string|max:100',
+            'apellido' => 'required|string|max:100',
+            'email' => 'required|email|max:80',
+            'telefono' => 'required|string|max:9',
+            'telefono_alternativo' => 'nullable|string|max:9',
+            'dui' => 'nullable|string|max:10',
+            'nit' => 'nullable|string|max:14',
+            'nrc' => 'nullable|string|max:10',
+            'tipo_cliente' => 'required|in:natural,juridico',
+            'direccion' => 'required|string|max:255',
+            'departamento' => 'required|string|max:50',
+            'municipio' => 'required|string|max:50',
+            'limite_credito' => 'numeric|min:0',
+            'dias_credito' => 'integer|min:0|max:365',
+            'descuento_autorizado' => 'numeric|min:0|max:100',
+            'activo' => 'boolean',
+            'credito_activo' => 'boolean',
+        ];
+    }
+
+    /**
+     * Mensajes de validación en español
+     */
+    public static function validationMessages(): array
+    {
+        return [
+            'nombre.required' => 'El nombre es obligatorio.',
+            'nombre.max' => 'El nombre no puede exceder 100 caracteres.',
+            'apellido.required' => 'El apellido es obligatorio.',
+            'apellido.max' => 'El apellido no puede exceder 100 caracteres.',
+            'email.required' => 'El correo electrónico es obligatorio.',
+            'email.email' => 'El correo debe ser una dirección válida.',
+            'email.max' => 'El correo no puede exceder 80 caracteres.',
+            'email.unique' => 'Este correo ya está registrado en el sistema.',
+            'telefono.required' => 'El teléfono principal es obligatorio.',
+            'telefono.max' => 'El teléfono no puede exceder 9 caracteres.',
+            'tipo_cliente.required' => 'El tipo de cliente es obligatorio.',
+            'tipo_cliente.in' => 'El tipo de cliente debe ser natural o jurídico.',
+            'direccion.required' => 'La dirección es obligatoria.',
+            'direccion.max' => 'La dirección no puede exceder 255 caracteres.',
+            'departamento.required' => 'El departamento es obligatorio.',
+            'municipio.required' => 'El municipio es obligatorio.',
+            'limite_credito.numeric' => 'El límite de crédito debe ser un número.',
+            'limite_credito.min' => 'El límite de crédito no puede ser negativo.',
+            'dias_credito.integer' => 'Los días de crédito deben ser un número entero.',
+            'dias_credito.min' => 'Los días de crédito no pueden ser negativos.',
+            'dias_credito.max' => 'Los días de crédito no pueden exceder 365.',
+            'descuento_autorizado.numeric' => 'El descuento debe ser un número.',
+            'descuento_autorizado.min' => 'El descuento no puede ser menor a 0%.',
+            'descuento_autorizado.max' => 'El descuento no puede ser mayor a 100%.',
+        ];
+    }
+
+    /**
      * Attributes to log for activity log.
      * Adjust array if you want specific attributes only.
      */

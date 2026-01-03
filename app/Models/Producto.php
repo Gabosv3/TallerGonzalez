@@ -56,6 +56,62 @@ class Producto extends Model
         'activo' => 'boolean',
     ];
 
+    /**
+     * Reglas de validación para el modelo
+     */
+    public static function validationRules(): array
+    {
+        return [
+            'nombre' => 'required|string|max:255',
+            'codigo' => 'required|string|max:50',
+            'descripcion' => 'nullable|string',
+            'marca_id' => 'nullable|exists:marcas,id',
+            'tipo_producto_id' => 'required|exists:tipos_productos,id',
+            'unidad_medida' => 'required|string|max:10',
+            'precio_compra' => 'required|numeric|min:0',
+            'precio_venta' => 'required|numeric|min:0',
+            'precio_minimo' => 'nullable|numeric|min:0',
+            'stock_actual' => 'integer|min:0',
+            'stock_minimo' => 'integer|min:0',
+            'stock_maximo' => 'nullable|integer|min:0',
+            'activo' => 'boolean',
+            'control_stock' => 'boolean',
+            'especificaciones_generales' => 'nullable|string',
+        ];
+    }
+
+    /**
+     * Mensajes de validación en español
+     */
+    public static function validationMessages(): array
+    {
+        return [
+            'nombre.required' => 'El nombre del producto es obligatorio.',
+            'nombre.max' => 'El nombre no puede exceder 255 caracteres.',
+            'codigo.required' => 'El código SKU es obligatorio.',
+            'codigo.max' => 'El código no puede exceder 50 caracteres.',
+            'tipo_producto_id.required' => 'Debes seleccionar un tipo de producto.',
+            'tipo_producto_id.exists' => 'El tipo de producto seleccionado no existe.',
+            'unidad_medida.required' => 'La unidad de medida es obligatoria.',
+            'precio_compra.required' => 'El precio de compra es obligatorio.',
+            'precio_compra.numeric' => 'El precio de compra debe ser un número válido.',
+            'precio_compra.min' => 'El precio de compra no puede ser negativo.',
+            'precio_venta.required' => 'El precio de venta es obligatorio.',
+            'precio_venta.numeric' => 'El precio de venta debe ser un número válido.',
+            'precio_venta.min' => 'El precio de venta no puede ser negativo.',
+            'precio_minimo.numeric' => 'El precio mínimo debe ser un número válido.',
+            'precio_minimo.min' => 'El precio mínimo no puede ser negativo.',
+            'stock_actual.integer' => 'El stock actual debe ser un número entero.',
+            'stock_actual.min' => 'El stock actual no puede ser negativo.',
+            'stock_minimo.integer' => 'El stock mínimo debe ser un número entero.',
+            'stock_minimo.min' => 'El stock mínimo no puede ser negativo.',
+            'stock_maximo.integer' => 'El stock máximo debe ser un número entero.',
+            'stock_maximo.min' => 'El stock máximo no puede ser negativo.',
+            'activo.boolean' => 'El estado debe ser verdadero o falso.',
+            'control_stock.boolean' => 'El control de stock debe ser verdadero o falso.',
+        ];
+    }
+
     // Relación con marca
     public function marca(): BelongsTo
     {

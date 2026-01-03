@@ -49,6 +49,62 @@ class Pedido extends Model
         'cancelado_at' => 'datetime',
     ];
 
+    /**
+     * Reglas de validación para el modelo
+     */
+    public static function validationRules(): array
+    {
+        return [
+            'proveedor_id' => 'required|exists:proveedores,id',
+            'user_id' => 'nullable|exists:users,id',
+            'numero_factura' => 'required|string|max:50|unique:pedidos,numero_factura',
+            'fecha_orden' => 'required|date',
+            'fecha_esperada' => 'required|date|after_or_equal:fecha_orden',
+            'fecha_entrega' => 'nullable|date',
+            'estado' => 'required|in:pendiente,confirmado,en_camino,parcial,completado,cancelado',
+            'contacto_proveedor' => 'nullable|string|max:100',
+            'telefono_proveedor' => 'nullable|string|max:20',
+            'subtotal' => 'numeric|min:0',
+            'impuesto_porcentaje' => 'numeric|min:0|max:100',
+            'monto_impuesto' => 'numeric|min:0',
+            'total' => 'numeric|min:0',
+            'observaciones' => 'nullable|string',
+            'terminos_pago' => 'nullable|string',
+            'condiciones_entrega' => 'nullable|string',
+        ];
+    }
+
+    /**
+     * Mensajes de validación en español
+     */
+    public static function validationMessages(): array
+    {
+        return [
+            'proveedor_id.required' => 'Debes seleccionar un proveedor.',
+            'proveedor_id.exists' => 'El proveedor seleccionado no existe.',
+            'numero_factura.required' => 'El número de factura es obligatorio.',
+            'numero_factura.max' => 'El número de factura no puede exceder 50 caracteres.',
+            'numero_factura.unique' => 'Este número de factura ya está registrado.',
+            'fecha_orden.required' => 'La fecha de orden es obligatoria.',
+            'fecha_orden.date' => 'La fecha de orden debe ser una fecha válida.',
+            'fecha_esperada.required' => 'La fecha esperada es obligatoria.',
+            'fecha_esperada.date' => 'La fecha esperada debe ser una fecha válida.',
+            'fecha_esperada.after_or_equal' => 'La fecha esperada no puede ser anterior a la fecha de orden.',
+            'fecha_entrega.date' => 'La fecha de entrega debe ser una fecha válida.',
+            'estado.required' => 'El estado del pedido es obligatorio.',
+            'estado.in' => 'El estado debe ser uno de: pendiente, confirmado, en camino, parcial, completado, cancelado.',
+            'subtotal.numeric' => 'El subtotal debe ser un número.',
+            'subtotal.min' => 'El subtotal no puede ser negativo.',
+            'impuesto_porcentaje.numeric' => 'El porcentaje de impuesto debe ser un número.',
+            'impuesto_porcentaje.min' => 'El porcentaje no puede ser negativo.',
+            'impuesto_porcentaje.max' => 'El porcentaje no puede exceder 100.',
+            'monto_impuesto.numeric' => 'El monto de impuesto debe ser un número.',
+            'monto_impuesto.min' => 'El monto de impuesto no puede ser negativo.',
+            'total.numeric' => 'El total debe ser un número.',
+            'total.min' => 'El total no puede ser negativo.',
+        ];
+    }
+
     public function proveedor(): BelongsTo
     {
         return $this->belongsTo(Proveedor::class);

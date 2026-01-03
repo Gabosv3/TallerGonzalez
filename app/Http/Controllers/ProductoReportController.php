@@ -3,10 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Producto;
+use App\Exports\ProductosExport;
+use App\Exports\ReordenExport;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Log;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class ProductoReportController extends Controller
 {
@@ -124,6 +127,32 @@ class ProductoReportController extends Controller
         } catch (\Exception $e) {
             Log::error('Error generating reorder report: ' . $e->getMessage());
             return Response::make('Error generando el reporte de reorden', 500);
+        }
+    }
+
+    public function exportarGeneralExcel()
+    {
+        try {
+            $export = new ProductosExport();
+            $filePath = $export->export();
+            
+            return response()->download($filePath, 'productos-' . now()->format('Ymd-His') . '.xlsx')->deleteFileAfterSend();
+        } catch (\Exception $e) {
+            Log::error('Error exporting products to Excel: ' . $e->getMessage());
+            return Response::make('Error generando el reporte en Excel', 500);
+        }
+    }
+
+    public function exportarReordenExcel()
+    {
+        try {
+            $export = new ReordenExport();
+            $filePath = $export->export();
+            
+            return response()->download($filePath, 'reorden-' . now()->format('Ymd-His') . '.xlsx')->deleteFileAfterSend();
+        } catch (\Exception $e) {
+            Log::error('Error exporting reorder to Excel: ' . $e->getMessage());
+            return Response::make('Error generando el reporte de reorden en Excel', 500);
         }
     }
 }

@@ -48,24 +48,18 @@ class AceiteResource extends Resource
                             ->schema([
                                 Select::make('producto_id')
                                     ->label('Producto Asociado')
-                                    ->relationship('producto', 'nombre')
+                                    ->relationship(
+                                        'producto',
+                                        'nombre',
+                                        fn($query) => $query->whereHas('tipoProducto', fn($q) => $q->where('nombre', 'Aceite'))
+                                    )
                                     ->required()
                                     ->validationMessages([
                                         'required' => 'Debes seleccionar un producto asociado.',
                                     ])
-                                    ->searchable()
+                                    ->searchable(['nombre', 'codigo'])
                                     ->preload()
-                                    ->helperText('Producto general al que pertenece este aceite')
-                                    ->createOptionForm([
-                                        TextInput::make('nombre')
-                                            ->required()
-                                            ->validationMessages([
-                                                'required' => 'El nombre del producto es obligatorio.',
-                                            ])
-                                            ->maxLength(255),
-                                        TextInput::make('codigo')
-                                            ->maxLength(50),
-                                    ]),
+                                    ->helperText('Producto general al que pertenece este aceite'),
 
                                 Select::make('marca_id')
                                     ->label('Marca')
@@ -136,8 +130,10 @@ class AceiteResource extends Resource
                                     ->validationMessages([
                                         'required' => 'La capacidad es obligatoria.',
                                         'numeric' => 'La capacidad debe ser un número.',
+                                        'min' => 'La capacidad debe ser mayor a 0.',
                                     ])
                                     ->step(0.01)
+                                    ->minValue(0.01)
                                     ->suffix('ml')
                                     ->placeholder('Ej. 1000, 946, 5000')
                                     ->helperText('Capacidad en mililitros'),
@@ -195,6 +191,11 @@ class AceiteResource extends Resource
                     ->weight('bold')
                     ->description(fn($record) => "Código: " . ($record->producto->codigo ?? 'N/A')),
 
+                TextColumn::make('producto.codigo')
+                    ->label('Código')
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+
                 TextColumn::make('marca.nombre')
                     ->label('Marca')
                     ->searchable()
@@ -249,7 +250,7 @@ class AceiteResource extends Resource
                 SelectFilter::make('producto')
                     ->label('Producto')
                     ->relationship('producto', 'nombre')
-                    ->searchable()
+                    ->searchable(['nombre', 'codigo'])
                     ->preload(),
 
                 SelectFilter::make('marca')
@@ -297,7 +298,11 @@ class AceiteResource extends Resource
                             TextInput::make('cantidad')
                                 ->numeric()
                                 ->required()
-                                ->label('Nueva cantidad en stock'),
+                                ->label('Nueva cantidad en stock')
+                                ->validationMessages([
+                                    'required' => 'La cantidad es obligatoria.',
+                                    'numeric' => 'La cantidad debe ser un número.',
+                                ]),
                         ])
                         ->action(function (Aceite $record, array $data) {
                             $record->update(['stock_disponible' => $data['cantidad']]);

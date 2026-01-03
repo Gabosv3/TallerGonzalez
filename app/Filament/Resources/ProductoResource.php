@@ -49,9 +49,11 @@ class ProductoResource extends Resource
                                     ->schema([
                                         Forms\Components\TextInput::make('codigo')
                                             ->label('Código SKU')
+                                            ->required()
                                             ->unique(ignoreRecord: true)
                                             ->maxLength(50)
                                             ->validationMessages([
+                                                'required' => 'El código SKU es obligatorio.',
                                                 'unique' => 'Este código SKU ya está registrado.',
                                                 'max' => 'El código no puede exceder 50 caracteres.',
                                             ])
@@ -219,10 +221,12 @@ class ProductoResource extends Resource
                                     ->numeric()
                                     ->prefix('$')
                                     ->step(0.01)
+                                    ->minValue(0)
                                     ->required()
                                     ->validationMessages([
                                         'required' => 'El precio de compra es obligatorio.',
                                         'numeric' => 'El precio debe ser un número válido.',
+                                        'min' => 'El precio no puede ser negativo.',
                                     ])
                                     ->live(debounce: 500)
                                     ->afterStateUpdated(function ($state, callable $set) {
@@ -253,10 +257,12 @@ class ProductoResource extends Resource
                                     ->numeric()
                                     ->prefix('$')
                                     ->step(0.01)
+                                    ->minValue(0)
                                     ->required()
                                     ->validationMessages([
                                         'required' => 'El precio de venta es obligatorio.',
                                         'numeric' => 'El precio debe ser un número válido.',
+                                        'min' => 'El precio no puede ser negativo.',
                                     ])
                                     ->live(debounce: 500)
                                     ->afterStateUpdated(function ($state, callable $set) {
@@ -287,6 +293,11 @@ class ProductoResource extends Resource
                                     ->numeric()
                                     ->prefix('$')
                                     ->step(0.01)
+                                    ->minValue(0)
+                                    ->validationMessages([
+                                        'numeric' => 'El precio mínimo debe ser un número válido.',
+                                        'min' => 'El precio mínimo no puede ser negativo.',
+                                    ])
                                     ->helperText('Precio mínimo permitido'),
                             ]),
 
@@ -297,27 +308,36 @@ class ProductoResource extends Resource
                                 Forms\Components\TextInput::make('stock_actual')
                                     ->label('Stock Actual')
                                     ->numeric()
+                                    ->minValue(0)
                                     ->required()
                                     ->validationMessages([
                                         'required' => 'El stock actual es obligatorio.',
                                         'numeric' => 'El stock debe ser un número.',
+                                        'min' => 'El stock no puede ser negativo.',
                                     ])
                                     ->default(0),
 
                                 Forms\Components\TextInput::make('stock_minimo')
                                     ->label('Stock Mínimo')
                                     ->numeric()
+                                    ->minValue(0)
                                     ->required()
                                     ->validationMessages([
                                         'required' => 'El stock mínimo es obligatorio.',
                                         'numeric' => 'El stock debe ser un número.',
+                                        'min' => 'El stock mínimo no puede ser negativo.',
                                     ])
                                     ->default(0),
 
                                 Forms\Components\TextInput::make('stock_maximo')
                                     ->label('Stock Máximo')
                                     ->numeric()
-                                    ->nullable(),
+                                    ->minValue(0)
+                                    ->nullable()
+                                    ->validationMessages([
+                                        'numeric' => 'El stock máximo debe ser un número.',
+                                        'min' => 'El stock máximo no puede ser negativo.',
+                                    ]),
 
                                 Forms\Components\Toggle::make('control_stock')
                                     ->label('Controlar Stock')
@@ -482,12 +502,24 @@ class ProductoResource extends Resource
                     ->openUrlInNewTab()
                     ->color('warning'),
 
+                Tables\Actions\Action::make('reporte_reorden_excel')
+                    ->label('Reporte Reorden (EXCEL)')
+                    ->icon('heroicon-o-arrow-down-tray')
+                    ->url(fn() => route('productos.reporte_reorden_excel'))
+                    ->color('success'),
+
                 Tables\Actions\Action::make('reporte_general')
                     ->label('Reporte General PDF')
                     ->icon('heroicon-o-document-text')
                     ->url(fn() => route('productos.reporte_general'))
                     ->openUrlInNewTab()
                     ->color('primary'),
+
+                Tables\Actions\Action::make('reporte_general_excel')
+                    ->label('Reporte General (EXCEL)')
+                    ->icon('heroicon-o-arrow-down-tray')
+                    ->url(fn() => route('productos.reporte_general_excel'))
+                    ->color('info'),
             ])
             ->actions([
                 Tables\Actions\ActionGroup::make([

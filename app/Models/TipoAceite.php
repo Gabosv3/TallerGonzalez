@@ -28,6 +28,41 @@ class TipoAceite extends Model
         'orden' => 'integer',
     ];
 
+    /**
+     * Reglas de validación para el modelo
+     */
+    public static function validationRules(): array
+    {
+        return [
+            'nombre' => 'required|string|max:255|unique:tipos_aceites,nombre',
+            'clave' => 'required|string|max:50|unique:tipos_aceites,clave',
+            'descripcion' => 'nullable|string',
+            'color' => 'nullable|string|max:7|regex:/^#[0-9A-F]{6}$/i',
+            'orden' => 'integer|min:0',
+            'activo' => 'boolean',
+        ];
+    }
+
+    /**
+     * Mensajes de validación en español
+     */
+    public static function validationMessages(): array
+    {
+        return [
+            'nombre.required' => 'El nombre del tipo de aceite es obligatorio.',
+            'nombre.max' => 'El nombre no puede exceder 255 caracteres.',
+            'nombre.unique' => 'Este tipo de aceite ya está registrado.',
+            'clave.required' => 'La clave es obligatoria.',
+            'clave.max' => 'La clave no puede exceder 50 caracteres.',
+            'clave.unique' => 'Esta clave ya está registrada.',
+            'color.max' => 'El color debe ser un código hexadecimal válido.',
+            'color.regex' => 'El color debe ser un código hexadecimal válido (ej: #6B7280).',
+            'orden.integer' => 'El orden debe ser un número entero.',
+            'orden.min' => 'El orden no puede ser negativo.',
+            'activo.boolean' => 'El estado debe ser verdadero o falso.',
+        ];
+    }
+
     // Relación con aceites
     public function aceites(): HasMany
     {
