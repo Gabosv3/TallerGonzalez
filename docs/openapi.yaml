@@ -6,10 +6,10 @@ info:
   contact:
     name: Soporte TallerGonzalez
 servers:
+  - url: https://pruebas.motorsgonzalez.com/api
+    description: Servidor de pruebas
   - url: http://localhost/api
     description: Desarrollo local
-  - url: /api
-    description: Relativa
 
 components:
   securitySchemes:
