@@ -1,15 +1,15 @@
 openapi: 3.0.0
 info:
   title: TallerGonzalez API
-  version: 1.0.0
-  description: API completa para gestión de facturas, productos y autenticación. Utiliza autenticación Bearer token con Laravel Sanctum.
+  version: 1.1.0
+  description: API completa para gestión de facturas, productos, compras y autenticación. Utiliza autenticación Bearer token con Laravel Sanctum.
   contact:
     name: Soporte TallerGonzalez
 servers:
+  - url: https://pruebas.motorsgonzalez.com/api
+    description: Servidor de pruebas
   - url: http://localhost/api
     description: Desarrollo local
-  - url: /api
-    description: Relativa
 
 components:
   securitySchemes:
@@ -226,6 +226,119 @@ components:
         pago:
           type: boolean
           description: Si se envía true, marca la factura como pagada
+
+    # ─── COMPRAS / KARDEX ──────────────────────────────────────
+
+    Proveedor:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        codigo:
+          type: string
+          example: PROV-001
+        nombre:
+          type: string
+          example: Distribuidora ABC
+        contacto:
+          type: string
+          example: Juan Pérez
+        telefono:
+          type: string
+          example: 2234-5678
+        email:
+          type: string
+          format: email
+          example: contacto@distribuidora.com
+        activo:
+          type: boolean
+
+    OrdenKardex:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 15
+        numero_orden:
+          type: string
+          example: PED-20240614-0001
+        fecha_orden:
+          type: string
+          format: date
+          example: "2024-06-14"
+        fecha_esperada:
+          type: string
+          format: date
+          example: "2024-06-21"
+        fecha_entrega:
+          type: string
+          format: date
+          nullable: true
+          example: "2024-06-19"
+        estado:
+          type: string
+          enum: [pendiente, confirmado, en_camino, parcial, completado, cancelado]
+          example: completado
+        proveedor:
+          $ref: '#/components/schemas/Proveedor'
+        subtotal:
+          type: number
+          example: 750.00
+        monto_impuesto:
+          type: number
+          example: 0.00
+        total:
+          type: number
+          example: 750.00
+        observaciones:
+          type: string
+          nullable: true
+        creado_por:
+          type: string
+          nullable: true
+          example: Gabriel Alegría
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+                example: 45
+              producto_id:
+                type: integer
+                example: 1
+              codigo:
+                type: string
+                example: ACEITE-001
+              nombre:
+                type: string
+                example: Aceite Motor 5W30
+              unidad_medida:
+                type: string
+                example: LT
+              variante:
+                type: string
+                nullable: true
+                description: Viscosidad y presentación (solo para aceites con variante)
+                example: 5W30 Galon
+              cantidad:
+                type: number
+                example: 10
+              cantidad_recibida:
+                type: number
+                nullable: true
+                example: 10
+              precio_unitario:
+                type: number
+                example: 50.00
+              subtotal:
+                type: number
+                example: 500.00
+              completado:
+                type: boolean
+                example: true
 
     PaginatedFacturas:
       type: object
@@ -751,6 +864,110 @@ paths:
           description: Factura no encontrada
         "422":
           description: Error de validación
+
+  # ─── COMPRAS / KARDEX ────────────────────────────────────────
+
+  /compras/kardex:
+    get:
+      summary: Órdenes de compra para Kardex
+      description: |
+        Devuelve las órdenes de compra del sistema filtradas por rango de fechas.
+        Incluye toda la información necesaria para generar el Kardex en el sistema externo:
+        proveedor, productos, cantidades, precios y estado de recepción.
+      tags:
+        - Compras
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: from
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+          description: Fecha inicial (YYYY-MM-DD)
+          example: "2024-06-01"
+        - name: to
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+          description: Fecha final (YYYY-MM-DD)
+          example: "2024-06-30"
+        - name: proveedor_id
+          in: query
+          schema:
+            type: integer
+          description: Filtrar por proveedor (opcional)
+        - name: estado
+          in: query
+          schema:
+            type: string
+            enum: [pendiente, confirmado, en_camino, parcial, completado, cancelado]
+          description: Filtrar por estado (opcional)
+      responses:
+        "200":
+          description: Lista de órdenes con sus detalles
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/OrdenKardex'
+                  total:
+                    type: integer
+                    example: 5
+                  periodo:
+                    type: object
+                    properties:
+                      from:
+                        type: string
+                        format: date
+                        example: "2024-06-01"
+                      to:
+                        type: string
+                        format: date
+                        example: "2024-06-30"
+        "422":
+          description: Error de validación (from/to requeridos)
+        "401":
+          description: No autenticado
+
+  /compras/kardex/{id}:
+    get:
+      summary: Detalle de una orden para Kardex
+      description: Devuelve todos los datos de una orden de compra específica para el Kardex.
+      tags:
+        - Compras
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: ID de la orden de compra
+      responses:
+        "200":
+          description: Datos completos de la orden
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/OrdenKardex'
+        "404":
+          description: Orden no encontrada
+        "401":
+          description: No autenticado
+
+  # ─── DOCUMENTACIÓN ────────────────────────────────────────────
 
   /openapi.yaml:
     get:

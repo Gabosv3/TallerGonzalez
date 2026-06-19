@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\ClienteController;
 use App\Http\Controllers\Api\CategoriaEconomicaController;
 use App\Http\Controllers\Api\FacturaController;
+use App\Http\Controllers\Api\ComprasKardexController;
 
 // Rutas públicas
 Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:10,1');
@@ -43,13 +44,18 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/{codigo}', [CategoriaEconomicaController::class, 'show']);
     });
 
-    // Facturas
-    
+    // Facturas de Venta
     Route::prefix('facturas')->group(function () {
         Route::post('/', [FacturaController::class, 'store']);
         Route::get('/', [FacturaController::class, 'index']);
         Route::get('/{factura}', [FacturaController::class, 'show']);
         Route::put('/{factura}', [FacturaController::class, 'update']);
+    });
+
+    // Compras - Kardex
+    Route::prefix('compras')->group(function () {
+        Route::get('/kardex', [ComprasKardexController::class, 'index']);
+        Route::get('/kardex/{orden}', [ComprasKardexController::class, 'show']);
     });
 
     // Autenticación
