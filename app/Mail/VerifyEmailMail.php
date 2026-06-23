@@ -3,6 +3,7 @@
 namespace App\Mail;
 
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Address;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Mail\Mailables\Headers;
@@ -27,7 +28,7 @@ class VerifyEmailMail extends Mailable
     {
         return new Envelope(
             from: config('mail.from.address'),
-            replyTo: [['address' => config('mail.from.address'), 'name' => config('mail.from.name')]],
+            replyTo: [new Address(config('mail.from.address'), config('mail.from.name'))],
             to: $this->email,
             subject: 'Verifica tu correo electronico - Taller Gonzalez',
         );
