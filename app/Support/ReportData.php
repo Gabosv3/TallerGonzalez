@@ -27,15 +27,17 @@ class ReportData
 
     public static function facturasResumen(array $f): array
     {
-        $vigentes = self::facturas($f)->where('estado', '!=', 'cancelada');
+        // Sin ORDER BY: MySQL en modo estricto rechaza ordenar una consulta de agregados
+        $base = fn () => self::facturas($f)->reorder();
+        $vigentes = $base()->where('estado', '!=', 'cancelada');
         $cantidad = (clone $vigentes)->count();
         $total = (float) (clone $vigentes)->sum('total');
 
         return [
-            'cantidad' => self::facturas($f)->count(),
+            'cantidad' => $base()->count(),
             'total' => $total,
             'promedio' => $cantidad > 0 ? $total / $cantidad : 0.0,
-            'canceladas' => self::facturas($f)->where('estado', 'cancelada')->count(),
+            'canceladas' => $base()->where('estado', 'cancelada')->count(),
         ];
     }
 
@@ -53,7 +55,7 @@ class ReportData
 
     public static function productosResumen(array $f): array
     {
-        $base = fn () => self::productos($f);
+        $base = fn () => self::productos($f)->reorder();
 
         return [
             'cantidad' => $base()->count(),
