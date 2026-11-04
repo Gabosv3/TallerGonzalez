@@ -11,17 +11,15 @@ class EditPedido extends EditRecord
 {
     protected static string $resource = PedidoResource::class;
 
+    protected function mutateFormDataBeforeSave(array $data): array
+    {
+        return array_merge($data, PedidoResource::totalesDesdeFormulario($data));
+    }
+
     protected function beforeSave(): void
     {
         $record = $this->record;
         $data = $this->form->getState();
-
-        // Remover campos temporales que no se deben guardar
-        if (isset($data['detalles'])) {
-            foreach ($data['detalles'] as &$detalle) {
-                unset($detalle['precio_con_iva_temp']);
-            }
-        }
 
         // Validación 1: No permitir editar completado o cancelado
         if (in_array($record->estado, ['completado', 'cancelado'])) {
@@ -76,6 +74,8 @@ class EditPedido extends EditRecord
 
     protected function afterSave(): void
     {
+        $this->record->refresh()->calcularTotales();
+
         Notification::make()
             ->title('Pedido actualizado')
             ->body('La orden ha sido actualizada correctamente.')

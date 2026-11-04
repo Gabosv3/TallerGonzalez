@@ -47,398 +47,414 @@ class PedidoResource extends Resource
     protected static ?string $pluralModelLabel = 'Órdenes de Compra';
     protected static ?int $navigationSort = 1;
 
+    /** IVA que se usa para la conversión rápida "precio sin IVA" / "precio con IVA" de cada producto. */
+    private const IVA_REFERENCIA = 13;
+
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
                 Wizard::make([
-                    Wizard\Step::make('Información Principal')
+                    Wizard\Step::make('Información principal')
                         ->icon('heroicon-o-document-text')
+                        ->description('Proveedor y fechas')
                         ->schema([
-                            Section::make('Datos de la Orden')
-                                ->description('Información básica de la orden de compra')
+                            Section::make('Datos de la orden')
+                                ->description('Proveedor, fechas y estado de la orden de compra')
                                 ->icon('heroicon-o-identification')
                                 ->schema([
-                                    Grid::make(2)
-                                        ->schema([
-                                            TextInput::make('numero_factura')
-                                                ->label('Número de Orden')
-                                                
-                                                ->unique(ignoreRecord: true)
-                                                ->validationMessages([
-                                                    'unique' => 'Este número de orden ya existe.',
-                                                ])
-                                                ->maxLength(50)
-                                                ->placeholder('PED-' . date('Ymd') . '-0001')
-                                                ->disabled()
-                                                ->helperText('Se genera automáticamente al guardar')
-                                                ->hintIcon('heroicon-o-document'),
+                                    Grid::make(['default' => 1, 'md' => 2])->schema([
+                                        TextInput::make('numero_factura')
+                                            ->label('Número de orden')
+                                            ->disabled()
+                                            ->dehydrated(false)
+                                            ->placeholder('Se genera al guardar')
+                                            ->prefixIcon('heroicon-o-hashtag'),
 
-                                            Select::make('proveedor_id')
-                                                ->label('Proveedor')
-                                                ->relationship('proveedor', 'nombre')
-                                                ->required()
-                                                ->validationMessages([
-                                                    'required' => 'Debes seleccionar un proveedor.',
-                                                ])
-                                                ->searchable()
-                                                ->preload()
-                                                ->live()
-                                                ->afterStateUpdated(function ($state, Set $set) {
-                                                    if ($state) {
-                                                        $proveedor = Proveedor::find($state);
-                                                        if ($proveedor) {
-                                                            $set('contacto_proveedor', $proveedor->contacto);
-                                                            $set('telefono_proveedor', $proveedor->telefono);
-                                                        }
-                                                    }
-                                                })
-                                                ->createOptionForm([
-                                                    Forms\Components\TextInput::make('nombre')
-                                                        ->required()
-                                                        ->maxLength(255),
-                                                    Forms\Components\TextInput::make('contacto')
-                                                        ->maxLength(255),
-                                                    Forms\Components\TextInput::make('telefono')
-                                                        ->tel()
-                                                        ->maxLength(20),
-                                                ])
-                                                ->helperText('Selecciona o crea un nuevo proveedor'),
-                                        ]),
+                                        Select::make('proveedor_id')
+                                            ->label('Proveedor')
+                                            ->relationship('proveedor', 'nombre')
+                                            ->required()
+                                            ->validationMessages(['required' => 'Debes seleccionar un proveedor.'])
+                                            ->searchable()
+                                            ->preload()
+                                            ->live()
+                                            ->afterStateUpdated(function ($state, Set $set) {
+                                                $proveedor = $state ? Proveedor::find($state) : null;
+                                                if ($proveedor) {
+                                                    $set('contacto_proveedor', $proveedor->contacto);
+                                                    $set('telefono_proveedor', $proveedor->telefono);
+                                                }
+                                            })
+                                            ->createOptionForm([
+                                                TextInput::make('nombre')->required()->maxLength(255),
+                                                TextInput::make('contacto')->maxLength(255),
+                                                TextInput::make('telefono')->tel()->maxLength(20),
+                                            ])
+                                            ->helperText('Selecciona uno existente o crea uno nuevo'),
+                                    ]),
 
-                                    Grid::make(3)
-                                        ->schema([
-                                            DatePicker::make('fecha_orden')
-                                                ->label('Fecha de Orden')
-                                                ->required()
-                                                ->default(now())
-                                                ->maxDate(now())
-                                                ->validationMessages([
-                                                    'max_date' => 'La fecha de orden no puede ser futura.',
-                                                    'required' => 'La fecha de orden es obligatoria.',
-                                                ])
-                                                ->helperText('Fecha de emisión de la orden'),
+                                    Grid::make(['default' => 1, 'md' => 3])->schema([
+                                        DatePicker::make('fecha_orden')
+                                            ->label('Fecha de la orden')
+                                            ->required()
+                                            ->native(false)
+                                            ->displayFormat('d/m/Y')
+                                            ->default(now())
+                                            ->maxDate(now())
+                                            ->validationMessages([
+                                                'max_date' => 'La fecha de la orden no puede ser futura.',
+                                                'required' => 'La fecha de la orden es obligatoria.',
+                                            ]),
 
-                                            DatePicker::make('fecha_esperada')
-                                                ->label('Fecha Esperada')
-                                                ->required()
-                                                ->minDate(now()->startOfDay())
-                                                ->validationMessages([
-                                                    'after_or_equal' => 'La fecha esperada debe ser igual o posterior a hoy.',
-                                                    'required' => 'La fecha esperada es obligatoria.',
-                                                ])
-                                                ->default(now()->addDays(7))
-                                                ->helperText('Fecha esperada de entrega'),
+                                        DatePicker::make('fecha_esperada')
+                                            ->label('Entrega esperada')
+                                            ->required()
+                                            ->native(false)
+                                            ->displayFormat('d/m/Y')
+                                            ->default(now()->addDays(7))
+                                            ->afterOrEqual('fecha_orden')
+                                            ->validationMessages([
+                                                'after_or_equal' => 'La entrega esperada no puede ser anterior a la fecha de la orden.',
+                                                'required' => 'La fecha esperada es obligatoria.',
+                                            ]),
 
-                                            Select::make('estado')
-                                                ->label('Estado del Pedido')
-                                                ->options([
-                                                    'pendiente' => 'Pendiente',
-                                                    'confirmado' => 'Confirmado',
-                                                    'en_camino' => 'En Camino',
-                                                    'parcial' => 'Parcialmente Recibido',
-                                                    'completado' => 'Completado',
-                                                    'cancelado' => 'Cancelado',
-                                                ])
-                                                ->default('pendiente')
-                                                ->required()
-                                                ->validationMessages([
-                                                    'required' => 'El estado es obligatorio.',
-                                                ])
-                                                ->native(false),
-                                        ]),
+                                        Select::make('estado')
+                                            ->label('Estado')
+                                            ->options([
+                                                'pendiente' => 'Pendiente',
+                                                'confirmado' => 'Confirmado',
+                                                'en_camino' => 'En camino',
+                                                'parcial' => 'Parcialmente recibido',
+                                                'completado' => 'Completado',
+                                                'cancelado' => 'Cancelado',
+                                            ])
+                                            ->default('pendiente')
+                                            ->required()
+                                            ->native(false)
+                                            ->validationMessages(['required' => 'El estado es obligatorio.']),
+                                    ]),
 
-                                    Grid::make(2)
-                                        ->schema([
-                                            TextInput::make('contacto_proveedor')
-                                                ->label('Contacto del Proveedor')
-                                                ->maxLength(255)
-                                                ->placeholder('Nombre del contacto')
-                                                ->helperText('Persona de contacto en el proveedor'),
+                                    Grid::make(['default' => 1, 'md' => 2])->schema([
+                                        TextInput::make('contacto_proveedor')
+                                            ->label('Contacto en el proveedor')
+                                            ->maxLength(255)
+                                            ->prefixIcon('heroicon-o-user'),
 
-                                            TextInput::make('telefono_proveedor')
-                                                ->label('Teléfono de Contacto')
-                                                ->tel()
-                                                ->maxLength(20)
-                                                ->placeholder('+1 234 567 8900'),
-                                        ]),
+                                        TextInput::make('telefono_proveedor')
+                                            ->label('Teléfono de contacto')
+                                            ->tel()
+                                            ->maxLength(20)
+                                            ->prefixIcon('heroicon-o-phone'),
+                                    ]),
+                                ]),
+
+                            Section::make('Condiciones comerciales')
+                                ->description('Opcional: forma de pago y condiciones de entrega')
+                                ->icon('heroicon-o-clipboard-document-check')
+                                ->collapsed()
+                                ->schema([
+                                    Grid::make(['default' => 1, 'md' => 2])->schema([
+                                        Textarea::make('terminos_pago')
+                                            ->label('Términos de pago')
+                                            ->placeholder('Ej.: crédito a 30 días')
+                                            ->rows(2),
+                                        Textarea::make('condiciones_entrega')
+                                            ->label('Condiciones de entrega')
+                                            ->placeholder('Ej.: entrega en bodega, flete por cuenta del proveedor')
+                                            ->rows(2),
+                                    ]),
                                 ]),
                         ]),
 
-                    Wizard\Step::make('Detalles de Productos')
+                    Wizard\Step::make('Productos')
                         ->icon('heroicon-o-shopping-bag')
+                        ->description('Qué se compra y a qué precio')
                         ->schema([
-                            Section::make('Items del Pedido')
-                                ->description('Agrega los productos a incluir en esta orden')
+                            Section::make('Productos de la orden')
+                                ->description('Agrega cada producto con su cantidad y su precio de compra')
                                 ->icon('heroicon-o-list-bullet')
                                 ->schema([
                                     Forms\Components\Repeater::make('detalles')
                                         ->relationship('detalles')
+                                        ->hiddenLabel()
                                         ->schema([
-                                            Grid::make(5)
-                                                ->schema([
-                                                    Select::make('producto_id')
-                                                        ->label('Producto')
-                                                        ->relationship('producto', 'nombre')
-                                                        ->required()
-                                                        ->validationMessages([
-                                                            'required' => 'Selecciona un producto.',
-                                                        ])
-                                                        ->searchable(['codigo', 'nombre'])
-                                                        ->preload()
-                                                        ->live()
-                                                        ->getSearchResultsUsing(fn (string $search) => Producto::where('codigo', 'LIKE', "%{$search}%")
-                                                            ->orWhere('nombre', 'LIKE', "%{$search}%")
-                                                            ->limit(50)
-                                                            ->pluck('nombre', 'id'))
-                                                        ->getOptionLabelUsing(fn ($value) => Producto::find($value)?->nombre ?? $value)
-                                                        ->afterStateUpdated(function ($state, Set $set, Get $get) {
-                                                            if ($state) {
-                                                                $producto = Producto::find($state);
-                                                                if ($producto) {
-                                                                    // Usar precio de compra SIN IVA
-                                                                    $set('precio_unitario', $producto->precio_compra);
-                                                                    
-                                                                    // Calcular y setear precio con IVA
-                                                                    $precioConIva = round($producto->precio_compra * 1.13, 2);
-                                                                    $set('precio_con_iva_temp', $precioConIva);
+                                            Grid::make(['default' => 1, 'md' => 6])->schema([
+                                                Select::make('producto_id')
+                                                    ->label('Producto')
+                                                    ->relationship('producto', 'nombre')
+                                                    ->required()
+                                                    ->validationMessages(['required' => 'Selecciona un producto.'])
+                                                    ->searchable(['codigo', 'nombre'])
+                                                    ->preload()
+                                                    ->live()
+                                                    ->distinct()
+                                                    ->disableOptionsWhenSelectedInSiblingRepeaterItems()
+                                                    ->getSearchResultsUsing(fn (string $search) => Producto::where('codigo', 'LIKE', "%{$search}%")
+                                                        ->orWhere('nombre', 'LIKE', "%{$search}%")
+                                                        ->limit(50)
+                                                        ->pluck('nombre', 'id'))
+                                                    ->getOptionLabelUsing(fn ($value) => Producto::find($value)?->nombre ?? $value)
+                                                    ->afterStateUpdated(function ($state, Set $set, Get $get) {
+                                                        $producto = $state ? Producto::find($state) : null;
+                                                        if ($producto) {
+                                                            $set('precio_unitario', $producto->precio_compra);
+                                                            $set('precio_con_iva_temp', round($producto->precio_compra * (1 + self::IVA_REFERENCIA / 100), 2));
+                                                            self::actualizarSubtotal($set, $get);
+                                                        }
+                                                    })
+                                                    ->columnSpan(['default' => 1, 'md' => 2]),
 
-                                                                    self::actualizarSubtotal($set, $get);
-                                                                }
-                                                            }
-                                                        })
-                                                        ->columnSpan(2),
+                                                TextInput::make('cantidad')
+                                                    ->label('Cantidad')
+                                                    ->numeric()
+                                                    ->required()
+                                                    ->default(1)
+                                                    ->minValue(1)
+                                                    ->validationMessages([
+                                                        'required' => 'Ingresa una cantidad.',
+                                                        'min' => 'La cantidad debe ser al menos 1.',
+                                                    ])
+                                                    ->live(onBlur: true)
+                                                    ->afterStateUpdated(fn (Set $set, Get $get) => self::actualizarSubtotal($set, $get)),
 
-                                                    TextInput::make('cantidad')
-                                                        ->label('Cantidad')
-                                                        ->numeric()
-                                                        ->required()
-                                                        ->default(1)
-                                                        ->minValue(1)
-                                                        ->validationMessages([
-                                                            'required' => 'Ingresa una cantidad.',
-                                                            'min' => 'La cantidad debe ser al menos 1.',
-                                                        ])
-                                                        ->live(onBlur: true)
-                                                        ->afterStateUpdated(fn(Set $set, Get $get) => self::actualizarSubtotal($set, $get)),
+                                                TextInput::make('precio_unitario')
+                                                    ->label('Precio sin IVA')
+                                                    ->numeric()
+                                                    ->required()
+                                                    ->minValue(0)
+                                                    ->prefix('$')
+                                                    ->step(0.01)
+                                                    ->validationMessages(['required' => 'El precio es obligatorio.'])
+                                                    ->live(debounce: 500)
+                                                    ->afterStateUpdated(function ($state, Set $set, Get $get) {
+                                                        if ($state !== null && $state !== '') {
+                                                            $set('precio_con_iva_temp', round((float) $state * (1 + self::IVA_REFERENCIA / 100), 2));
+                                                            self::actualizarSubtotal($set, $get);
+                                                        }
+                                                    }),
 
-                                                    TextInput::make('precio_unitario')
-                                                        ->label('Precio Sin IVA')
-                                                        ->numeric()
-                                                        ->required()
-                                                        ->validationMessages([
-                                                            'required' => 'El precio es obligatorio.',
-                                                        ])
-                                                        ->prefix('$')
-                                                        ->step(0.01)
-                                                        ->live(debounce: 500)
-                                                        ->afterStateUpdated(function ($state, Set $set, Get $get) {
-                                                            if ($state !== null && $state !== '') {
-                                                                // Cuando cambio precio sin IVA, calcula el con IVA
-                                                                $precioSinIva = (float) $state;
-                                                                $precioConIva = round($precioSinIva * 1.13, 2);
-                                                                $set('precio_con_iva_temp', $precioConIva);
-                                                                // Calcula subtotal con el precio sin IVA
-                                                                self::actualizarSubtotal($set, $get);
-                                                            }
-                                                        }),
+                                                TextInput::make('precio_con_iva_temp')
+                                                    ->label('Precio con IVA (' . self::IVA_REFERENCIA . '%)')
+                                                    ->numeric()
+                                                    ->prefix('$')
+                                                    ->step(0.01)
+                                                    ->dehydrated(false)
+                                                    ->live(debounce: 500)
+                                                    ->afterStateUpdated(function ($state, Set $set, Get $get) {
+                                                        if ($state !== null && $state !== '') {
+                                                            $set('precio_unitario', round((float) $state / (1 + self::IVA_REFERENCIA / 100), 2));
+                                                            self::actualizarSubtotal($set, $get);
+                                                        }
+                                                    }),
 
-                                                    TextInput::make('precio_con_iva_temp')
-                                                        ->label('Precio + IVA (13%)')
-                                                        ->numeric()
-                                                        ->prefix('$')
-                                                        ->step(0.01)
-                                                        ->live(debounce: 500)
-                                                        ->dehydrated(false)
-                                                        ->default(fn(Get $get) => round((float)($get('precio_unitario') ?? 0) * 1.13, 2))
-                                                        ->afterStateUpdated(function ($state, Set $set, Get $get) {
-                                                            if ($state !== null && $state !== '') {
-                                                                // Cuando cambio precio con IVA, calcula el sin IVA
-                                                                $precioConIva = (float) $state;
-                                                                $precioSinIva = round($precioConIva / 1.13, 2);
-                                                                $set('precio_unitario', $precioSinIva);
-                                                                // Calcula subtotal con el precio sin IVA
-                                                                self::actualizarSubtotal($set, $get);
-                                                            }
-                                                        }),
-
-                                                    TextInput::make('subtotal')
-                                                        ->label('Subtotal')
-                                                        ->numeric()
-                                                        ->readOnly()
-                                                        ->prefix('$')
-                                                        ->default(0)
-                                                        ->extraInputAttributes(['class' => 'font-bold']),
-                                                ]),
+                                                TextInput::make('subtotal')
+                                                    ->label('Subtotal')
+                                                    ->numeric()
+                                                    ->readOnly()
+                                                    ->dehydrated(false)
+                                                    ->prefix('$')
+                                                    ->default(0)
+                                                    ->extraInputAttributes(['class' => 'font-bold']),
+                                            ]),
 
                                             Placeholder::make('info_producto_seleccionado')
-                                                ->label('Información del Producto')
-                                                ->content(function (Get $get) {
-                                                    $productoId = $get('producto_id');
-                                                    if (!$productoId) {
-                                                        return new \Illuminate\Support\HtmlString('
-                                                            <div class="text-center p-3 bg-gray-50 border border-gray-200 rounded">
-                                                                <p class="text-sm text-gray-600">Selecciona un producto para ver su información</p>
-                                                            </div>
-                                                        ');
-                                                    }
-
-                                                    $producto = Producto::find($productoId);
-                                                    if (!$producto) return null;
-
-                                                    return self::generarInfoProducto($producto);
-                                                })
+                                                ->hiddenLabel()
+                                                ->content(fn (Get $get) => self::generarInfoProducto($get('producto_id') ?: null))
                                                 ->columnSpanFull(),
                                         ])
+                                        ->minItems(1)
                                         ->defaultItems(1)
                                         ->reorderable()
                                         ->cloneable()
-                                        ->collapseAllAction(fn($action) => $action->label('Contraer todos'))
-                                        ->expandAllAction(fn($action) => $action->label('Expandir todos'))
-                                        ->deleteAction(
-                                            fn($action) => $action->requiresConfirmation(),
-                                        )
-                                        ->itemLabel(
-                                            fn(array $state): ?string =>
-                                            $state['producto_id'] ?
-                                                Producto::find($state['producto_id'])?->nombre
-                                                : 'Nuevo Item'
-                                        )
-                                        ->helperText('Agrega todos los productos para esta orden de compra')
-                                        ->live()
-                                        ->afterStateUpdated(fn(Get $get, Set $set) => self::calcularTotales($get, $set)),
+                                        ->addActionLabel('Agregar producto')
+                                        ->collapseAllAction(fn ($action) => $action->label('Contraer todos'))
+                                        ->expandAllAction(fn ($action) => $action->label('Expandir todos'))
+                                        ->deleteAction(fn ($action) => $action->requiresConfirmation())
+                                        ->itemLabel(fn (array $state): ?string => ($state['producto_id'] ?? null)
+                                            ? Producto::find($state['producto_id'])?->nombre
+                                            : 'Nuevo producto')
+                                        ->validationMessages(['min' => 'Agrega al menos un producto a la orden.'])
+                                        ->live(),
+
+                                    Placeholder::make('subtotal_productos')
+                                        ->label('Subtotal de productos (sin IVA)')
+                                        ->content(fn (Get $get) => '$' . number_format(self::subtotalItems($get('detalles') ?? []), 2))
+                                        ->extraAttributes(['class' => 'font-bold']),
                                 ]),
                         ]),
 
-                    Wizard\Step::make('Resumen y Totales')
+                    Wizard\Step::make('Descuento y totales')
                         ->icon('heroicon-o-calculator')
+                        ->description('Descuento, IVA y total')
                         ->schema([
-                            Section::make('Resumen Financiero')
-                                ->description('Revisa y confirma los totales de la orden')
-                                ->icon('heroicon-o-banknotes')
-                                ->schema([
-                                    Grid::make(2)
-                                        ->schema([
-                                            TextInput::make('subtotal')
-                                                ->label('Subtotal')
+                            Grid::make(['default' => 1, 'lg' => 3])->schema([
+                                Section::make('Descuento e impuesto')
+                                    ->description('El descuento se aplica antes del IVA')
+                                    ->icon('heroicon-o-receipt-percent')
+                                    ->columnSpan(['default' => 1, 'lg' => 2])
+                                    ->schema([
+                                        Grid::make(['default' => 1, 'md' => 3])->schema([
+                                            Forms\Components\ToggleButtons::make('descuento_tipo')
+                                                ->label('Tipo de descuento')
+                                                ->options(['monto' => 'Monto ($)', 'porcentaje' => 'Porcentaje (%)'])
+                                                ->default('monto')
+                                                ->inline()
+                                                ->live()
+                                                ->afterStateUpdated(fn (Set $set) => $set('descuento_valor', 0)),
+
+                                            TextInput::make('descuento_valor')
+                                                ->label('Descuento de la compra')
                                                 ->numeric()
-                                                ->readOnly()
-                                                ->prefix('$')
                                                 ->default(0)
-                                                ->extraInputAttributes(['class' => 'text-lg font-bold text-gray-900']),
+                                                ->minValue(0)
+                                                ->step(0.01)
+                                                ->prefix(fn (Get $get) => $get('descuento_tipo') === 'porcentaje' ? null : '$')
+                                                ->suffix(fn (Get $get) => $get('descuento_tipo') === 'porcentaje' ? '%' : null)
+                                                ->live(debounce: 500)
+                                                ->rules([
+                                                    fn (Get $get): \Closure => function (string $attribute, $value, \Closure $fail) use ($get) {
+                                                        $value = (float) $value;
+                                                        if ($get('descuento_tipo') === 'porcentaje') {
+                                                            if ($value > 100) {
+                                                                $fail('El porcentaje de descuento no puede ser mayor a 100.');
+                                                            }
+                                                            return;
+                                                        }
+                                                        $subtotal = round(self::subtotalItems($get('detalles') ?? []), 2);
+                                                        if ($value > $subtotal) {
+                                                            $fail('El descuento no puede ser mayor al subtotal ($' . number_format($subtotal, 2) . ').');
+                                                        }
+                                                    },
+                                                ])
+                                                ->helperText('Escribe 0 si la compra no tiene descuento'),
 
                                             TextInput::make('impuesto_porcentaje')
-                                                ->label('Impuesto (%)')
+                                                ->label('IVA')
                                                 ->numeric()
-                                                ->default(13)
+                                                ->default(self::IVA_REFERENCIA)
                                                 ->suffix('%')
                                                 ->minValue(0)
                                                 ->maxValue(100)
-                                                ->live(onBlur: true)
-                                                ->afterStateUpdated(fn(Get $get, Set $set) => self::calcularTotales($get, $set)),
-
-                                            TextInput::make('monto_impuesto')
-                                                ->label('Monto de Impuesto')
-                                                ->numeric()
-                                                ->readOnly()
-                                                ->prefix('$')
-                                                ->default(0),
-
-                                            TextInput::make('total')
-                                                ->label('Total General')
-                                                ->numeric()
-                                                ->required()
-                                                ->validationMessages([
-                                                    'required' => 'El total no puede estar vacío.',
-                                                ])
-                                                ->prefix('$')
-                                                ->default(0)
-                                                ->extraInputAttributes(['class' => 'text-xl font-bold text-green-600']),
+                                                ->live(debounce: 500),
                                         ]),
 
-                                    Textarea::make('observaciones')
-                                        ->label('Observaciones y Notas')
-                                        ->placeholder('Instrucciones especiales, términos de pago, condiciones de entrega, etc.')
-                                        ->rows(3)
-                                        ->columnSpanFull()
-                                        ->helperText('Información adicional relevante para este pedido'),
+                                        Textarea::make('observaciones')
+                                            ->label('Observaciones y notas')
+                                            ->placeholder('Instrucciones especiales o detalle del documento del proveedor')
+                                            ->rows(4)
+                                            ->columnSpanFull(),
+                                    ]),
 
-                                    Placeholder::make('resumen')
-                                        ->label('Resumen de la Orden')
-                                        ->content(function (Get $get) {
-                                            $items = $get('detalles') ?? [];
-                                            $totalItems = count($items);
-                                            $totalProductos = array_sum(array_column($items, 'cantidad') ?? []);
-
-                                            $resumen = "Resumen: {$totalItems} tipo(s) de producto";
-                                            $resumen .= ", {$totalProductos} unidad(es) en total";
-
-                                            return $resumen;
-                                        })
-                                        ->extraAttributes(['class' => 'text-sm text-gray-600']),
-                                ]),
+                                Section::make('Resumen de la orden')
+                                    ->icon('heroicon-o-banknotes')
+                                    ->columnSpan(['default' => 1, 'lg' => 1])
+                                    ->schema([
+                                        Placeholder::make('resumen_totales')
+                                            ->hiddenLabel()
+                                            ->content(fn (Get $get) => self::resumenTotales($get)),
+                                    ]),
+                            ]),
                         ]),
                 ])
                     ->skippable()
-                    ->persistStepInQueryString()
-                    ->submitAction(
-                        \Filament\Forms\Components\Actions\Action::make('submit')
-                            ->label('Guardar Orden de Compra')
-                            ->submit('submit')
-                            ->keyBindings(['mod+s'])
-                    ),
+                    ->persistStepInQueryString(),
             ])
             ->columns(1);
     }
 
-    private static function generarInfoProducto($producto): \Illuminate\Support\HtmlString
+    /** Ficha del producto elegido en una fila (todos los textos escapados). */
+    private static function generarInfoProducto(?int $productoId): \Illuminate\Support\HtmlString
     {
-        $html = '<div class="p-3 bg-blue-50 border border-blue-200 rounded">';
+        $producto = $productoId ? Producto::find($productoId) : null;
 
-        $html .= '
-            <div class="flex items-center gap-2 mb-2">
-                <span class="text-lg">�</span>
-                <p class="font-semibold text-blue-800">' . $producto->nombre . '</p>
-            </div>
-            <div class="grid grid-cols-2 gap-2 text-sm">
-                <div><span class="font-medium">Código:</span> ' . ($producto->codigo ?? 'N/A') . '</div>
-                <div><span class="font-medium">Stock actual:</span> ' . $producto->stock_actual . ' ' . $producto->unidad_medida . '</div>
-                <div><span class="font-medium">Stock mínimo:</span> ' . $producto->stock_minimo . '</div>
-                <div><span class="font-medium">Precio compra:</span> $' . number_format($producto->precio_compra, 2) . '</div>
-            </div>
-        ';
+        if (! $producto) {
+            return new \Illuminate\Support\HtmlString('<div class="pedido-info pedido-info--vacio">Selecciona un producto para ver su existencia y su precio de compra.</div>');
+        }
 
-        $html .= '</div>';
+        $nivel = $producto->stock_actual <= 0 ? 'bad' : ($producto->stock_actual <= $producto->stock_minimo ? 'warn' : 'ok');
+        $etiqueta = ['bad' => 'Agotado', 'warn' => 'Stock bajo', 'ok' => 'Stock normal'][$nivel];
+
+        $campos = [
+            'Código' => e($producto->codigo ?? 'N/A'),
+            'Existencia' => e(rtrim(rtrim(number_format((float) $producto->stock_actual, 2, '.', ''), '0'), '.') . ' ' . $producto->unidad_medida) . ' <span class="pedido-chip pedido-chip--' . $nivel . '">' . $etiqueta . '</span>',
+            'Mínimo' => e((string) $producto->stock_minimo),
+            'Último precio de compra' => '$' . number_format((float) $producto->precio_compra, 2),
+        ];
+
+        $html = '<div class="pedido-info"><strong>' . e($producto->nombre) . '</strong><dl>';
+        foreach ($campos as $k => $v) {
+            $html .= '<div><dt>' . e($k) . '</dt><dd>' . $v . '</dd></div>';
+        }
+
+        return new \Illuminate\Support\HtmlString($html . '</dl></div>');
+    }
+
+    /** Tarjeta con el desglose: subtotal, descuento, base, IVA y total. */
+    private static function resumenTotales(Get $get): \Illuminate\Support\HtmlString
+    {
+        $items = $get('detalles') ?? [];
+        $t = Pedido::calcular(
+            self::subtotalItems($items),
+            $get('descuento_tipo'),
+            (float) ($get('descuento_valor') ?? 0),
+            (float) ($get('impuesto_porcentaje') ?? self::IVA_REFERENCIA),
+        );
+
+        $unidades = array_sum(array_map(fn ($i) => (float) ($i['cantidad'] ?? 0), $items));
+        $detalleDescuento = $get('descuento_tipo') === 'porcentaje' && (float) $get('descuento_valor') > 0
+            ? ' (' . rtrim(rtrim(number_format((float) $get('descuento_valor'), 2), '0'), '.') . '%)'
+            : '';
+        $m = fn (float $v) => '$' . number_format($v, 2);
+
+        $html = '<div class="orden-resumen">'
+            . '<p class="orden-resumen__items">' . count($items) . ' producto(s) · ' . rtrim(rtrim(number_format($unidades, 2), '0'), '.') . ' unidad(es)</p>'
+            . '<div><span>Subtotal</span><span>' . $m($t['subtotal']) . '</span></div>'
+            . '<div class="orden-resumen__desc"><span>Descuento' . e($detalleDescuento) . '</span><span>- ' . $m($t['descuento_monto']) . '</span></div>'
+            . '<div><span>Base imponible</span><span>' . $m($t['base']) . '</span></div>'
+            . '<div><span>IVA (' . e(rtrim(rtrim(number_format((float) ($get('impuesto_porcentaje') ?? self::IVA_REFERENCIA), 2), '0'), '.')) . '%)</span><span>' . $m($t['monto_impuesto']) . '</span></div>'
+            . '<div class="orden-resumen__total"><span>Total a pagar</span><span>' . $m($t['total']) . '</span></div>'
+            . '</div>';
+
         return new \Illuminate\Support\HtmlString($html);
+    }
+
+    private static function subtotalItems(array $items): float
+    {
+        $subtotal = 0.0;
+        foreach ($items as $item) {
+            $subtotal += (float) ($item['cantidad'] ?? 0) * (float) ($item['precio_unitario'] ?? 0);
+        }
+
+        return $subtotal;
     }
 
     private static function actualizarSubtotal(Set $set, Get $get): void
     {
-        $cantidad = (float) ($get('cantidad') ?? 0);
-        $precio = (float) ($get('precio_unitario') ?? 0);
-        $subtotal = $cantidad * $precio;
-
+        $subtotal = (float) ($get('cantidad') ?? 0) * (float) ($get('precio_unitario') ?? 0);
         $set('subtotal', number_format($subtotal, 2, '.', ''));
     }
 
-    private static function calcularTotales(Get $get, Set $set): void
+    /**
+     * Totales definitivos a partir de lo que llega del formulario (se usa al crear y al editar).
+     */
+    public static function totalesDesdeFormulario(array $data): array
     {
-        $items = $get('detalles') ?? [];
-        $subtotal = 0;
+        $t = Pedido::calcular(
+            self::subtotalItems($data['detalles'] ?? []),
+            $data['descuento_tipo'] ?? 'monto',
+            (float) ($data['descuento_valor'] ?? 0),
+            (float) ($data['impuesto_porcentaje'] ?? self::IVA_REFERENCIA),
+        );
 
-        foreach ($items as $item) {
-            $cantidad = (float) ($item['cantidad'] ?? 0);
-            $precio = (float) ($item['precio_unitario'] ?? 0);
-            $subtotal += $cantidad * $precio;
-        }
-
-        $impuestoPorcentaje = (float) ($get('impuesto_porcentaje') ?? 13);
-        $montoImpuesto = $subtotal * ($impuestoPorcentaje / 100);
-        $total = $subtotal + $montoImpuesto;
-
-        $set('subtotal', number_format($subtotal, 2, '.', ''));
-        $set('monto_impuesto', number_format($montoImpuesto, 2, '.', ''));
-        $set('total', number_format($total, 2, '.', ''));
+        return [
+            'subtotal' => $t['subtotal'],
+            'descuento_tipo' => $data['descuento_tipo'] ?? 'monto',
+            'descuento_valor' => (float) ($data['descuento_valor'] ?? 0),
+            'descuento_monto' => $t['descuento_monto'],
+            'monto_impuesto' => $t['monto_impuesto'],
+            'total' => $t['total'],
+        ];
     }
 
     public static function table(Table $table): Table

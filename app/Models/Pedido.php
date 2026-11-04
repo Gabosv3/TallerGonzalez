@@ -25,6 +25,9 @@ class Pedido extends Model
         'contacto_proveedor',
         'telefono_proveedor',
         'subtotal',
+        'descuento_tipo',
+        'descuento_valor',
+        'descuento_monto',
         'impuesto_porcentaje',
         'monto_impuesto',
         'total',
@@ -41,6 +44,8 @@ class Pedido extends Model
         'fecha_esperada' => 'date',
         'fecha_entrega' => 'date',
         'subtotal' => 'decimal:2',
+        'descuento_valor' => 'decimal:2',
+        'descuento_monto' => 'decimal:2',
         'impuesto_porcentaje' => 'decimal:2',
         'monto_impuesto' => 'decimal:2',
         'total' => 'decimal:2',
@@ -65,6 +70,8 @@ class Pedido extends Model
             'contacto_proveedor' => 'nullable|string|max:100',
             'telefono_proveedor' => 'nullable|string|max:20',
             'subtotal' => 'numeric|min:0',
+            'descuento_tipo' => 'nullable|in:monto,porcentaje',
+            'descuento_valor' => 'nullable|numeric|min:0',
             'impuesto_porcentaje' => 'numeric|min:0|max:100',
             'monto_impuesto' => 'numeric|min:0',
             'total' => 'numeric|min:0',
@@ -217,28 +224,62 @@ class Pedido extends Model
     }
 
     /**
-     * Calcular y actualizar los totales del pedido
-     * Optimizado para evitar queries extras
+     * Cálculo único de totales (lo usan el formulario, el guardado y los reportes).
+     * El descuento se aplica antes del impuesto: base = subtotal - descuento; impuesto = base x %.
+     *
+     * @return array{subtotal: float, descuento_monto: float, base: float, monto_impuesto: float, total: float}
+     */
+    public static function calcular(float $subtotal, ?string $tipoDescuento, float $valorDescuento, float $impuestoPorcentaje): array
+    {
+        $subtotal = round(max($subtotal, 0), 2);
+        $valorDescuento = max($valorDescuento, 0);
+
+        $descuento = $tipoDescuento === 'porcentaje'
+            ? round($subtotal * (min($valorDescuento, 100) / 100), 2)
+            : round($valorDescuento, 2);
+        $descuento = min($descuento, $subtotal);
+
+        $base = round($subtotal - $descuento, 2);
+        $impuesto = round($base * (max($impuestoPorcentaje, 0) / 100), 2);
+
+        return [
+            'subtotal' => $subtotal,
+            'descuento_monto' => $descuento,
+            'base' => $base,
+            'monto_impuesto' => $impuesto,
+            'total' => round($base + $impuesto, 2),
+        ];
+    }
+
+    /**
+     * Base imponible (subtotal menos descuento).
+     */
+    public function getBaseImponibleAttribute(): float
+    {
+        return round((float) $this->subtotal - (float) $this->descuento_monto, 2);
+    }
+
+    /**
+     * Recalcular y guardar los totales a partir de los detalles guardados.
      */
     public function calcularTotales(): void
     {
-        // Si los detalles ya están cargados en memoria, usarlos
-        // De lo contrario, cargar solo lo necesario
-        $detalles = $this->relationLoaded('detalles') 
-            ? $this->detalles 
-            : $this->detalles()->get();
-        
-        $subtotal = $detalles->sum(function ($detalle) {
-            return $detalle->cantidad * $detalle->precio_unitario;
-        });
+        $detalles = $this->detalles()->get();
 
-        $montoImpuesto = $subtotal * ($this->impuesto_porcentaje / 100);
-        $total = $subtotal + $montoImpuesto;
+        $subtotal = $detalles->sum(fn ($detalle) => (float) $detalle->cantidad * (float) $detalle->precio_unitario);
+
+        $totales = self::calcular(
+            $subtotal,
+            $this->descuento_tipo,
+            (float) $this->descuento_valor,
+            (float) $this->impuesto_porcentaje,
+        );
 
         $this->update([
-            'subtotal' => $subtotal,
-            'monto_impuesto' => $montoImpuesto,
-            'total' => $total,
+            'subtotal' => $totales['subtotal'],
+            'descuento_monto' => $totales['descuento_monto'],
+            'monto_impuesto' => $totales['monto_impuesto'],
+            'total' => $totales['total'],
         ]);
     }
 

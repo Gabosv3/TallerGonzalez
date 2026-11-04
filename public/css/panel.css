@@ -373,3 +373,89 @@ html:not(.dark) .fi-sidebar-header {
 .fi-user-menu .fi-avatar {
     box-shadow: 0 0 0 2px rgba(var(--primary-500), 0.35);
 }
+
+/* ── Orden de compra: ficha de producto y resumen de totales ── */
+.pedido-info {
+    padding: 0.8rem 1rem;
+    border-radius: 0.7rem;
+    background: rgba(100, 116, 139, 0.07);
+    border: 1px solid rgba(100, 116, 139, 0.16);
+    font-size: 0.82rem;
+}
+
+.pedido-info--vacio {
+    color: rgb(100, 116, 139);
+    text-align: center;
+}
+
+.pedido-info strong {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.pedido-info dl {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+    gap: 0.5rem 1.25rem;
+    margin: 0;
+}
+
+.pedido-info dt {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: rgb(100, 116, 139);
+}
+
+.pedido-info dd {
+    margin: 0;
+    font-weight: 600;
+}
+
+.pedido-chip {
+    display: inline-block;
+    margin-left: 0.35rem;
+    padding: 0.05rem 0.5rem;
+    border-radius: 999px;
+    font-size: 0.68rem;
+    font-weight: 700;
+}
+
+.pedido-chip--ok { color: rgb(22, 163, 74); background: rgba(22, 163, 74, 0.12); }
+.pedido-chip--warn { color: rgb(180, 83, 9); background: rgba(245, 158, 11, 0.16); }
+.pedido-chip--bad { color: rgb(220, 38, 38); background: rgba(220, 38, 38, 0.12); }
+
+.orden-resumen > div {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.55rem 0;
+    border-bottom: 1px dashed rgba(100, 116, 139, 0.25);
+    font-size: 0.88rem;
+}
+
+.orden-resumen .orden-resumen__items {
+    margin: 0 0 0.4rem;
+    font-size: 0.78rem;
+    color: rgb(100, 116, 139);
+}
+
+.orden-resumen__desc span:last-child {
+    color: rgb(22, 163, 74);
+    font-weight: 600;
+}
+
+.orden-resumen .orden-resumen__total {
+    margin-top: 0.4rem;
+    padding: 0.8rem 0.9rem;
+    border: 0;
+    border-radius: 0.7rem;
+    background: rgba(var(--primary-500), 0.1);
+    font-size: 1.1rem;
+    font-weight: 800;
+}
+
+.orden-resumen__total span:last-child {
+    color: rgb(var(--primary-600));
+}

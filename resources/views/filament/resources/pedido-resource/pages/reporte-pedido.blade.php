@@ -137,6 +137,16 @@
                     <span class="font-semibold">Subtotal:</span>
                     <span>${{ number_format($this->record->subtotal, 2) }}</span>
                 </div>
+                @if ((float) $this->record->descuento_monto > 0)
+                <div class="flex justify-between">
+                    <span class="font-semibold">Descuento:</span>
+                    <span>- ${{ number_format($this->record->descuento_monto, 2) }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="font-semibold">Base imponible:</span>
+                    <span>${{ number_format($this->record->base_imponible, 2) }}</span>
+                </div>
+                @endif
                 <div class="flex justify-between">
                     <span class="font-semibold">Impuesto ({{ $this->record->impuesto_porcentaje }}%):</span>
                     <span>${{ number_format($this->record->monto_impuesto, 2) }}</span>

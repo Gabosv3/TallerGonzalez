@@ -139,6 +139,7 @@ curl -X GET "http://localhost/api/compras/kardex?from=2024-06-01&to=2024-06-30&e
 | `estado` | Estado actual de la orden |
 | `proveedor` | Datos del proveedor |
 | `subtotal` | Suma de items sin impuesto |
+| `descuento` | Descuento de la compra en dólares (se aplica antes del impuesto) |
 | `monto_impuesto` | Monto de impuesto |
 | `total` | Total final |
 | `creado_por` | Nombre del usuario que creó la orden |

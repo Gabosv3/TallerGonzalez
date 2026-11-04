@@ -9,15 +9,16 @@ class CreatePedido extends CreateRecord
 {
     protected static string $resource = PedidoResource::class;
 
-    protected function mutateFormDataBeforeSave(array $data): array
+    protected function mutateFormDataBeforeCreate(array $data): array
     {
-        // Remover campos temporales que no se deben guardar
-        if (isset($data['detalles'])) {
-            foreach ($data['detalles'] as &$detalle) {
-                unset($detalle['precio_con_iva_temp']);
-            }
-        }
-        return $data;
+        $data['user_id'] = auth()->id();
+
+        return array_merge($data, PedidoResource::totalesDesdeFormulario($data));
+    }
+
+    protected function afterCreate(): void
+    {
+        // Los detalles se guardan después de la orden: se recalculan los totales con lo guardado
+        $this->record->calcularTotales();
     }
 }
-

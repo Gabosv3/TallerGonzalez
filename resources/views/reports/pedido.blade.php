@@ -46,6 +46,20 @@
             @endforeach
         </tbody>
         <tfoot>
+            @if ((float) $pedido->descuento_monto > 0)
+            <tr>
+                <td colspan="6" class="right">Subtotal</td>
+                <td class="right">${{ number_format($pedido->subtotal, 2) }}</td>
+            </tr>
+            <tr>
+                <td colspan="6" class="right">Descuento{{ $pedido->descuento_tipo === 'porcentaje' ? ' (' . rtrim(rtrim(number_format((float) $pedido->descuento_valor, 2), '0'), '.') . '%)' : '' }}</td>
+                <td class="right">- ${{ number_format($pedido->descuento_monto, 2) }}</td>
+            </tr>
+            <tr>
+                <td colspan="6" class="right">IVA ({{ rtrim(rtrim(number_format((float) $pedido->impuesto_porcentaje, 2), '0'), '.') }}%)</td>
+                <td class="right">${{ number_format($pedido->monto_impuesto, 2) }}</td>
+            </tr>
+            @endif
             <tr>
                 <td colspan="6" class="right"><strong>Total</strong></td>
                 <td class="right"><strong>${{ number_format($pedido->total, 2) }}</strong></td>

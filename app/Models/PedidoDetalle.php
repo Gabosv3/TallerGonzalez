@@ -56,7 +56,17 @@ class PedidoDetalle extends Model
         parent::boot();
 
         static::saving(function ($model) {
-            $model->subtotal = $model->cantidad * $model->precio_unitario;
+            // Copia del producto al momento de la compra (el nombre es obligatorio en la tabla)
+            if ($model->producto_id && blank($model->producto_nombre)) {
+                $producto = Producto::find($model->producto_id);
+                $model->producto_nombre = $producto?->nombre ?? '';
+                $model->producto_codigo = $model->producto_codigo ?: $producto?->codigo;
+                if (! array_key_exists('unidad_medida', $model->getAttributes())) {
+                    $model->unidad_medida = $producto?->unidad_medida ?: 'pza';
+                }
+            }
+
+            $model->subtotal = round($model->cantidad * $model->precio_unitario, 2);
             
             // Actualizar estado de completado
             if ($model->cantidad_recibida >= $model->cantidad) {

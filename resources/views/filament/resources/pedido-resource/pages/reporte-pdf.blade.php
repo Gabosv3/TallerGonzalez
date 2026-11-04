@@ -112,6 +112,16 @@
                 <td><strong>Subtotal:</strong></td>
                 <td class="text-right">${{ number_format($pedido->subtotal, 2) }}</td>
             </tr>
+            @if ((float) $pedido->descuento_monto > 0)
+            <tr>
+                <td><strong>Descuento{{ $pedido->descuento_tipo === 'porcentaje' ? ' (' . rtrim(rtrim(number_format((float) $pedido->descuento_valor, 2), '0'), '.') . '%)' : '' }}:</strong></td>
+                <td class="text-right">- ${{ number_format($pedido->descuento_monto, 2) }}</td>
+            </tr>
+            <tr>
+                <td><strong>Base imponible:</strong></td>
+                <td class="text-right">${{ number_format($pedido->base_imponible, 2) }}</td>
+            </tr>
+            @endif
             <tr>
                 <td><strong>Impuesto ({{ $pedido->impuesto_porcentaje }}%):</strong></td>
                 <td class="text-right">${{ number_format($pedido->monto_impuesto, 2) }}</td>
