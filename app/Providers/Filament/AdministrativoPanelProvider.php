@@ -6,6 +6,8 @@ use Backstage\TwoFactorAuth\TwoFactorAuthPlugin;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\MenuItem;
+use Filament\Navigation\NavigationGroup;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
@@ -26,10 +28,27 @@ use ShuvroRoy\FilamentSpatieLaravelBackup\Pages\Backups;
 
 class AdministrativoPanelProvider extends PanelProvider
 {
+    /**
+     * Usa el logo configurado solo si el archivo existe; si no, el logo del repositorio.
+     */
+    public static function logoUrl(?GeneralSetting $settings = null): string
+    {
+        $settings ??= GeneralSetting::first();
+
+        if ($settings && $settings->site_logo && file_exists(public_path('storage/' . $settings->site_logo))) {
+            return asset('storage/' . $settings->site_logo);
+        }
+
+        return asset('assets/img/tallergonzalez.png');
+    }
+
     public function panel(Panel $panel): Panel
     {
         $settings =  GeneralSetting::first(); // Obtén la primera configuración de la base de datos
 
+        $logoUrl = static::logoUrl($settings);
+        $siteName = $settings && $settings->site_name ? $settings->site_name : 'Taller González';
+        $brand = new \Illuminate\Support\HtmlString(view('filament.brand', ['logo' => $logoUrl, 'name' => $siteName])->render());
 
         return $panel
             ->default()
@@ -45,12 +64,24 @@ class AdministrativoPanelProvider extends PanelProvider
 
 
             ->colors([
+                'blue' => \Filament\Support\Colors\Color::Blue,
+                'green' => \Filament\Support\Colors\Color::Green,
+                'orange' => \Filament\Support\Colors\Color::Orange,
+                'purple' => \Filament\Support\Colors\Color::Purple,
                 'primary' => $settings && $settings->theme_color ? $settings->theme_color : '#FFA500',  // Si es null, se pone el color predeterminado
             ])
-            ->brandLogo(asset($settings && $settings->site_logo ? 'storage/' . $settings->site_logo : 'assets/img/tallergonzalez.png'))
-            ->brandLogoHeight('3.5rem')
-            ->brandName($settings && $settings->site_name ? $settings->site_name : 'No se encontró')  // Si el nombre del sitio es null, se pone 'No se encontró'
-            ->darkModeBrandLogo(asset($settings && $settings->site_logo ? 'storage/' . $settings->site_logo : 'assets/img/tallergonzalez.png'))
+            ->brandLogo($brand)
+            ->brandLogoHeight('2.75rem')
+            ->sidebarCollapsibleOnDesktop()
+            ->maxContentWidth('full')
+            ->navigationGroups([
+                NavigationGroup::make('Inventario'),
+                NavigationGroup::make('Ventas'),
+                NavigationGroup::make('Compras'),
+                NavigationGroup::make('Administración')->collapsed(),
+            ])
+            ->brandName($siteName)
+            ->darkModeBrandLogo($brand)
             ->discoverResources(app_path('Filament/Resources'), 'App\\Filament\\Resources')
             ->discoverPages(app_path('Filament/Pages'), 'App\\Filament\\Pages')
             ->pages([
@@ -58,9 +89,11 @@ class AdministrativoPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(app_path('Filament/Widgets'), 'App\\Filament\\Widgets')
             ->widgets([
-                Widgets\AccountWidget::class,
-                \App\Filament\Widgets\StatsOverview::class,
+                \App\Filament\Widgets\Bienvenida::class,
+                \App\Filament\Widgets\KpiCards::class,
+                \App\Filament\Widgets\VentasPorMes::class,
                 \App\Filament\Widgets\PedidosPorMes::class,
+                \App\Filament\Widgets\ProductosStockBajo::class,
                 \App\Filament\Widgets\Top10ProductosMes::class,
                 \App\Filament\Widgets\Top10ClientesMes::class,
                 \App\Filament\Widgets\ProductosPorMarca::class,
@@ -78,27 +111,37 @@ class AdministrativoPanelProvider extends PanelProvider
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
             ])
-            ->databaseNotifications()
+            ->userMenuItems([
+                MenuItem::make()
+                    ->label('Mi perfil')
+                    ->icon('heroicon-o-user-circle')
+                    ->url(fn (): string => url('administrativo/mi-perfil')),
+            ])
+            ->databaseNotifications(isLazy: false)
             ->databaseNotificationsPolling('30s')
+            ->globalSearchKeyBindings(['ctrl+k', 'command+k'])
+            ->globalSearchFieldKeyBindingSuffix()
+            ->globalSearchDebounce('350ms')
             ->plugins([
                 FilamentShieldPlugin::make(),
                 // Asegúrate de tener este plugin instalado
                 FilamentGeneralSettingsPlugin::make()
                     ->setIcon('heroicon-o-cog')
-                    ->setNavigationGroup('Configuración del Sistema')
-                    ->setTitle('Configuraciones')
-                    ->setNavigationLabel('Configuraciones Generales'),
+                    ->setNavigationGroup('Administración')
+                    ->setSort(30)
+                    ->setTitle('Configuración general')
+                    ->setNavigationLabel('Configuración general'),
 
                 FilamentEditProfilePlugin::make()
                     ->slug('mi-perfil')
                     ->setTitle('Mi Perfil')
                     ->setNavigationLabel('Mi Perfil')
-                    ->setNavigationGroup('Configuración del Sistema')
+                    ->shouldRegisterNavigation(false)
                     ->setIcon('heroicon-o-user'),
                 TwoFactorAuthPlugin::make(),
                 FilamentSpatieLaravelBackupPlugin::make()
                     ->usingPage(Backups::class)
-                    ->authorize(fn() => true),
+                    ->authorize(fn() => auth()->user()?->hasRole('super_admin') ?? false),
             ])
             ->registration(null) // Deshabilitar registro explícitamente
             ->authMiddleware([

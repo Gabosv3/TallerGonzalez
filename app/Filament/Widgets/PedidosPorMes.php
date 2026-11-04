@@ -8,9 +8,10 @@ use Filament\Widgets\ChartWidget;
 
 class PedidosPorMes extends ChartWidget
 {
-    protected static ?string $heading = '📈 Pedidos por Mes (Últimos 6 meses)';
-    protected static ?int $sort = 2;
-    protected int | string | array $columnSpan = 'full';
+    protected static ?string $heading = 'Pedidos por mes (últimos 6 meses)';
+    protected static ?int $sort = 3;
+    protected int | string | array $columnSpan = 1;
+    protected static ?string $maxHeight = '260px';
 
     protected function getData(): array
     {
@@ -40,6 +41,14 @@ class PedidosPorMes extends ChartWidget
                 ],
             ],
             'labels' => $labels,
+        ];
+    }
+
+    protected function getOptions(): array
+    {
+        return [
+            'plugins' => ['legend' => ['display' => false]],
+            'scales' => ['y' => ['beginAtZero' => true, 'ticks' => ['precision' => 0]]],
         ];
     }
 

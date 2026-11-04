@@ -6,7 +6,6 @@
 - **Públicos:** 3 (sin autenticación)
   - POST /login
   - GET /openapi.yaml
-  - GET /openapi-debug
 - **Protegidos:** 19 (requieren Bearer token)
 
 ---

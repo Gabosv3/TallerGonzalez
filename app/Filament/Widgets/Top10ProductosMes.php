@@ -8,8 +8,8 @@ use Illuminate\Support\Facades\DB;
 
 class Top10ProductosMes extends ChartWidget
 {
-    protected static ?string $heading = '🏆 Top 10 Productos Más Vendidos Este Mes';
-    protected static ?int $sort = 3;
+    protected static ?string $heading = 'Top 10 productos del mes';
+    protected static ?int $sort = 5;
     protected int | string | array $columnSpan = 1;
 
     protected function getData(): array

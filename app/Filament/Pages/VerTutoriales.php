@@ -9,10 +9,9 @@ use Illuminate\Support\Collection;
 class VerTutoriales extends Page
 {
     protected static ?string $navigationIcon = 'heroicon-o-academic-cap';
-    protected static ?string $navigationGroup = 'Ayuda y Soporte';
-    protected static ?string $navigationLabel = 'Ver Tutoriales';
+    protected static ?string $navigationLabel = 'Tutoriales';
     protected static ?string $title = 'Tutoriales del Sistema';
-    protected static ?int $navigationSort = 11;
+    protected static ?int $navigationSort = 3;
 
     protected static string $view = 'filament.pages.ver-tutoriales';
 

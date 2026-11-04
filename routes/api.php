@@ -15,7 +15,6 @@ Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:10
 // Swagger/OpenAPI spec and UI (públicos)
 use App\Http\Controllers\ApiDocsController;
 Route::get('/openapi.yaml', [ApiDocsController::class, 'spec']);
-Route::get('/openapi-debug', [ApiDocsController::class, 'specDebug']);
 
 // Todas las rutas protegidas requieren autenticación
 Route::middleware(['auth:sanctum'])->group(function () {

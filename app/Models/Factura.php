@@ -13,6 +13,10 @@ class Factura extends Model
 
     protected $fillable = ['numero_factura', 'fecha', 'cliente', 'total', 'cliente_id', 'estado', 'created_by'];
 
+    protected $casts = [
+        'fecha' => 'date',
+    ];
+
     protected $dispatchesEvents = [
         'created' => VentaCreada::class,
     ];

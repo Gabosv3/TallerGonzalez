@@ -1,7 +1,6 @@
 <?php
 
 use Backstage\TwoFactorAuth\Enums\TwoFactorType;
-use Backstage\TwoFactorAuth\Http\Livewire\Auth\Login;
 use Backstage\TwoFactorAuth\Http\Livewire\Auth\LoginTwoFactor;
 use Backstage\TwoFactorAuth\Http\Livewire\Auth\PasswordConfirmation;
 use Backstage\TwoFactorAuth\Http\Livewire\Auth\PasswordReset;
@@ -76,7 +75,7 @@ return [
     | Make your that your classes extend the original classes.
     |
     */
-    'login' => Login::class,
+    'login' => \App\Filament\Pages\Auth\Login::class,
     'register' => Register::class,
     'challenge' => LoginTwoFactor::class,
     'two_factor_settings' => TwoFactor::class,

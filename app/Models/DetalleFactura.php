@@ -12,6 +12,7 @@ class DetalleFactura extends Model
     protected $fillable = [
         'factura_id',
         'producto_id',
+        'descripcion',
         'cantidad',
         'precio_unitario',
         'subtotal',

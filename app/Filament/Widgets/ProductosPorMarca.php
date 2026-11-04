@@ -7,8 +7,8 @@ use Filament\Widgets\ChartWidget;
 
 class ProductosPorMarca extends ChartWidget
 {
-    protected static ?string $heading = '📦 Productos por Marca';
-    protected static ?int $sort = 5;
+    protected static ?string $heading = 'Productos por marca';
+    protected static ?int $sort = 7;
     protected int | string | array $columnSpan = 1;
     protected static string $type = 'doughnut';
 

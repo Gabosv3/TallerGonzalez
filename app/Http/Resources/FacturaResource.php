@@ -25,6 +25,7 @@ class FacturaResource extends JsonResource
                         'id' => $d->id,
                         'producto_id' => $d->producto_id,
                         'producto' => $d->producto?->nombre,
+                        'descripcion' => $d->descripcion,
                         'cantidad' => (int) $d->cantidad,
                         'precio_unitario' => (float) $d->precio_unitario,
                         'subtotal' => (float) $d->subtotal,

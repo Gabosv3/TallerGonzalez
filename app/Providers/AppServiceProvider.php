@@ -3,7 +3,6 @@ namespace App\Providers;
 
 use App\Models\User;
 use Filament\Support\Facades\FilamentView;
-use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 use App\Policies\GeneralSettingsPolicy;
 use Illuminate\Support\Facades\Gate;
@@ -38,10 +37,44 @@ class AppServiceProvider extends ServiceProvider
         // Registrar el Observer para Producto
         \App\Models\Producto::observe(\App\Observers\ProductoObserver::class);
 
-        // Este código parece estar relacionado con un hook para tu vista personalizada de inicio de sesión
+        // Valores por defecto de todas las tablas del panel
+        \Filament\Tables\Table::configureUsing(fn (\Filament\Tables\Table $table) => $table
+            ->paginated([10, 25, 50, 100])
+            ->defaultPaginationPageOption(25)
+            ->extremePaginationLinks()
+            ->striped()
+            ->filtersLayout(\Filament\Tables\Enums\FiltersLayout::AboveContentCollapsible)
+            ->filtersFormColumns(['default' => 1, 'md' => 2, 'xl' => 4])
+            ->filtersTriggerAction(fn ($action) => $action->label('Filtros')->icon('heroicon-m-funnel')->color('gray')));
+
+        \Filament\Tables\Actions\ActionGroup::configureUsing(fn ($group) => $group
+            ->icon('heroicon-m-ellipsis-vertical')
+            ->color('gray')
+            ->tooltip('Acciones'));
+
+        // Aviso de nuevo cliente (se omiten los clientes temporales creados desde la API)
+        \App\Models\Cliente::created(function ($cliente) {
+            if ($cliente->apellido !== 'Temporal') {
+                \App\Services\Notificaciones::clienteNuevo($cliente);
+            }
+        });
+
+        // Estilos y mensaje de marca del login (sin depender de Vite)
         FilamentView::registerRenderHook(
-            'panels::auth.login.form.after',
-            fn (): string => Blade::render('@vite(\'resources/css/custom-login.css\')'),
+            'panels::head.end',
+            fn (): string => collect(['login', 'panel'])
+                ->map(fn ($css) => '<link rel="stylesheet" href="' . asset("css/{$css}.css") . '?v=' . @filemtime(public_path("css/{$css}.css")) . '">')
+                ->implode(''),
+        );
+
+        FilamentView::registerRenderHook(
+            'panels::footer',
+            fn (): string => '<aside class="login-brand">'
+                . '<img src="' . e(\App\Providers\Filament\AdministrativoPanelProvider::logoUrl()) . '" alt="Taller González">'
+                . '<div><h2>Taller González</h2><p>Sistema de gestión de inventario, pedidos y facturación.</p></div>'
+                . '<small>© ' . date('Y') . ' Taller González</small>'
+                . '</aside>',
+            scopes: \App\Filament\Pages\Auth\Login::class,
         );
     }
 }

@@ -1,0 +1,121 @@
+/* Login dividido: panel de marca a la izquierda, formulario limpio a la derecha. No depende de Vite. */
+
+.login-brand {
+    display: none;
+}
+
+.fi-simple-main {
+    border-radius: 1rem;
+}
+
+.fi-simple-header-heading {
+    letter-spacing: -0.01em;
+}
+
+.fi-simple-main .fi-btn[type="submit"] {
+    padding-block: 0.7rem;
+    font-weight: 700;
+}
+
+@media (min-width: 1024px) {
+    .fi-simple-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+        min-height: 100vh;
+    }
+
+    /* Panel izquierdo */
+    .login-brand {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        grid-column: 1;
+        grid-row: 1;
+        min-height: 100vh;
+        padding: 3.5rem 4rem;
+        color: #fff;
+        background:
+            linear-gradient(180deg, rgba(8, 8, 10, 0.55) 0%, rgba(8, 8, 10, 0.88) 100%),
+            url("../img/login-bg.jpg") center / cover no-repeat;
+    }
+
+    .login-brand img {
+        align-self: flex-start;
+        height: 5rem;
+        width: auto;
+        max-width: 100%;
+        object-fit: contain;
+        border-radius: 0.75rem;
+    }
+
+    .login-brand h2 {
+        margin: 0 0 0.75rem;
+        font-size: 2.75rem;
+        font-weight: 800;
+        line-height: 1.1;
+    }
+
+    .login-brand p {
+        margin: 0;
+        max-width: 26rem;
+        font-size: 1.05rem;
+        line-height: 1.6;
+        color: rgba(255, 255, 255, 0.78);
+    }
+
+    .login-brand small {
+        font-size: 0.8rem;
+        color: rgba(255, 255, 255, 0.55);
+    }
+
+    /* Panel derecho: sin tarjeta flotante */
+    .fi-simple-main-ctn {
+        grid-column: 2;
+        grid-row: 1;
+        padding: 0;
+    }
+
+    .fi-simple-main {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        width: 100%;
+        max-width: none;
+        min-height: 100vh;
+        margin: 0;
+        padding: 3rem clamp(2rem, 7vw, 7rem);
+        border-radius: 0;
+        box-shadow: none;
+        --tw-ring-shadow: 0 0 #0000;
+    }
+
+    .fi-simple-page {
+        width: 100%;
+        max-width: 26rem;
+        margin-inline: auto;
+    }
+
+    /* El logo ya está en el panel izquierdo */
+    .fi-simple-header .fi-logo,
+    .fi-simple-header img {
+        display: none;
+    }
+
+    .fi-simple-header {
+        align-items: flex-start;
+        text-align: left;
+    }
+
+    .fi-simple-header-heading {
+        font-size: 2rem;
+    }
+}
+
+@media (max-width: 1023px) {
+    .fi-simple-main {
+        margin-inline: 1rem;
+        width: auto;
+        box-shadow: 0 10px 40px -15px rgba(0, 0, 0, 0.35);
+        border-top: 4px solid rgb(var(--primary-500));
+    }
+}

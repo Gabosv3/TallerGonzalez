@@ -2,11 +2,21 @@
 
 namespace App\Filament\Pages\Auth;
 
-use Filament\Pages\Auth\Login as BaseLogin;
+use Backstage\TwoFactorAuth\Http\Livewire\Auth\Login as BaseLogin;
 use Filament\Forms\Components\Component;
 
 class Login extends BaseLogin
 {
+    public function getHeading(): string|\Illuminate\Contracts\Support\Htmlable
+    {
+        return 'Bienvenido';
+    }
+
+    public function getSubHeading(): string|\Illuminate\Contracts\Support\Htmlable|null
+    {
+        return 'Ingresa tus credenciales para acceder al sistema';
+    }
+
     public function hasRegistration(): bool
     {
         return false;

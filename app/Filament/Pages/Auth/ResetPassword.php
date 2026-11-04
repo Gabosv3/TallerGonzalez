@@ -58,17 +58,17 @@ class ResetPassword extends BaseResetPassword
             parent::submit();
             
             Notification::make()
-                ->title('✓ Contraseña Actualizada')
+                ->title('Contraseña Actualizada')
                 ->body('Tu contraseña ha sido restablecida correctamente. Ahora puedes iniciar sesión.')
                 ->success()
                 ->send();
             
-            Log::info('✓ Contraseña restablecida exitosamente');
+            Log::info('Contraseña restablecida exitosamente');
             
         } catch (ValidationException $e) {
             Log::warning('Error de validación: ' . json_encode($e->errors()));
             Notification::make()
-                ->title('❌ Error de Validación')
+                ->title('Error de Validación')
                 ->body('Por favor verifica los datos ingresados.')
                 ->danger()
                 ->send();
@@ -76,7 +76,7 @@ class ResetPassword extends BaseResetPassword
         } catch (\Exception $e) {
             Log::error('Error: ' . $e->getMessage());
             Notification::make()
-                ->title('❌ Error')
+                ->title('Error')
                 ->body('Ocurrió un error al restablecer tu contraseña. Por favor intenta de nuevo.')
                 ->danger()
                 ->send();

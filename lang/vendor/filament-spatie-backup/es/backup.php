@@ -60,7 +60,7 @@ return [
             ],
 
             'navigation' => [
-                'group' => 'Configuraciones',
+                'group' => 'Administración',
                 'label' => 'Respaldos',
             ],
         ],

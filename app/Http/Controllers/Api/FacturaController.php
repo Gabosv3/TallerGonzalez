@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreFacturaRequest;
 use App\Models\Factura;
+use App\Services\Notificaciones;
 use App\Models\DetalleFactura;
 use App\Models\Cliente;
 use App\Models\Producto;
@@ -142,6 +143,8 @@ class FacturaController extends Controller
 
                 return $factura->load('detalles.producto');
             });
+
+            Notificaciones::ventaRegistrada($result);
 
             return ApiResponse::success($result, 'Factura creada', 201);
         } catch (\Exception $e) {

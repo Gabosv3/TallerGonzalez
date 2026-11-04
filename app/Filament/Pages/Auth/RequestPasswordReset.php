@@ -45,9 +45,9 @@ class RequestPasswordReset extends BaseRequestPasswordReset
             Log::info("Estado del reset: {$status}");
             
             if ($status === Password::RESET_LINK_SENT) {
-                Log::info("✓ Enlace enviado correctamente");
+                Log::info("Enlace enviado correctamente");
                 Notification::make()
-                    ->title('✓ Enlace Enviado')
+                    ->title('Enlace Enviado')
                     ->body('Se ha enviado un enlace de restablecimiento a tu correo electrónico. Por favor revisa tu bandeja de entrada.')
                     ->success()
                     ->send();
@@ -56,7 +56,7 @@ class RequestPasswordReset extends BaseRequestPasswordReset
             } else {
                 Log::warning("Fallo al enviar enlace: {$status}");
                 Notification::make()
-                    ->title('⏱️ Intenta Más Tarde')
+                    ->title('⏱Intenta Más Tarde')
                     ->body('Has solicitado demasiados enlaces. Por favor espera un tiempo antes de intentar nuevamente.')
                     ->warning()
                     ->send();
@@ -65,7 +65,7 @@ class RequestPasswordReset extends BaseRequestPasswordReset
         } catch (\Exception $e) {
             Log::error('Error: ' . $e->getMessage());
             Notification::make()
-                ->title('❌ Error')
+                ->title('Error')
                 ->body('Ocurrió un error al procesar tu solicitud. Por favor intenta de nuevo.')
                 ->danger()
                 ->send();
