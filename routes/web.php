@@ -40,5 +40,8 @@ use App\Http\Controllers\ApiDocsController;
 Route::get('/api/docs', [ApiDocsController::class, 'ui']);
 
 Route::get('/password/reset/{token}', function ($token) {
-    return redirect(route('filament.administrativo.auth.password-reset.reset', ['token' => $token, 'email' => request()->email]));
+    $user = \App\Models\User::where('email', request('email'))->first();
+    abort_unless($user, 404);
+
+    return redirect(\Filament\Facades\Filament::getPanel('administrativo')->getResetPasswordUrl($token, $user));
 })->name('password.reset');

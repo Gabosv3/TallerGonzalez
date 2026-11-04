@@ -41,10 +41,8 @@ class CustomPasswordBroker extends PasswordBroker
         // Enviar el correo AQUÍ, DIRECTAMENTE, sin depender de callbacks ni de Filament
         try {
             // Construir la URL de reset usando la ruta de Filament
-            $url = route('filament.administrativo.auth.password-reset.reset', [
-                'token' => $token,
-                'email' => $user->email,
-            ]);
+            // El enlace debe ir firmado: la ruta de Filament rechaza con 403 las URLs sin firma
+            $url = \Filament\Facades\Filament::getPanel('administrativo')->getResetPasswordUrl($token, $user);
 
             Log::info("✓ URL de reset generada");
 

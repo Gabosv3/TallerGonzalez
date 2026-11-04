@@ -129,10 +129,8 @@ class User extends Authenticatable implements FilamentUser
     {
         \Illuminate\Support\Facades\Log::info('Intentando enviar correo de restablecimiento a: ' . $this->email);
 
-        $url = route('filament.administrativo.auth.password-reset.reset', [
-            'token' => $token,
-            'email' => $this->getEmailForPasswordReset(),
-        ]);
+        // El enlace debe ir firmado: la ruta de Filament rechaza con 403 las URLs sin firma
+        $url = \Filament\Facades\Filament::getPanel('administrativo')->getResetPasswordUrl($token, $this);
 
         try {
             \Illuminate\Support\Facades\Mail::to($this->email)->send(new \App\Mail\ResetPasswordMail($url));
