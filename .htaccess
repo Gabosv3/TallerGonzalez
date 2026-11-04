@@ -1,0 +1,12 @@
+# Hostinger sirve la carpeta del proyecto completa; Laravel solo debe exponerse desde /public.
+# Todo lo que no esté en /public (.env, app, vendor, storage...) queda inaccesible.
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    RewriteCond %{REQUEST_URI} !^/public/
+    RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>
+
+<IfModule mod_autoindex.c>
+    Options -Indexes
+</IfModule>
