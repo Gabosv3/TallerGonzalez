@@ -1,69 +1,53 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <title>Reporte de Productos</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #1f2937; }
-        .container { padding: 40px; }
-        .header { margin-bottom: 30px; border-bottom: 3px solid #059669; padding-bottom: 15px; }
-        .header h1 { color: #1f2937; font-size: 28px; margin-bottom: 5px; }
-        .header p { color: #6b7280; font-size: 14px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th { background-color: #059669; color: white; padding: 12px; text-align: left; font-weight: 600; font-size: 13px; }
-        td { padding: 10px 12px; border-bottom: 1px solid #e5e7eb; font-size: 13px; }
-        tr:nth-child(even) { background-color: #f9fafb; }
-        tr:hover { background-color: #f3f4f6; }
-        .footer { margin-top: 40px; text-align: center; color: #9ca3af; font-size: 12px; border-top: 1px solid #e5e7eb; padding-top: 15px; }
-        .text-right { text-align: right; }
-        .currency { font-weight: 600; }
-        .stock-low { color: #dc2626; font-weight: 600; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>📦 Reporte de Productos</h1>
-            <p>Generado el {{ now()->format('d/m/Y H:i:s') }}</p>
-        </div>
+@extends('exports.layout')
 
-        <table>
-            <thead>
-                <tr>
-                    <th>Código</th>
-                    <th>Nombre</th>
-                    <th>Marca</th>
-                    <th class="text-right">Stock Actual</th>
-                    <th class="text-right">Mínimo</th>
-                    <th class="text-right">Máximo</th>
-                    <th class="text-right">Precio Venta</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($productos as $producto)
-                    <tr>
-                        <td>{{ $producto->codigo }}</td>
-                        <td>{{ $producto->nombre }}</td>
-                        <td>{{ $producto->marca?->nombre ?? 'N/A' }}</td>
-                        <td class="text-right {{ $producto->stock_actual < $producto->stock_minimo ? 'stock-low' : '' }}">
-                            {{ $producto->stock_actual }}
-                        </td>
-                        <td class="text-right">{{ $producto->stock_minimo }}</td>
-                        <td class="text-right">{{ $producto->stock_maximo }}</td>
-                        <td class="text-right currency">$ {{ number_format($producto->precio_venta, 2) }}</td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="7" style="text-align: center; color: #9ca3af;">No hay productos registrados</td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
+@section('titulo', 'Reporte de inventario')
 
-        <div class="footer">
-            <p>Total de registros: {{ $productos->count() }}</p>
-        </div>
+@section('contenido')
+    <div class="filtros">
+        <b>Marca:</b> {{ $filtroMarca ?: 'Todas' }}
+        · <b>Stock:</b> {{ $filtroStock ?: 'Todos' }}
     </div>
-</body>
-</html>
+
+    <table class="kpis">
+        <tr>
+            <td><span class="l">Productos</span><span class="v">{{ $resumen['cantidad'] }}</span></td>
+            <td><span class="l">Unidades en stock</span><span class="v">{{ number_format($resumen['unidades']) }}</span></td>
+            <td><span class="l">Valor del inventario (costo)</span><span class="v">$ {{ number_format($resumen['valor'], 2) }}</span></td>
+            <td><span class="l">Con stock bajo</span><span class="v">{{ $resumen['bajo'] }}</span></td>
+        </tr>
+    </table>
+
+    <table class="datos">
+        <thead>
+            <tr>
+                <th>Código</th>
+                <th>Producto</th>
+                <th>Marca</th>
+                <th class="c">Stock</th>
+                <th class="c">Mín.</th>
+                <th class="c">Estado</th>
+                <th class="r">P. compra</th>
+                <th class="r">P. venta</th>
+            </tr>
+        </thead>
+        <tbody>
+            @forelse ($productos as $p)
+                @php
+                    [$etiqueta, $clase] = $p->stock_actual <= 0 ? ['Agotado', 'bad'] : ($p->stock_actual <= $p->stock_minimo ? ['Bajo', 'warn'] : ['Normal', 'ok']);
+                @endphp
+                <tr>
+                    <td>{{ $p->codigo }}</td>
+                    <td>{{ $p->nombre }}</td>
+                    <td>{{ $p->marca?->nombre ?? '—' }}</td>
+                    <td class="c">{{ $p->stock_actual }}</td>
+                    <td class="c">{{ $p->stock_minimo }}</td>
+                    <td class="c"><span class="badge {{ $clase }}">{{ $etiqueta }}</span></td>
+                    <td class="r">$ {{ number_format($p->precio_compra, 2) }}</td>
+                    <td class="r">$ {{ number_format($p->precio_venta, 2) }}</td>
+                </tr>
+            @empty
+                <tr><td colspan="8" class="vacio">No hay productos para los filtros seleccionados.</td></tr>
+            @endforelse
+        </tbody>
+    </table>
+@endsection

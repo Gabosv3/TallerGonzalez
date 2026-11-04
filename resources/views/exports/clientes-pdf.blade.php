@@ -1,75 +1,57 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <title>Reporte de Clientes</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #1f2937; }
-        .container { padding: 40px; }
-        .header { margin-bottom: 30px; border-bottom: 3px solid #7c3aed; padding-bottom: 15px; }
-        .header h1 { color: #1f2937; font-size: 28px; margin-bottom: 5px; }
-        .header p { color: #6b7280; font-size: 14px; }
-        .filters { background-color: #f3f4f6; padding: 12px; border-radius: 6px; margin-bottom: 20px; font-size: 13px; color: #4b5563; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th { background-color: #7c3aed; color: white; padding: 12px; text-align: left; font-weight: 600; font-size: 13px; }
-        td { padding: 10px 12px; border-bottom: 1px solid #e5e7eb; font-size: 13px; }
-        tr:nth-child(even) { background-color: #f9fafb; }
-        tr:hover { background-color: #f3f4f6; }
-        .footer { margin-top: 40px; text-align: center; color: #9ca3af; font-size: 12px; border-top: 1px solid #e5e7eb; padding-top: 15px; }
-        .text-right { text-align: right; }
-        .currency { font-weight: 600; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>👥 Reporte de Clientes</h1>
-            <p>Generado el {{ now()->format('d/m/Y H:i:s') }}</p>
-        </div>
+@extends('exports.layout')
 
-        @if($desde || $hasta)
-        <div class="filters">
-            <strong>Filtro de fechas:</strong>
-            {{ $desde ? 'Desde ' . \Carbon\Carbon::parse($desde)->format('d/m/Y') : 'Sin fecha inicial' }}
-            {{ $hasta ? ' hasta ' . \Carbon\Carbon::parse($hasta)->format('d/m/Y') : '' }}
-        </div>
-        @endif
+@section('titulo', 'Reporte de clientes')
 
-        <table>
-            <thead>
-                <tr>
-                    <th>Nombre</th>
-                    <th>Email</th>
-                    <th>Teléfono</th>
-                    <th>Dirección</th>
-                    <th class="text-right">Facturas</th>
-                    <th class="text-right">Total Gasto</th>
-                    <th>Estado</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($clientes as $cliente)
-                    <tr>
-                        <td>{{ $cliente->nombre }}</td>
-                        <td>{{ $cliente->email }}</td>
-                        <td>{{ $cliente->telefono ?? 'N/A' }}</td>
-                        <td>{{ substr($cliente->direccion ?? 'N/A', 0, 40) }}</td>
-                        <td class="text-right">{{ $cliente->facturas_count }}</td>
-                        <td class="text-right currency">$ {{ number_format($cliente->facturas_sum_total ?? 0, 2) }}</td>
-                        <td>Activo</td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="7" style="text-align: center; color: #9ca3af;">No hay clientes registrados</td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
-
-        <div class="footer">
-            <p>Total de registros: {{ $clientes->count() }} | Total de compras: $ {{ number_format($clientes->sum('facturas_sum_total'), 2) }}</p>
-        </div>
+@section('contenido')
+    <div class="filtros">
+        <b>Estado:</b> {{ $filtroEstado }}
+        · <b>Compras del período:</b>
+        {{ $desde ? \Carbon\Carbon::parse($desde)->format('d/m/Y') : 'Inicio' }}
+        al
+        {{ $hasta ? \Carbon\Carbon::parse($hasta)->format('d/m/Y') : 'hoy' }}
     </div>
-</body>
-</html>
+
+    <table class="kpis">
+        <tr>
+            <td><span class="l">Clientes</span><span class="v">{{ $resumen['cantidad'] }}</span></td>
+            <td><span class="l">Con compras en el período</span><span class="v">{{ $resumen['con_compras'] }}</span></td>
+            <td><span class="l">Total facturado</span><span class="v">$ {{ number_format($resumen['total'], 2) }}</span></td>
+            <td><span class="l">Promedio por cliente</span><span class="v">$ {{ number_format($resumen['con_compras'] > 0 ? $resumen['total'] / $resumen['con_compras'] : 0, 2) }}</span></td>
+        </tr>
+    </table>
+
+    <table class="datos">
+        <thead>
+            <tr>
+                <th>Cliente</th>
+                <th>Contacto</th>
+                <th>DUI / NIT</th>
+                <th class="c">Estado</th>
+                <th class="c">Facturas</th>
+                <th class="r">Total comprado</th>
+            </tr>
+        </thead>
+        <tbody>
+            @forelse ($clientes as $c)
+                <tr>
+                    <td>{{ \App\Support\ReportData::nombreCliente($c) }}</td>
+                    <td>{{ $c->email }}<br><span style="color:#6b7280">{{ $c->telefono }}</span></td>
+                    <td>{{ $c->dui ?: ($c->nit ?: '—') }}</td>
+                    <td class="c"><span class="badge {{ $c->activo ? 'ok' : 'gris' }}">{{ $c->activo ? 'Activo' : 'Inactivo' }}</span></td>
+                    <td class="c">{{ $c->facturas_count }}</td>
+                    <td class="r">$ {{ number_format($c->facturas_sum_total ?? 0, 2) }}</td>
+                </tr>
+            @empty
+                <tr><td colspan="6" class="vacio">No hay clientes para los filtros seleccionados.</td></tr>
+            @endforelse
+        </tbody>
+        @if ($clientes->isNotEmpty())
+            <tfoot>
+                <tr>
+                    <td colspan="5" class="r">Total facturado</td>
+                    <td class="r">$ {{ number_format($resumen['total'], 2) }}</td>
+                </tr>
+            </tfoot>
+        @endif
+    </table>
+@endsection
