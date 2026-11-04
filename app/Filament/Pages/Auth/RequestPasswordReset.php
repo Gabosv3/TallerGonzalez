@@ -11,6 +11,11 @@ use Illuminate\Support\Facades\Log;
 
 class RequestPasswordReset extends BaseRequestPasswordReset
 {
+    public function getHeading(): string|\Illuminate\Contracts\Support\Htmlable
+    {
+        return 'Recuperar contraseña';
+    }
+
     public function form(Form $form): Form
     {
         return $form
@@ -44,24 +49,26 @@ class RequestPasswordReset extends BaseRequestPasswordReset
             
             Log::info("Estado del reset: {$status}");
             
-            if ($status === Password::RESET_LINK_SENT) {
-                Log::info("Enlace enviado correctamente");
+            if ($status === Password::RESET_THROTTLED) {
+                Log::warning("Solicitud limitada para: {$email}");
                 Notification::make()
-                    ->title('Enlace Enviado')
-                    ->body('Se ha enviado un enlace de restablecimiento a tu correo electrónico. Por favor revisa tu bandeja de entrada.')
-                    ->success()
-                    ->send();
-                    
-                $this->redirect(route('filament.administrativo.auth.login'));
-            } else {
-                Log::warning("Fallo al enviar enlace: {$status}");
-                Notification::make()
-                    ->title('⏱Intenta Más Tarde')
-                    ->body('Has solicitado demasiados enlaces. Por favor espera un tiempo antes de intentar nuevamente.')
+                    ->title('Espera un momento')
+                    ->body('Ya te enviamos un enlace hace poco. Revisa tu correo o vuelve a intentarlo en un minuto.')
                     ->warning()
                     ->send();
+
+                return;
             }
-            
+
+            // Mismo mensaje exista o no el correo, para no revelar qué cuentas están registradas
+            Notification::make()
+                ->title('Revisa tu correo')
+                ->body('Si el correo está registrado, te enviamos un enlace para crear una nueva contraseña. Es válido por 60 minutos.')
+                ->success()
+                ->send();
+
+            $this->redirect(route('filament.administrativo.auth.login'));
+
         } catch (\Exception $e) {
             Log::error('Error: ' . $e->getMessage());
             Notification::make()

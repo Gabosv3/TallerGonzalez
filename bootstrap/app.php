@@ -12,6 +12,8 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        // Detras del proxy del hosting: respeta el esquema (https) y el host para que las URL firmadas coincidan
+        $middleware->trustProxies(at: '*');
         $middleware->redirectGuestsTo(fn () => route('filament.administrativo.auth.login'));
     })
     ->withExceptions(function (Exceptions $exceptions) {

@@ -11,6 +11,11 @@ use Illuminate\Validation\ValidationException;
 
 class ResetPassword extends BaseResetPassword
 {
+    public function getHeading(): string|\Illuminate\Contracts\Support\Htmlable
+    {
+        return 'Crear nueva contraseña';
+    }
+
     public function form(Form $form): Form
     {
         return $form

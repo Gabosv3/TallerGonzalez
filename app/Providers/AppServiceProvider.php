@@ -74,7 +74,11 @@ class AppServiceProvider extends ServiceProvider
                 . '<div><h2>Taller González</h2><p>Sistema de gestión de inventario, pedidos y facturación.</p></div>'
                 . '<small>© ' . date('Y') . ' Taller González</small>'
                 . '</aside>',
-            scopes: \App\Filament\Pages\Auth\Login::class,
+            scopes: [
+                \App\Filament\Pages\Auth\Login::class,
+                \App\Filament\Pages\Auth\RequestPasswordReset::class,
+                \App\Filament\Pages\Auth\ResetPassword::class,
+            ],
         );
     }
 }

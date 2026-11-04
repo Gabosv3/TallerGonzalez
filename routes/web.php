@@ -45,3 +45,14 @@ Route::get('/password/reset/{token}', function ($token) {
 
     return redirect(\Filament\Facades\Filament::getPanel('administrativo')->getResetPasswordUrl($token, $user));
 })->name('password.reset');
+
+// Archivos subidos (logos, miniaturas...). Si existe el enlace public/storage el servidor web los entrega
+// directamente; esta ruta solo actua cuando ese enlace falta.
+Route::get('/storage/{path}', function (string $path) {
+    $disco = \Illuminate\Support\Facades\Storage::disk('public');
+
+    abort_if(str_contains($path, '..') || ! $disco->exists($path), 404);
+
+    return $disco->response($path);
+})->where('path', '.*')->name('storage.publico');
+
