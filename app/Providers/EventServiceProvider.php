@@ -5,9 +5,6 @@ namespace App\Providers;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
-use App\Events\VentaCreada;
-use App\Listeners\NotificarVenta;
-use App\Listeners\NotificarStockBajo;
 use App\Listeners\SendTwoFactorCodeDirectly;
 use Laravel\Fortify\Events\TwoFactorAuthenticationChallenged;
 use Laravel\Fortify\Events\TwoFactorAuthenticationEnabled;
@@ -22,10 +19,6 @@ class EventServiceProvider extends ServiceProvider
     protected $listen = [
         Registered::class => [
             SendEmailVerificationNotification::class,
-        ],
-        VentaCreada::class => [
-            NotificarVenta::class,
-            NotificarStockBajo::class,
         ],
         TwoFactorAuthenticationChallenged::class => [
             SendTwoFactorCodeDirectly::class,

@@ -3,46 +3,27 @@
 namespace App\Observers;
 
 use App\Models\Producto;
-use App\Models\User;
-use Filament\Notifications\Notification;
+use App\Services\Notificaciones;
 
 class ProductoObserver
 {
     /**
-     * Notificar cuando el stock es muy bajo
+     * Notifica una sola vez cuando el stock cruza el mínimo o se agota.
      */
     public function updated(Producto $producto): void
     {
-        // Si el stock es crítico (menor que la mitad del mínimo)
-        if ($producto->stock_actual < ($producto->stock_minimo / 2) && $producto->stock_actual > 0) {
-            $usuarios = User::whereHas('roles', function ($query) {
-                $query->whereIn('name', ['admin', 'almacen']);
-            })->get();
-
-            foreach ($usuarios as $usuario) {
-                Notification::make()
-                    ->title('🔴 Stock Crítico')
-                    ->body("Producto: {$producto->nombre} - Stock: {$producto->stock_actual} unidades")
-                    ->icon('heroicon-o-exclamation-triangle')
-                    ->color('danger')
-                    ->sendToDatabase($usuario);
-            }
+        if (! $producto->wasChanged('stock_actual')) {
+            return;
         }
 
-        // Si se agotó el stock
-        if ($producto->stock_actual === 0 && $producto->wasChanged('stock_actual')) {
-            $usuarios = User::whereHas('roles', function ($query) {
-                $query->whereIn('name', ['admin', 'almacen', 'vendedor']);
-            })->get();
+        $antes = (float) $producto->getOriginal('stock_actual');
+        $ahora = (float) $producto->stock_actual;
+        $minimo = (float) $producto->stock_minimo;
 
-            foreach ($usuarios as $usuario) {
-                Notification::make()
-                    ->title('❌ Producto Agotado')
-                    ->body("Producto: {$producto->nombre} - Sin stock disponible")
-                    ->icon('heroicon-o-x-circle')
-                    ->color('danger')
-                    ->sendToDatabase($usuario);
-            }
+        if ($ahora <= 0 && $antes > 0) {
+            Notificaciones::stockBajo($producto);
+        } elseif ($minimo > 0 && $ahora <= $minimo && $antes > $minimo) {
+            Notificaciones::stockBajo($producto);
         }
     }
 }
