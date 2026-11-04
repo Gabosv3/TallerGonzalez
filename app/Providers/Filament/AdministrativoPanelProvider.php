@@ -35,8 +35,12 @@ class AdministrativoPanelProvider extends PanelProvider
     {
         $settings ??= GeneralSetting::first();
 
-        if ($settings && $settings->site_logo && file_exists(public_path('storage/' . $settings->site_logo))) {
-            return asset('storage/' . $settings->site_logo);
+        // Se comprueba en el disco público (no en public/storage), para que funcione aunque falte el enlace simbólico
+        $disco = \Illuminate\Support\Facades\Storage::disk('public');
+
+        if ($settings && $settings->site_logo && $disco->exists($settings->site_logo)) {
+            // La versión evita que el navegador muestre el logo anterior: el archivo siempre se llama igual
+            return asset('storage/' . $settings->site_logo) . '?v=' . $disco->lastModified($settings->site_logo);
         }
 
         return asset('assets/img/tallergonzalez.png');
