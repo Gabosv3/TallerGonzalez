@@ -64,8 +64,8 @@ class EditServicio extends EditRecord
                 $nuevoProducto = end($state['productos']);
                 if (isset($nuevoProducto['nombre_producto'])) {
                     Notification::make()
-                        ->title('✅ Producto Agregado')
-                        ->body('📦 ' . $nuevoProducto['nombre_producto'] . ' (' . ($nuevoProducto['cantidad'] ?? 1) . 'x)')
+                        ->title('Producto Agregado')
+                        ->body('' . $nuevoProducto['nombre_producto'] . ' (' . ($nuevoProducto['cantidad'] ?? 1) . 'x)')
                         ->success()
                         ->duration(2000)
                         ->send();
@@ -75,8 +75,8 @@ class EditServicio extends EditRecord
                 foreach ($state['productos'] as $index => $producto) {
                     if (isset($previousProducts[$index]) && $previousProducts[$index] !== $producto) {
                         Notification::make()
-                            ->title('✏️ Producto Actualizado')
-                            ->body('📦 ' . ($producto['nombre_producto'] ?? 'Producto') . ' (' . ($producto['cantidad'] ?? 1) . 'x)')
+                            ->title('Producto Actualizado')
+                            ->body('' . ($producto['nombre_producto'] ?? 'Producto') . ' (' . ($producto['cantidad'] ?? 1) . 'x)')
                             ->info()
                             ->duration(2000)
                             ->send();
@@ -90,8 +90,8 @@ class EditServicio extends EditRecord
                 $nuevoServicio = end($state['servicios']);
                 if (isset($nuevoServicio['servicio_nombre'])) {
                     Notification::make()
-                        ->title('✅ Servicio Agregado')
-                        ->body('🔧 ' . $nuevoServicio['servicio_nombre'] . ' - $' . ($nuevoServicio['servicio_precio'] ?? 0))
+                        ->title('Servicio Agregado')
+                        ->body('' . $nuevoServicio['servicio_nombre'] . ' - $' . ($nuevoServicio['servicio_precio'] ?? 0))
                         ->success()
                         ->duration(2000)
                         ->send();
@@ -101,8 +101,8 @@ class EditServicio extends EditRecord
                 foreach ($state['servicios'] as $index => $servicio) {
                     if (isset($previousServices[$index]) && $previousServices[$index] !== $servicio) {
                         Notification::make()
-                            ->title('✏️ Servicio Actualizado')
-                            ->body('🔧 ' . ($servicio['servicio_nombre'] ?? 'Servicio') . ' - $' . ($servicio['servicio_precio'] ?? 0))
+                            ->title('Servicio Actualizado')
+                            ->body('' . ($servicio['servicio_nombre'] ?? 'Servicio') . ' - $' . ($servicio['servicio_precio'] ?? 0))
                             ->info()
                             ->duration(2000)
                             ->send();

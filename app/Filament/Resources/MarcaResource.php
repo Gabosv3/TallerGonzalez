@@ -26,10 +26,12 @@ use Illuminate\Support\Str;
 
 class MarcaResource extends Resource
 {
+    protected static int $globalSearchResultsLimit = 5;
+
     protected static ?string $model = Marca::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-tag';
-    protected static ?string $navigationGroup = 'Catálogo';
+    protected static ?string $navigationGroup = 'Inventario';
     protected static ?string $navigationLabel = 'Marcas';
     protected static ?string $modelLabel = 'Marca';
     protected static ?string $pluralModelLabel = 'Marcas';
@@ -209,36 +211,11 @@ class MarcaResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\TrashedFilter::make(),
-                TernaryFilter::make('activo')
-                    ->label('Estado')
-                    ->placeholder('Todas las marcas')
-                    ->trueLabel('Solo activas')
-                    ->falseLabel('Solo inactivas'),
-
-                SelectFilter::make('pais_origen')
-                    ->label('País de Origen')
-                    ->searchable()
-                    ->preload()
-                    ->options(fn () => Marca::query()
-                        ->whereNotNull('pais_origen')
-                        ->distinct()
-                        ->pluck('pais_origen', 'pais_origen')
-                        ->toArray()),
-
-                Tables\Filters\Filter::make('con_productos')
-                    ->label('Con productos')
-                    ->query(fn (Builder $query): Builder => $query->has('productos')),
-
-                Tables\Filters\Filter::make('sin_productos')
-                    ->label('Sin productos')
-                    ->query(fn (Builder $query): Builder => $query->doesntHave('productos')),
-
-                Tables\Filters\Filter::make('recientes')
-                    ->label('Agregadas este mes')
-                    ->query(fn (Builder $query): Builder => 
-                        $query->where('created_at', '>=', now()->subMonth())
-                    ),
+                Tables\Filters\TrashedFilter::make()->label('Eliminadas'),
+                \App\Filament\Support\Filtros::activo(),
+                \App\Filament\Support\Filtros::valores('pais_origen', 'País de origen', \App\Models\Marca::class),
+                \App\Filament\Support\Filtros::conRelacion('con_productos', 'productos', 'Productos', 'Con productos', 'Sin productos'),
+                \App\Filament\Support\Filtros::rangoFechas('registrada', 'created_at', 'Registro'),
             ])
             ->actions([
                 Tables\Actions\ActionGroup::make([
@@ -326,15 +303,7 @@ class MarcaResource extends Resource
         ];
     }
 
-    public static function getNavigationBadge(): ?string
-    {
-        return static::getModel()::where('activo', true)->count();
-    }
 
-    public static function getNavigationBadgeColor(): string|array|null
-    {
-        return 'success';
-    }
 
     public static function getEloquentQuery(): Builder
     {

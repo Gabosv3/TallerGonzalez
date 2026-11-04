@@ -36,11 +36,13 @@ use Carbon\Carbon;
 
 class PedidoResource extends Resource
 {
+    protected static int $globalSearchResultsLimit = 5;
+
     protected static ?string $model = Pedido::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-clipboard-document-list';
-    protected static ?string $navigationGroup = 'Gestión de Compras';
-    protected static ?string $navigationLabel = 'Órdenes de Compra';
+    protected static ?string $navigationGroup = 'Compras';
+    protected static ?string $navigationLabel = 'Órdenes de compra';
     protected static ?string $modelLabel = 'Orden de Compra';
     protected static ?string $pluralModelLabel = 'Órdenes de Compra';
     protected static ?int $navigationSort = 1;
@@ -131,12 +133,12 @@ class PedidoResource extends Resource
                                             Select::make('estado')
                                                 ->label('Estado del Pedido')
                                                 ->options([
-                                                    'pendiente' => '🟡 Pendiente',
-                                                    'confirmado' => '🔵 Confirmado',
-                                                    'en_camino' => '🟠 En Camino',
-                                                    'parcial' => '🟣 Parcialmente Recibido',
-                                                    'completado' => '🟢 Completado',
-                                                    'cancelado' => '🔴 Cancelado',
+                                                    'pendiente' => 'Pendiente',
+                                                    'confirmado' => 'Confirmado',
+                                                    'en_camino' => 'En Camino',
+                                                    'parcial' => 'Parcialmente Recibido',
+                                                    'completado' => 'Completado',
+                                                    'cancelado' => 'Cancelado',
                                                 ])
                                                 ->default('pendiente')
                                                 ->required()
@@ -469,12 +471,12 @@ class PedidoResource extends Resource
                     ->label('Estado')
                     ->badge()
                     ->formatStateUsing(function ($state) {
-                        if ($state === 'pendiente') return '🟡 Pendiente';
-                        if ($state === 'confirmado') return '🔵 Confirmado';
-                        if ($state === 'en_camino') return '🟠 En Camino';
-                        if ($state === 'parcial') return '🟣 Parcial';
-                        if ($state === 'completado') return '🟢 Completado';
-                        if ($state === 'cancelado') return '🔴 Cancelado';
+                        if ($state === 'pendiente') return 'Pendiente';
+                        if ($state === 'confirmado') return 'Confirmado';
+                        if ($state === 'en_camino') return 'En Camino';
+                        if ($state === 'parcial') return 'Parcial';
+                        if ($state === 'completado') return 'Completado';
+                        if ($state === 'cancelado') return 'Cancelado';
                         return $state;
                     })
                     ->color(function ($state) {
@@ -525,107 +527,9 @@ class PedidoResource extends Resource
                     ->preload(),
 
                 // Filtros mejorados por fechas
-                Filter::make('fecha_orden')
-                    ->form([
-                        DatePicker::make('desde')
-                            ->label('Desde')
-                            ->validationMessages([
-                                'date' => 'La fecha debe ser válida.',
-                            ]),
-                        DatePicker::make('hasta')
-                            ->label('Hasta')
-                            ->validationMessages([
-                                'date' => 'La fecha debe ser válida.',
-                            ]),
-                    ])
-                    ->query(function (Builder $query, array $data): Builder {
-                        return $query
-                            ->when(
-                                $data['desde'],
-                                fn(Builder $query, $date): Builder => $query->whereDate('fecha_orden', '>=', $date),
-                            )
-                            ->when(
-                                $data['hasta'],
-                                fn(Builder $query, $date): Builder => $query->whereDate('fecha_orden', '<=', $date),
-                            );
-                    })
-                    ->indicateUsing(function (array $data): array {
-                        $indicators = [];
-                        if ($data['desde'] ?? null) {
-                            $indicators[] = 'Desde: ' . Carbon::parse($data['desde'])->format('d/m/Y');
-                        }
-                        if ($data['hasta'] ?? null) {
-                            $indicators[] = 'Hasta: ' . Carbon::parse($data['hasta'])->format('d/m/Y');
-                        }
-                        return $indicators;
-                    }),
+                \App\Filament\Support\Filtros::rangoFechas('fecha_orden', 'fecha_orden', 'Fecha de orden'),
 
                 // Filtro por mes y año
-                Filter::make('mes_ano')
-                    ->form([
-                        Select::make('mes')->label('Mes')
-                            ->options([
-                                1 => 'Enero',
-                                2 => 'Febrero',
-                                3 => 'Marzo',
-                                4 => 'Abril',
-                                5 => 'Mayo',
-                                6 => 'Junio',
-                                7 => 'Julio',
-                                8 => 'Agosto',
-                                9 => 'Septiembre',
-                                10 => 'Octubre',
-                                11 => 'Noviembre',
-                                12 => 'Diciembre'
-                            ])
-                            ->default(now()->month),
-                        Select::make('ano')->label('Año')
-                            ->options(function () {
-                                $years = [];
-                                $startYear = 2020;
-                                $endYear = now()->year;
-                                for ($year = $endYear; $year >= $startYear; $year--) {
-                                    $years[$year] = $year;
-                                }
-                                return $years;
-                            })
-                            ->default(now()->year),
-                    ])
-                    ->query(function (Builder $query, array $data): Builder {
-                        return $query
-                            ->when(
-                                $data['mes'] ?? null,
-                                fn(Builder $query, $mes): Builder => $query->whereMonth('fecha_orden', $mes)
-                            )
-                            ->when(
-                                $data['ano'] ?? null,
-                                fn(Builder $query, $ano): Builder => $query->whereYear('fecha_orden', $ano)
-                            );
-                    })
-                    ->indicateUsing(function (array $data): array {
-                        $indicators = [];
-                        if ($data['mes'] ?? null) {
-                            $meses = [
-                                1 => 'Enero',
-                                2 => 'Febrero',
-                                3 => 'Marzo',
-                                4 => 'Abril',
-                                5 => 'Mayo',
-                                6 => 'Junio',
-                                7 => 'Julio',
-                                8 => 'Agosto',
-                                9 => 'Septiembre',
-                                10 => 'Octubre',
-                                11 => 'Noviembre',
-                                12 => 'Diciembre'
-                            ];
-                            $indicators[] = 'Mes: ' . $meses[$data['mes']];
-                        }
-                        if ($data['ano'] ?? null) {
-                            $indicators[] = 'Año: ' . $data['ano'];
-                        }
-                        return $indicators;
-                    }),
 
                 // Filtros de rango de montos
                 Filter::make('rango_total')
@@ -658,16 +562,8 @@ class PedidoResource extends Resource
                     }),
 
                 // Filtro: Pedidos recientes (últimos 7 días)
-                Filter::make('ultimos_7_dias')
-                    ->label('Últimos 7 días')
-                    ->query(fn(Builder $query): Builder => $query->where('fecha_orden', '>=', now()->subDays(7)))
-                    ->toggle(),
 
                 // Filtro: Pedidos del día actual
-                Filter::make('hoy')
-                    ->label('Hoy')
-                    ->query(fn(Builder $query): Builder => $query->whereDate('fecha_orden', today()))
-                    ->toggle(),
             ])
             ->actions([
                 Tables\Actions\ActionGroup::make([
@@ -833,13 +729,36 @@ class PedidoResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        return static::getModel()::where('estado', 'pendiente')->count();
+        $pendientes = static::getModel()::where('estado', 'pendiente')->count();
+
+        return $pendientes > 0 ? (string) $pendientes : null;
     }
 
     public static function getNavigationBadgeColor(): string|array|null
     {
-        return static::getModel()::where('estado', 'pendiente')->count() > 0 ? 'warning' : 'gray';
+        return 'warning';
     }
 
-    
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['numero_factura', 'proveedor.nombre'];
+    }
+
+    public static function getGlobalSearchEloquentQuery(): Builder
+    {
+        return parent::getGlobalSearchEloquentQuery()->with('proveedor');
+    }
+
+    public static function getGlobalSearchResultTitle($record): string
+    {
+        return 'Orden ' . ($record->numero_factura ?: '#' . $record->id);
+    }
+
+    public static function getGlobalSearchResultDetails($record): array
+    {
+        return [
+            'Proveedor' => $record->proveedor?->nombre ?? '—',
+            'Estado' => ucfirst(str_replace('_', ' ', (string) $record->estado)),
+        ];
+    }
 }

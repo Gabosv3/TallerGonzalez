@@ -28,7 +28,7 @@ class TipoAceiteResource extends Resource
     protected static ?string $model = TipoAceite::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-    protected static ?string $navigationGroup = 'Catálogo';
+    protected static ?string $navigationGroup = 'Inventario';
     protected static ?string $navigationLabel = 'Tipos de Aceite';
     protected static ?string $modelLabel = 'Tipo de Aceite';
     protected static ?string $pluralModelLabel = 'Tipos de Aceite';
@@ -197,26 +197,9 @@ class TipoAceiteResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\TrashedFilter::make(),
-                TernaryFilter::make('activo')
-                    ->label('Estado')
-                    ->placeholder('Todos los tipos')
-                    ->trueLabel('Solo activos')
-                    ->falseLabel('Solo inactivos'),
-
-                Tables\Filters\Filter::make('con_productos')
-                    ->label('Con productos')
-                    ->query(fn (Builder $query): Builder => $query->has('aceites')),
-
-                Tables\Filters\Filter::make('sin_productos')
-                    ->label('Sin productos')
-                    ->query(fn (Builder $query): Builder => $query->doesntHave('aceites')),
-
-                Tables\Filters\Filter::make('recientes')
-                    ->label('Agregados este mes')
-                    ->query(fn (Builder $query): Builder => 
-                        $query->where('created_at', '>=', now()->subMonth())
-                    ),
+                Tables\Filters\TrashedFilter::make()->label('Eliminados'),
+                \App\Filament\Support\Filtros::activo(),
+                \App\Filament\Support\Filtros::conRelacion('con_aceites', 'aceites', 'Aceites', 'Con aceites', 'Sin aceites'),
             ])
             ->actions([
                 Tables\Actions\ActionGroup::make([
@@ -302,15 +285,7 @@ class TipoAceiteResource extends Resource
         ];
     }
 
-    public static function getNavigationBadge(): ?string
-    {
-        return static::getModel()::where('activo', true)->count();
-    }
 
-    public static function getNavigationBadgeColor(): string|array|null
-    {
-        return 'success';
-    }
 
     public static function getEloquentQuery(): Builder
     {

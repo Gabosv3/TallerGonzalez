@@ -26,10 +26,12 @@ use Illuminate\Support\Str;
 
 class ClienteResource extends Resource
 {
+    protected static int $globalSearchResultsLimit = 5;
+
     protected static ?string $model = Cliente::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-user-group';
-    protected static ?string $navigationGroup = 'Gestión Comercial';
+    protected static ?string $navigationGroup = 'Ventas';
     protected static ?string $navigationLabel = 'Clientes';
     protected static ?string $modelLabel = 'Cliente';
     protected static ?string $pluralModelLabel = 'Clientes';
@@ -150,7 +152,7 @@ class ClienteResource extends Resource
                                 'regex' => 'El DUI debe contener solo 9 dígitos numéricos.',
                                 'numeric' => 'El DUI solo puede contener números.',
                             ])
-                            ->helperText('✓ Exactamente 9 dígitos numéricos (sin guiones)')
+                            ->helperText('Exactamente 9 dígitos numéricos (sin guiones)')
                             ->hint('Formato requerido: 059863879'),
 
                         Toggle::make('nit_homologado')
@@ -198,7 +200,7 @@ class ClienteResource extends Resource
                                 'regex' => 'El NIT debe contener solo dígitos numéricos válidos.',
                                 'numeric' => 'El NIT solo puede contener números.',
                             ])
-                            ->helperText(fn (\Filament\Forms\Get $get) => $get('nit_homologado') ? '✓ Copia del DUI (9 dígitos)' : '✓ Exactamente 14 dígitos numéricos (sin guiones)')
+                            ->helperText(fn (\Filament\Forms\Get $get) => $get('nit_homologado') ? 'Copia del DUI (9 dígitos)' : 'Exactamente 14 dígitos numéricos (sin guiones)')
                             ->hint(fn (\Filament\Forms\Get $get) => $get('nit_homologado') ? 'Homologado con DUI' : 'Formato requerido: 06141510901234'),                                        TextInput::make('nrc')
                                             ->label('NRC')
                                             ->maxLength(20)
@@ -214,11 +216,11 @@ class ClienteResource extends Resource
                                         Select::make('tipo_cliente')
                                             ->label('Tipo de Cliente')
                                             ->options([
-                                                'consumidor_final' => '👤 Consumidor Final',
-                                                'contribuyente' => '🏢 Contribuyente',
-                                                'empresa' => '🏭 Empresa',
-                                                'distribuidor' => '🚚 Distribuidor',
-                                                'mayorista' => '📦 Mayorista',
+                                                'consumidor_final' => 'Consumidor Final',
+                                                'contribuyente' => 'Contribuyente',
+                                                'empresa' => 'Empresa',
+                                                'distribuidor' => 'Distribuidor',
+                                                'mayorista' => 'Mayorista',
                                             ])
                                             ->default('consumidor_final')
                                             ->required()
@@ -506,8 +508,8 @@ class ClienteResource extends Resource
 
                 TextColumn::make('nombre_completo')
                     ->label('Cliente')
-                    ->searchable(['nombre', 'apellido'])
-                    ->sortable()
+                    ->searchable(['nombre', 'apellido', 'razon_social'])
+                    ->sortable(['nombre', 'apellido'])
                     ->description(fn ($record) => $record->email)
                     ->tooltip(fn ($record) => $record->dui)
                     ->limit(30),
@@ -523,11 +525,11 @@ class ClienteResource extends Resource
                 BadgeColumn::make('tipo_cliente')
                     ->label('Tipo')
                     ->formatStateUsing(function ($state) {
-                        if ($state === 'consumidor_final') return '👤 Final';
-                        if ($state === 'contribuyente') return '🏢 Contribuyente';
-                        if ($state === 'empresa') return '🏭 Empresa';
-                        if ($state === 'distribuidor') return '🚚 Distribuidor';
-                        if ($state === 'mayorista') return '📦 Mayorista';
+                        if ($state === 'consumidor_final') return 'Final';
+                        if ($state === 'contribuyente') return 'Contribuyente';
+                        if ($state === 'empresa') return 'Empresa';
+                        if ($state === 'distribuidor') return 'Distribuidor';
+                        if ($state === 'mayorista') return 'Mayorista';
                         return $state;
                     })
                     ->colors([
@@ -550,7 +552,7 @@ class ClienteResource extends Resource
                     ->label('Categoría Económica')
                     ->searchable()
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: false)
+                    ->toggleable(isToggledHiddenByDefault: true)
                     ->limit(40)
                     ->tooltip(fn ($record) => $record->categoriaEconomica?->descripcion),
 
@@ -586,53 +588,25 @@ class ClienteResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\TrashedFilter::make(),
-                TernaryFilter::make('activo')
-                    ->label('Estado')
-                    ->placeholder('Todos los clientes')
-                    ->trueLabel('Solo activos')
-                    ->falseLabel('Solo inactivos'),
-
-                TernaryFilter::make('credito_activo')
+                Tables\Filters\TrashedFilter::make()->label('Eliminados'),
+                \App\Filament\Support\Filtros::activo(),
+                Tables\Filters\TernaryFilter::make('credito_activo')
                     ->label('Crédito')
                     ->placeholder('Todos')
                     ->trueLabel('Con crédito')
                     ->falseLabel('Sin crédito'),
-
-                SelectFilter::make('tipo_cliente')
-                    ->label('Tipo de Cliente')
+                Tables\Filters\SelectFilter::make('tipo_cliente')
+                    ->label('Tipo de cliente')
                     ->options([
-                        'consumidor_final' => 'Consumidor Final',
+                        'consumidor_final' => 'Consumidor final',
                         'contribuyente' => 'Contribuyente',
                         'empresa' => 'Empresa',
                         'distribuidor' => 'Distribuidor',
                         'mayorista' => 'Mayorista',
                     ])
-                    ->multiple()
-                    ->preload(),
-
-                SelectFilter::make('departamento')
-                    ->label('Departamento')
-                    ->searchable()
-                    ->preload()
-                    ->options(fn () => Cliente::query()
-                        ->whereNotNull('departamento')
-                        ->distinct()
-                        ->pluck('departamento', 'departamento')
-                        ->toArray()),
-
-                Tables\Filters\Filter::make('con_credito')
-                    ->label('Con Límite de Crédito')
-                    ->query(fn (Builder $query): Builder => 
-                        $query->where('limite_credito', '>', 0)
-                    )
-                    ->toggle(),
-
-                Tables\Filters\Filter::make('recientes')
-                    ->label('Registrados este mes')
-                    ->query(fn (Builder $query): Builder => 
-                        $query->where('created_at', '>=', now()->subMonth())
-                    ),
+                    ->multiple(),
+                \App\Filament\Support\Filtros::valores('departamento', 'Departamento', \App\Models\Cliente::class),
+                \App\Filament\Support\Filtros::rangoFechas('registrado', 'created_at', 'Registro'),
             ])
             ->actions([
                 Tables\Actions\ActionGroup::make([
@@ -720,15 +694,7 @@ class ClienteResource extends Resource
         ];
     }
 
-    public static function getNavigationBadge(): ?string
-    {
-        return static::getModel()::where('activo', true)->count();
-    }
 
-    public static function getNavigationBadgeColor(): string|array|null
-    {
-        return 'success';
-    }
 
     public static function getEloquentQuery(): Builder
     {
@@ -743,6 +709,14 @@ class ClienteResource extends Resource
 
     public static function getGlobalSearchResultTitle($record): string
     {
-        return $record->nombre;
+        return $record->razon_social ?: $record->nombre_completo;
+    }
+
+    public static function getGlobalSearchResultDetails($record): array
+    {
+        return array_filter([
+            'DUI / NIT' => $record->dui ?: $record->nit,
+            'Teléfono' => $record->telefono,
+        ]);
     }
 }

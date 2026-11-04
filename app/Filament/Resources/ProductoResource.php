@@ -15,10 +15,12 @@ use Illuminate\Support\HtmlString;
 
 class ProductoResource extends Resource
 {
+    protected static int $globalSearchResultsLimit = 5;
+
     protected static ?string $model = Producto::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-cube';
-    protected static ?string $navigationGroup = 'Inventario Automotriz';
+    protected static ?string $navigationGroup = 'Inventario';
     protected static ?string $navigationLabel = 'Productos';
     protected static ?string $modelLabel = 'Producto';
     protected static ?string $pluralModelLabel = 'Productos';
@@ -385,16 +387,14 @@ class ProductoResource extends Resource
                         if ($record->es_aceite && $record->tiene_variantes) {
                             $totalVariantes = $record->aceites->count();
                             $stockTotal = $record->aceites->sum('stock_disponible');
-                            $desc .= " 📦 ({$totalVariantes} variantes, {$stockTotal} total)";
+                            $desc .= " ({$totalVariantes} variantes, {$stockTotal} total)";
                         } elseif ($record->es_aceite && $record->variante_principal) {
                             $variante = $record->variante_principal;
                             $desc .= " - {$variante->marca->nombre} {$variante->viscosidad}";
                         }
                         return $desc;
                     })
-                    ->weight('bold')
-                    ->icon('heroicon-o-qr-code')
-                    ->iconColor('gray'),
+                    ->weight('bold'),
 
                 // Columna de marca
                 Tables\Columns\TextColumn::make('marca.nombre')
@@ -455,71 +455,50 @@ class ProductoResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                // Mostrar registros borrados (soft deletes)
-                Tables\Filters\TrashedFilter::make(),
-
-                // Filtro por tipo de producto
+                Tables\Filters\TrashedFilter::make()->label('Eliminados'),
                 Tables\Filters\SelectFilter::make('tipo_producto_id')
-                    ->label('Tipo de Producto')
+                    ->label('Tipo de producto')
                     ->relationship('tipoProducto', 'nombre')
-                    ->preload()
-                    ->multiple(),
-
-                // Filtro por marca
+                    ->multiple()
+                    ->preload(),
                 Tables\Filters\SelectFilter::make('marca_id')
                     ->label('Marca')
                     ->relationship('marca', 'nombre')
-                    ->preload()
-                    ->searchable(),
-
-                // Filtro de Stock Bajo
-                Tables\Filters\Filter::make('stock_bajo')
-                    ->label('Stock Bajo')
-                    ->query(fn(Builder $query) => $query->whereColumn('stock_actual', '<=', 'stock_minimo'))
-                    ->indicator('Stock Bajo'),
-
-                // Filtro por estado
-                Tables\Filters\TernaryFilter::make('activo')
-                    ->label('Estado Activo')
-                    ->placeholder('Todos')
-                    ->trueLabel('Solo activos')
-                    ->falseLabel('Solo inactivos'),
-
-                // Nuevo filtro: Productos con variantes
+                    ->multiple()
+                    ->searchable()
+                    ->preload(),
+                \App\Filament\Support\Filtros::nivelStock(),
+                \App\Filament\Support\Filtros::activo(),
                 Tables\Filters\Filter::make('con_variantes')
-                    ->label('Con Variantes')
-                    ->query(fn(Builder $query) => $query->whereHas('aceites', function ($q) {
-                        $q->groupBy('producto_id')
-                            ->havingRaw('COUNT(*) > 1');
-                    }))
+                    ->label('Solo con variantes')
+                    ->query(fn (Builder $query) => $query->has('aceites', '>', 1))
                     ->toggle(),
             ])
             ->headerActions([
-                Tables\Actions\Action::make('reporte_reorden_pdf')
-                    ->label('Reporte Reorden (PDF)')
-                    ->icon('heroicon-o-clipboard-document-check')
-                    ->url(fn() => route('productos.reporte_reorden'))
-                    ->openUrlInNewTab()
-                    ->color('warning'),
-
-                Tables\Actions\Action::make('reporte_reorden_excel')
-                    ->label('Reporte Reorden (EXCEL)')
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\Action::make('inventario_pdf')
+                        ->label('Inventario completo (PDF)')
+                        ->icon('heroicon-o-document-text')
+                        ->url(fn() => route('productos.reporte_general'))
+                        ->openUrlInNewTab(),
+                    Tables\Actions\Action::make('inventario_excel')
+                        ->label('Inventario completo (Excel)')
+                        ->icon('heroicon-o-table-cells')
+                        ->url(fn() => route('productos.reporte_general_excel')),
+                    Tables\Actions\Action::make('reorden_pdf')
+                        ->label('Productos a reabastecer (PDF)')
+                        ->icon('heroicon-o-clipboard-document-check')
+                        ->url(fn() => route('productos.reporte_reorden'))
+                        ->openUrlInNewTab(),
+                    Tables\Actions\Action::make('reorden_excel')
+                        ->label('Productos a reabastecer (Excel)')
+                        ->icon('heroicon-o-table-cells')
+                        ->url(fn() => route('productos.reporte_reorden_excel')),
+                ])
+                    ->label('Exportar')
                     ->icon('heroicon-o-arrow-down-tray')
-                    ->url(fn() => route('productos.reporte_reorden_excel'))
-                    ->color('success'),
-
-                Tables\Actions\Action::make('reporte_general')
-                    ->label('Reporte General PDF')
-                    ->icon('heroicon-o-document-text')
-                    ->url(fn() => route('productos.reporte_general'))
-                    ->openUrlInNewTab()
-                    ->color('primary'),
-
-                Tables\Actions\Action::make('reporte_general_excel')
-                    ->label('Reporte General (EXCEL)')
-                    ->icon('heroicon-o-arrow-down-tray')
-                    ->url(fn() => route('productos.reporte_general_excel'))
-                    ->color('info'),
+                    ->button()
+                    ->color('gray'),
             ])
             ->actions([
                 Tables\Actions\ActionGroup::make([
@@ -545,11 +524,7 @@ class ProductoResource extends Resource
                     Tables\Actions\RestoreAction::make()
                         ->icon('heroicon-o-arrow-uturn-left')
                         ->color('success'),
-                ])
-                    ->button()
-                    ->label('Acciones')
-                    ->color('gray')
-                    ->size('sm'),
+                ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -603,12 +578,19 @@ class ProductoResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        return (string) static::getModel()::where('activo', true)->count();
+        $bajo = static::getModel()::bajoStock()->count();
+
+        return $bajo > 0 ? (string) $bajo : null;
+    }
+
+    public static function getNavigationBadgeTooltip(): ?string
+    {
+        return 'Productos con stock bajo';
     }
 
     public static function getNavigationBadgeColor(): ?string
     {
-        return 'success';
+        return 'danger';
     }
 
     public static function getGloballySearchableAttributes(): array
@@ -619,6 +601,15 @@ class ProductoResource extends Resource
     public static function getGlobalSearchResultTitle($record): string
     {
         return $record->nombre;
+    }
+
+    public static function getGlobalSearchResultDetails($record): array
+    {
+        return [
+            'Código' => $record->codigo,
+            'Marca' => $record->marca?->nombre ?? '—',
+            'Stock' => $record->stock_actual,
+        ];
     }
 
     public static function getEloquentQuery(): Builder

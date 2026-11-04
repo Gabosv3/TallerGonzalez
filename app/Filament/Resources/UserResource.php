@@ -21,14 +21,16 @@ use Filament\Notifications\Notification;
 
 class UserResource extends Resource
 {
+    protected static int $globalSearchResultsLimit = 5;
+
     protected static ?string $model = User::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-user-group';
     protected static ?string $navigationLabel = 'Usuarios';
     protected static ?string $modelLabel = 'Usuario';
     protected static ?string $pluralModelLabel = 'Usuarios';
-    protected static ?string $navigationGroup = 'Configuración del Sistema';
-    protected static ?int $navigationSort = 100;
+    protected static ?string $navigationGroup = 'Administración';
+    protected static ?int $navigationSort = 10;
 
     public static function form(Form $form): Form
     {
@@ -263,46 +265,23 @@ class UserResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\TrashedFilter::make(),
-                Tables\Filters\Filter::make('verified')
-                    ->label('Correo Verificado')
-                    ->query(fn($query) => $query->whereNotNull('email_verified_at')),
-
-                Tables\Filters\Filter::make('unverified')
-                    ->label('Correo No Verificado')
-                    ->query(fn($query) => $query->whereNull('email_verified_at')),
-
+                Tables\Filters\TrashedFilter::make()->label('Eliminados'),
+                Tables\Filters\TernaryFilter::make('verificado')
+                    ->label('Correo')
+                    ->placeholder('Todos')
+                    ->trueLabel('Verificado')
+                    ->falseLabel('Sin verificar')
+                    ->queries(
+                        true: fn (Builder $query) => $query->whereNotNull('email_verified_at'),
+                        false: fn (Builder $query) => $query->whereNull('email_verified_at'),
+                        blank: fn (Builder $query) => $query,
+                    ),
                 Tables\Filters\SelectFilter::make('roles')
                     ->label('Rol')
                     ->relationship('roles', 'name')
                     ->multiple()
-                    ->preload()
-                    ->searchable(),
-
-                Tables\Filters\Filter::make('created_at')
-                    ->form([
-                        Forms\Components\DatePicker::make('created_from')
-                            ->label('Desde')
-                            ->validationMessages([
-                                'date' => 'La fecha debe ser válida.',
-                            ]),
-                        Forms\Components\DatePicker::make('created_until')
-                            ->label('Hasta')
-                            ->validationMessages([
-                                'date' => 'La fecha debe ser válida.',
-                            ]),
-                    ])
-                    ->query(function (Builder $query, array $data): Builder {
-                        return $query
-                            ->when(
-                                $data['created_from'],
-                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
-                            )
-                            ->when(
-                                $data['created_until'],
-                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
-                            );
-                    }),
+                    ->preload(),
+                \App\Filament\Support\Filtros::rangoFechas('created_at', 'created_at', 'Alta'),
             ])
             ->actions([
                 Tables\Actions\ActionGroup::make([
@@ -471,5 +450,20 @@ class UserResource extends Resource
     {
         return parent::getEloquentQuery()
             ->with(['roles']);
+    }
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['name', 'email'];
+    }
+
+    public static function getGlobalSearchResultTitle($record): string
+    {
+        return $record->name;
+    }
+
+    public static function getGlobalSearchResultDetails($record): array
+    {
+        return ['Correo' => $record->email];
     }
 }

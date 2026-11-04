@@ -27,14 +27,16 @@ use Illuminate\Support\HtmlString;
 
 class AceiteResource extends Resource
 {
+    protected static int $globalSearchResultsLimit = 5;
+
     protected static ?string $model = Aceite::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-beaker';
     protected static ?string $navigationLabel = 'Aceites';
     protected static ?string $modelLabel = 'Aceite';
     protected static ?string $pluralModelLabel = 'Aceites';
-    protected static ?string $navigationGroup = 'Inventario Automotriz';
-    protected static ?int $navigationSort = 1;
+    protected static ?string $navigationGroup = 'Inventario';
+    protected static ?int $navigationSort = 2;
 
     public static function form(Form $form): Form
     {
@@ -247,39 +249,25 @@ class AceiteResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                SelectFilter::make('producto')
+                Tables\Filters\SelectFilter::make('producto')
                     ->label('Producto')
                     ->relationship('producto', 'nombre')
                     ->searchable(['nombre', 'codigo'])
                     ->preload(),
-
-                SelectFilter::make('marca')
+                Tables\Filters\SelectFilter::make('marca')
                     ->label('Marca')
                     ->relationship('marca', 'nombre')
+                    ->multiple()
                     ->searchable()
                     ->preload(),
-
-                SelectFilter::make('tipoAceite')
-                    ->label('Tipo de Aceite')
+                Tables\Filters\SelectFilter::make('tipoAceite')
+                    ->label('Tipo de aceite')
                     ->relationship('tipoAceite', 'nombre')
-                    ->searchable()
+                    ->multiple()
                     ->preload(),
-
-                SelectFilter::make('viscosidad')
-                    ->label('Viscosidad')
-                    ->options(fn() => Aceite::query()
-                        ->whereNotNull('viscosidad')
-                        ->distinct()
-                        ->pluck('viscosidad', 'viscosidad')
-                        ->toArray())
-                    ->searchable()
-                    ->preload(),
-
-                TernaryFilter::make('activo')
-                    ->label('Estado')
-                    ->placeholder('Todos los productos')
-                    ->trueLabel('Solo activos')
-                    ->falseLabel('Solo inactivos'),
+                \App\Filament\Support\Filtros::valores('viscosidad', 'Viscosidad', \App\Models\Aceite::class),
+                \App\Filament\Support\Filtros::nivelStock('stock_disponible', 'stock_minimo'),
+                \App\Filament\Support\Filtros::activo(),
             ])
             ->actions([
                 Tables\Actions\ActionGroup::make([
@@ -354,19 +342,29 @@ class AceiteResource extends Resource
         ];
     }
 
-    public static function getNavigationBadge(): ?string
-    {
-        return static::getModel()::where('activo', true)->count();
-    }
 
-    public static function getNavigationBadgeColor(): ?string
-    {
-        return 'success';
-    }
 
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()
             ->with(['marca', 'tipoAceite', 'producto']);
+    }
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['viscosidad', 'modelo', 'producto.nombre', 'marca.nombre'];
+    }
+
+    public static function getGlobalSearchResultTitle($record): string
+    {
+        return $record->producto?->nombre ?? ($record->modelo ?: 'Aceite #' . $record->id);
+    }
+
+    public static function getGlobalSearchResultDetails($record): array
+    {
+        return array_filter([
+            'Viscosidad' => $record->viscosidad,
+            'Marca' => $record->marca?->nombre,
+        ]);
     }
 }

@@ -15,12 +15,14 @@ class TutorialResource extends Resource
 {
     protected static ?string $model = Tutorial::class;
 
+    protected static ?string $slug = 'tutoriales';
+
     protected static ?string $navigationIcon = 'heroicon-o-play-circle';
-    protected static ?string $navigationGroup = 'Ayuda y Soporte';
-    protected static ?string $navigationLabel = 'Tutoriales';
+    protected static ?string $navigationGroup = 'Administración';
+    protected static ?string $navigationLabel = 'Gestionar tutoriales';
     protected static ?string $modelLabel = 'Tutorial';
     protected static ?string $pluralModelLabel = 'Tutoriales';
-    protected static ?int $navigationSort = 10;
+    protected static ?int $navigationSort = 50;
 
     public static function form(Form $form): Form
     {
@@ -145,6 +147,9 @@ class TutorialResource extends Resource
             ])
             ->filters([
                 //
+            ])
+            ->filters([
+                \App\Filament\Support\Filtros::activo(),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

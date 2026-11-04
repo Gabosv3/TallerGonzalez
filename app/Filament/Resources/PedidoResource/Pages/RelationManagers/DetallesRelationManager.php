@@ -16,7 +16,7 @@ class DetallesRelationManager extends RelationManager
     protected static string $relationship = 'detalles';
     protected static ?string $recordTitleAttribute = 'producto_id';
 
-    // ❌ Quita el static
+    // Quita el static
     public function form(Form $form): Form
     {
         return $form
@@ -45,7 +45,7 @@ class DetallesRelationManager extends RelationManager
             ]);
     }
 
-    // ❌ Quita el static
+    // Quita el static
     public function table(Table $table): Table
     {
         return $table

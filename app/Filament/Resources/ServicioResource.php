@@ -17,10 +17,12 @@ use Filament\Notifications\Notification;
 
 class ServicioResource extends Resource
 {
+    protected static int $globalSearchResultsLimit = 5;
+
     protected static ?string $model = Servicio::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-wrench-screwdriver';
-    protected static ?string $navigationGroup = 'Mantenimiento';
+    protected static ?string $navigationGroup = 'Ventas';
     protected static ?string $navigationLabel = 'Servicios';
     protected static ?string $modelLabel = 'Servicio';
     protected static ?string $pluralModelLabel = 'Servicios';
@@ -45,7 +47,7 @@ class ServicioResource extends Resource
                                     ->live(debounce: 800)
                                     ->maxLength(10)
                                     ->placeholder('ABC-123')
-                                    ->prefix('🚗')
+                                    ->prefix('')
                                     ->validationMessages([
                                         'required' => 'La placa del vehículo es obligatoria.',
                                         'max' => 'La placa no puede exceder 10 caracteres.',
@@ -66,10 +68,10 @@ class ServicioResource extends Resource
                                 Forms\Components\Select::make('estado')
                                     ->label('Estado del Servicio')
                                     ->options([
-                                        'pendiente' => '🟡 Pendiente',
-                                        'en_proceso' => '🔵 En Proceso',
-                                        'completado' => '🟢 Completado',
-                                        'cancelado' => '🔴 Cancelado',
+                                        'pendiente' => 'Pendiente',
+                                        'en_proceso' => 'En Proceso',
+                                        'completado' => 'Completado',
+                                        'cancelado' => 'Cancelado',
                                     ])
                                     ->default('pendiente')
                                     ->required()
@@ -94,7 +96,7 @@ class ServicioResource extends Resource
                     ]),
 
                 Forms\Components\Section::make('Productos Utilizados')
-                    ->description('📦 Registra los productos usados en el servicio')
+                    ->description('Registra los productos usados en el servicio')
                     ->icon('heroicon-o-shopping-bag')
                     ->collapsible()
                     ->collapsed(false)
@@ -187,13 +189,13 @@ class ServicioResource extends Resource
                             )
                             ->itemLabel(
                                 fn(array $state): ?string =>
-                                isset($state['codigo_producto']) ? '📦 ' . ($state['codigo_producto'] ?? '') . ' (' . ($state['cantidad'] ?? 1) . 'x)' : 'Agregar Producto'
+                                isset($state['codigo_producto']) ? '' . ($state['codigo_producto'] ?? '') . ' (' . ($state['cantidad'] ?? 1) . 'x)' : 'Agregar Producto'
                             )
                             ->helperText('Agrega los productos utilizados en este servicio'),
                     ]),
 
                 Forms\Components\Section::make('Servicios Realizados')
-                    ->description('🔧 Registra los servicios adicionales realizados')
+                    ->description('Registra los servicios adicionales realizados')
                     ->icon('heroicon-o-wrench')
                     ->collapsible()
                     ->collapsed(false)
@@ -261,7 +263,7 @@ class ServicioResource extends Resource
                             )
                             ->itemLabel(
                                 fn(array $state): ?string =>
-                                isset($state['servicio_nombre']) ? '🔧 ' . $state['servicio_nombre'] . ' - $' . ($state['servicio_precio'] ?? 0) : 'Agregar Servicio'
+                                isset($state['servicio_nombre']) ? '' . $state['servicio_nombre'] . ' - $' . ($state['servicio_precio'] ?? 0) : 'Agregar Servicio'
                             )
                             ->helperText('Agrega los servicios adicionales realizados'),
                     ]),
@@ -292,10 +294,10 @@ class ServicioResource extends Resource
                     ->label('Estado')
                     ->badge()
                     ->formatStateUsing(function ($state) {
-                        if ($state === 'pendiente') return '🟡 Pendiente';
-                        if ($state === 'en_proceso') return '🔵 En Proceso';
-                        if ($state === 'completado') return '🟢 Completado';
-                        if ($state === 'cancelado') return '🔴 Cancelado';
+                        if ($state === 'pendiente') return 'Pendiente';
+                        if ($state === 'en_proceso') return 'En Proceso';
+                        if ($state === 'completado') return 'Completado';
+                        if ($state === 'cancelado') return 'Cancelado';
                         return $state;
                     })
                     ->colors([
@@ -322,17 +324,13 @@ class ServicioResource extends Resource
                 Tables\Filters\SelectFilter::make('estado')
                     ->label('Estado')
                     ->options([
-                        'pendiente' => '🟡 Pendiente',
-                        'en_proceso' => '🔵 En Proceso',
-                        'completado' => '🟢 Completado',
-                        'cancelado' => '🔴 Cancelado',
+                        'pendiente' => 'Pendiente',
+                        'en_proceso' => 'En proceso',
+                        'completado' => 'Completado',
+                        'cancelado' => 'Cancelado',
                     ])
-                    ->multiple()
-                    ->preload(),
-
-                Tables\Filters\Filter::make('recientes')
-                    ->label('Últimos 7 días')
-                    ->query(fn(Builder $query): Builder => $query->where('created_at', '>=', now()->subDays(7))),
+                    ->multiple(),
+                \App\Filament\Support\Filtros::rangoFechas('fecha', 'created_at', 'Fecha'),
             ])
             ->actions([
                 Tables\Actions\ActionGroup::make([
@@ -389,10 +387,10 @@ class ServicioResource extends Resource
                             Forms\Components\Select::make('estado')
                                 ->label('Nuevo estado')
                                 ->options([
-                                    'pendiente' => '🟡 Pendiente',
-                                    'en_proceso' => '🔵 En Proceso',
-                                    'completado' => '🟢 Completado',
-                                    'cancelado' => '🔴 Cancelado',
+                                    'pendiente' => 'Pendiente',
+                                    'en_proceso' => 'En Proceso',
+                                    'completado' => 'Completado',
+                                    'cancelado' => 'Cancelado',
                                 ])
                                 ->required()
                                 ->validationMessages([
@@ -430,15 +428,7 @@ class ServicioResource extends Resource
         ];
     }
 
-    public static function getNavigationBadge(): ?string
-    {
-        return static::getModel()::where('estado', 'pendiente')->count();
-    }
 
-    public static function getNavigationBadgeColor(): string|array|null
-    {
-        return 'warning';
-    }
 
     public static function getGloballySearchableAttributes(): array
     {
@@ -447,6 +437,11 @@ class ServicioResource extends Resource
 
     public static function getGlobalSearchResultTitle($record): string
     {
-        return $record->placa;
+        return 'Servicio · ' . $record->placa;
+    }
+
+    public static function getGlobalSearchResultDetails($record): array
+    {
+        return ['Estado' => ucfirst((string) $record->estado)];
     }
 }

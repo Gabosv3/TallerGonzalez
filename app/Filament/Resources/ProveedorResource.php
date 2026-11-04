@@ -23,10 +23,14 @@ use Filament\Tables\Filters\SelectFilter;
 
 class ProveedorResource extends Resource
 {
+    protected static int $globalSearchResultsLimit = 5;
+
     protected static ?string $model = Proveedor::class;
 
+    protected static ?string $slug = 'proveedores';
+
     protected static ?string $navigationIcon = 'heroicon-o-building-storefront';
-    protected static ?string $navigationGroup = 'Gestión de Compras';
+    protected static ?string $navigationGroup = 'Compras';
     protected static ?string $navigationLabel = 'Proveedores';
     protected static ?string $modelLabel = 'Proveedor';
     protected static ?string $pluralModelLabel = 'Proveedores';
@@ -267,38 +271,11 @@ class ProveedorResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\TrashedFilter::make(),
-                TernaryFilter::make('activo')
-                    ->label('Estado')
-                    ->placeholder('Todos los proveedores')
-                    ->trueLabel('Solo activos')
-                    ->falseLabel('Solo inactivos'),
-
-                SelectFilter::make('ciudad')
-                    ->label('Ciudad')
-                    ->searchable()
-                    ->preload()
-                    ->options(fn () => Proveedor::query()
-                        ->whereNotNull('ciudad')
-                        ->distinct()
-                        ->pluck('ciudad', 'ciudad')
-                        ->toArray()),
-
-                SelectFilter::make('pais')
-                    ->label('País')
-                    ->searchable()
-                    ->preload()
-                    ->options(fn () => Proveedor::query()
-                        ->whereNotNull('pais')
-                        ->distinct()
-                        ->pluck('pais', 'pais')
-                        ->toArray()),
-
-                Tables\Filters\Filter::make('recientes')
-                    ->label('Registrados este mes')
-                    ->query(fn (Builder $query): Builder => 
-                        $query->where('created_at', '>=', now()->subMonth())
-                    ),
+                Tables\Filters\TrashedFilter::make()->label('Eliminados'),
+                \App\Filament\Support\Filtros::activo(),
+                \App\Filament\Support\Filtros::valores('ciudad', 'Ciudad', \App\Models\Proveedor::class),
+                \App\Filament\Support\Filtros::valores('pais', 'País', \App\Models\Proveedor::class),
+                \App\Filament\Support\Filtros::rangoFechas('registrado', 'created_at', 'Registro'),
             ])
             ->actions([
                 Tables\Actions\ActionGroup::make([
@@ -374,15 +351,7 @@ class ProveedorResource extends Resource
         ];
     }
 
-    public static function getNavigationBadge(): ?string
-    {
-        return static::getModel()::where('activo', true)->count();
-    }
 
-    public static function getNavigationBadgeColor(): string|array|null
-    {
-        return 'success';
-    }
 
     public static function getEloquentQuery(): Builder
     {

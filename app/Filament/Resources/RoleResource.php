@@ -200,14 +200,12 @@ class RoleResource extends Resource implements HasShieldPermissions
 
     public static function getNavigationGroup(): ?string
     {
-        return Utils::isResourceNavigationGroupEnabled()
-            ? __('filament-shield::filament-shield.nav.group')
-            : '';
+        return 'Administración';
     }
 
     public static function getNavigationLabel(): string
     {
-        return __('filament-shield::filament-shield.nav.role.label');
+        return 'Roles y permisos';
     }
 
     public static function getNavigationIcon(): string
@@ -217,7 +215,7 @@ class RoleResource extends Resource implements HasShieldPermissions
 
     public static function getNavigationSort(): ?int
     {
-        return Utils::getResourceNavigationSort();
+        return 20;
     }
 
     public static function getSlug(): string
@@ -225,17 +223,7 @@ class RoleResource extends Resource implements HasShieldPermissions
         return Utils::getResourceSlug();
     }
 
-    public static function getNavigationBadge(): ?string
-    {
-        return Utils::isResourceNavigationBadgeEnabled()
-            ? strval(static::getEloquentQuery()->count())
-            : null;
-    }
 
-    public static function getNavigationBadgeColor(): ?string
-    {
-        return 'success';
-    }
 
     public static function isScopedToTenant(): bool
     {
